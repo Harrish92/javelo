@@ -26,7 +26,7 @@ public final class Math2{
      * @param y0 valeur de y en x0
      * @param y1 valeur de y en x
      * @param x nombre à virgule
-     * @return retourne une interpolation de la forme de y = a*x+y0
+     * @return retourne une interpolation sous la forme de y = a*x+y0
      */
     static double interpolate(double y0, double y1, double x){
         return Math.fma(y1,x,y0);
@@ -83,10 +83,10 @@ public final class Math2{
 
     /**
      *
-     * @param uX cordonnée X du point u
-     * @param uY cordonnée Y du point u
-     * @param vX cordonnée X du point v
-     * @param vY cordonnée Y du point v
+     * @param uX coordonnée X du point u
+     * @param uY coordonnée Y du point u
+     * @param vX coordonnée X du point v
+     * @param vY coordonnée Y du point v
      * @return retourne le produit scalaire entre deux vecteurs.
      */
     static double dotProduct(double uX, double uY, double vX, double vY){
@@ -95,8 +95,8 @@ public final class Math2{
 
     /**
      *
-     * @param uX cordonnée X du point u
-     * @param uY cordonnée Y du point u
+     * @param uX coordonnée X du point u
+     * @param uY coordonnée Y du point u
      * @return retourne le carré de la norme d'un vecteur.
      */
     static double squareNorm(double uX, double uY){
@@ -105,8 +105,8 @@ public final class Math2{
 
     /**
      *
-     * @param uX cordonnée X du point u
-     * @param uY cordonnée Y du point u
+     * @param uX coordonnée X du point u
+     * @param uY coordonnée Y du point u
      * @return retourne la norme d'un vecteur.
      */
     static double norm(double uX, double uY){
@@ -115,12 +115,12 @@ public final class Math2{
 
     /**
      *
-     * @param aX cordonnée X du point A
-     * @param aY cordonnée Y du point A
-     * @param bX cordonnée X du point B
-     * @param bY cordonnée Y du point B
-     * @param pX cordonnée X du point P
-     * @param pY cordonnée Y du point P
+     * @param aX coordonnée X du point A
+     * @param aY coordonnée Y du point A
+     * @param bX coordonnée X du point B
+     * @param bY coordonnée Y du point B
+     * @param pX coordonnée X du point P
+     * @param pY coordonnée Y du point P
      * @return retourne la longeur de la projection du vecteur AP sur le vecteur AB.
      */
     static double projectionLength(double aX, double aY, double bX, double bY, double pX, double pY){
