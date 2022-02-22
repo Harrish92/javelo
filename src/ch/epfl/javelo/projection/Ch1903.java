@@ -1,4 +1,5 @@
 package ch.epfl.javelo.projection;
 
-public class Ch1903 {
+public final class Ch1903 {
+
 }

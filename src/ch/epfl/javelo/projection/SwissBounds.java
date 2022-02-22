@@ -1,7 +1,8 @@
 package ch.epfl.javelo.projection;
 
 /**
- * Préconditions à l'exécution d'un algorithme.
+ * Définit les coordonnées limites de la suisse
+ * et possède une méthode qui vérifie des coordonnées.
  *
  * @author Yoan Giovannini (303934)
  */
