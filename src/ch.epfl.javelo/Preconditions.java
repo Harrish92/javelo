@@ -1,4 +1,23 @@
 package ch.epfl.javelo;
 
-public class Preconditions {
+/**
+ * Préconditions à l'exécution d'un algorithme.
+ *
+ * @author Yoan Giovannini (303934)
+ */
+public final class Preconditions {
+    private Preconditions() {}
+
+    /**
+     * Lève une exception de type IllegalArgumentException
+     * si le paramètre shouldBeTrue est faux.
+     *
+     * @param shouldBeTrue
+     *          l'argument
+     */
+    public static void checkArgument(boolean shouldBeTrue) {
+        if(!shouldBeTrue){
+            throw new IllegalArgumentException();
+        }
+    }
 }
