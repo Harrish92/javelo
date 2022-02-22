@@ -17,10 +17,20 @@ public record PointCh(double e, double n) {
     }
 
     public double squaredDistanceTo(PointCh that) {
-
+        double deltaE = Math.abs(this.e - that.e());
+        double deltaN = Math.abs(this.n - that.n());
+        return Math.hypot(deltaE, deltaN);
     }
 
     public double distanceTo(PointCh that) {
+        return Math.pow(this.squaredDistanceTo(that), 1/2);
+    }
+
+    public double lon() {
+
+    }
+
+    public double lat() {
 
     }
 
