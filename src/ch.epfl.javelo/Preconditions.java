@@ -1,5 +1,4 @@
-package ch.epfl.javelo
+package ch.epfl.javelo;
 
 public class Preconditions {
-
 }
