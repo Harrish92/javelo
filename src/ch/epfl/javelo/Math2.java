@@ -99,7 +99,7 @@ public final class Math2{
      * @param uY coordonnée Y du point u
      * @return retourne le carré de la norme d'un vecteur.
      */
-    static double squareNorm(double uX, double uY){
+    static double squaredNorm(double uX, double uY){
         return Math.pow(uX, 2) + Math.pow(uY, 2);
     }
 
@@ -110,7 +110,7 @@ public final class Math2{
      * @return retourne la norme d'un vecteur.
      */
     static double norm(double uX, double uY){
-        return Math.sqrt(squareNorm(uX,uY));
+        return Math.sqrt(squaredNorm(uX,uY));
     }
 
     /**
