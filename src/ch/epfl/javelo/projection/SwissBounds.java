@@ -15,6 +15,11 @@ public final class SwissBounds {
     public final static double HEIGHT = MAX_N - MIN_N;
 
     /**
+     * classe non instantiable
+     */
+    private SwissBounds(){}
+
+    /**
      * Vérifie si les coordonnées données en paramètre sont en suisse.
      *
      * @param e La coordonnée E.

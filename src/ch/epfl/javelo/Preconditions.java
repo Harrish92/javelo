@@ -12,8 +12,8 @@ public final class Preconditions {
      * Lève une exception de type IllegalArgumentException
      * si le paramètre shouldBeTrue est faux.
      *
-     * @param shouldBeTrue
-     *          l'argument
+     * @param shouldBeTrue Le paramètre.
+     * @throws IllegalArgumentException si le paramètre est faux.
      */
     public static void checkArgument(boolean shouldBeTrue) {
         if(!shouldBeTrue){
