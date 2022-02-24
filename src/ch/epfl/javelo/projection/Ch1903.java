@@ -22,9 +22,9 @@ public final class Ch1903 {
         double e = 2600072.37
                 + 211455.93*lon1
                 - 10938.51 * lon1 * lat1
-                - 0.36 * lat1 * Math.pow(lon1, 2)
+                - 0.36 * lon1 * Math.pow(lat1, 2)
                 - 44.54 * Math.pow(lon1, 3);
-        return Math.toRadians(e);
+        return e;
     }
 
     /**
@@ -42,9 +42,9 @@ public final class Ch1903 {
                 + 308807.95 * lat1
                 + 3745.25 * Math.pow(lon1, 2)
                 + 76.63 * Math.pow(lat1, 2)
-                - 194.56 * Math.pow(lon, 2) * lat1
+                - 194.56 * Math.pow(lon1, 2) * lat1
                 + 119.79 * Math.pow(lat1, 3);
-        return Math.toRadians(n);
+        return n;
     }
 
     /**
@@ -54,8 +54,7 @@ public final class Ch1903 {
      * @return retourne la longitude dans le système WGS84.
      */
     public static double lon(double e, double n){
-        e = Math.toDegrees(e);
-        n = Math.toDegrees(n);
+
         double x = Math.pow(10, -6) * (e - 2600000);
         double y = Math.pow(10, -6) * (n - 1200000);
         double lon0 = 2.6779094
@@ -75,16 +74,15 @@ public final class Ch1903 {
      * @return  retourne la latitude dans le système WGS84.
      */
     public static double lat(double e, double n){
-        e = Math.toDegrees(e);
-        n = Math.toDegrees(n);
+
         double x = Math.pow(10, -6) * (e - 2600000);
         double y = Math.pow(10, -6) * (n - 1200000);
         double lat0 = 16.9023892
                 + 3.238272*y
                 - 0.270978*Math.pow(x,2)
                 - 0.002528*Math.pow(y,2)
-                - 0.447*Math.pow(x,2)*y
+                - 0.0447*Math.pow(x,2)*y
                 - 0.0140*Math.pow(y,3);
-        return Math.toRadians(lat0 * 100 / 36);
+        return Math.toRadians(lat0 * 100 / 36) ;
     }
 }
