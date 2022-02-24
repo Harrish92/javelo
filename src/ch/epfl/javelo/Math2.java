@@ -17,7 +17,8 @@ public final class Math2{
      * @return retourne un entier qui est la valeur supérieure de la division entre x et y.
      */
     static int ceilDiv(int x, int y){
-        Preconditions.checkArgument(x < 0 || y <= 0);
+        Preconditions.checkArgument(x >= 0);
+        Preconditions.checkArgument(y > 0);
         return (x+y-1)/y;
     }
 
@@ -29,7 +30,15 @@ public final class Math2{
      * @return retourne une interpolation sous la forme de y = a*x+y0
      */
     static double interpolate(double y0, double y1, double x){
-        return Math.fma(y1,x,y0);
+        double a;
+        if(x != 0){
+            a = (y1 - y0);
+        }else{
+            a = 0;
+        }
+
+        return Math.fma(a, x, y0);
+
     }
 
     /**
@@ -42,7 +51,7 @@ public final class Math2{
      *         Sinon retourne la valeur de v.
      */
     static int clamp(int min, int v, int max){
-        Preconditions.checkArgument(min > max);
+        Preconditions.checkArgument(max > min);
         if(v < min){
             return min;
         }else{
@@ -59,7 +68,7 @@ public final class Math2{
      * méthode similaire à celui au-dessus, mais les paramètres et le type de retour sont des nombre à virgule.
      */
     static double clamp(double  min, double v, double max){
-        Preconditions.checkArgument(min > max);
+        Preconditions.checkArgument(max > min);
         if(v < min){
             return min;
         }else{
@@ -90,7 +99,7 @@ public final class Math2{
      * @return retourne le produit scalaire entre deux vecteurs.
      */
     static double dotProduct(double uX, double uY, double vX, double vY){
-        return Math.fma(uX, vX, uX*uY);
+        return Math.fma(uX, vX, uY*vY);
     }
 
     /**
@@ -128,7 +137,7 @@ public final class Math2{
         double uY = Math.abs(aY - pY);
         double vX = Math.abs(aX-bX);
         double vY = Math.abs(aY-bY);
-        return (Math.abs(aX - pX) / norm(vX, vY));
+        return (dotProduct(uX, uY, vX, vY) / norm(vX, vY));
     }
 
 
