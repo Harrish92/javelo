@@ -6,6 +6,10 @@ package ch.epfl.javelo;
  * @author Yoan Giovannini (303934)
  */
 public final class Preconditions {
+
+    /**
+     * Classe non instantiable
+     */
     private Preconditions() {}
 
     /**
