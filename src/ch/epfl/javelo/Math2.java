@@ -16,7 +16,7 @@ public final class Math2{
      * @param y un entier
      * @return retourne un entier qui est la valeur supérieure de la division entre x et y.
      */
-    static int ceilDiv(int x, int y){
+    public static int ceilDiv(int x, int y){
         Preconditions.checkArgument(x >= 0);
         Preconditions.checkArgument(y > 0);
         return (x+y-1)/y;
@@ -29,7 +29,7 @@ public final class Math2{
      * @param x nombre à virgule
      * @return retourne une interpolation sous la forme de y = a*x+y0
      */
-    static double interpolate(double y0, double y1, double x){
+    public static double interpolate(double y0, double y1, double x){
         double a;
         if(x != 0){
             a = (y1 - y0);
@@ -50,7 +50,7 @@ public final class Math2{
      *         retourn la valeur de min si v est inférieur au bord inférieur de l'intervalle.
      *         Sinon retourne la valeur de v.
      */
-    static int clamp(int min, int v, int max){
+    public static int clamp(int min, int v, int max){
         Preconditions.checkArgument(max > min);
         if(v < min){
             return min;
@@ -67,7 +67,7 @@ public final class Math2{
     /**
      * méthode similaire à celui au-dessus, mais les paramètres et le type de retour sont des nombre à virgule.
      */
-    static double clamp(double  min, double v, double max){
+    public static double clamp(double  min, double v, double max){
         Preconditions.checkArgument(max > min);
         if(v < min){
             return min;
@@ -86,7 +86,7 @@ public final class Math2{
      * @param x un nombre à virgule
      * @return retourne y = asinh(x) en fonction de la valeur de x.
      */
-    static double asinh(double x){
+    public static double asinh(double x){
         return Math.log(x+Math.sqrt(1+Math.pow(x,2)));
     }
 
@@ -98,7 +98,7 @@ public final class Math2{
      * @param vY coordonnée Y du point v
      * @return retourne le produit scalaire entre deux vecteurs.
      */
-    static double dotProduct(double uX, double uY, double vX, double vY){
+    public static double dotProduct(double uX, double uY, double vX, double vY){
         return Math.fma(uX, vX, uY*vY);
     }
 
@@ -108,7 +108,7 @@ public final class Math2{
      * @param uY coordonnée Y du point u
      * @return retourne le carré de la norme d'un vecteur.
      */
-    static double squaredNorm(double uX, double uY){
+    public static double squaredNorm(double uX, double uY){
         return Math.pow(uX, 2) + Math.pow(uY, 2);
     }
 
@@ -118,7 +118,7 @@ public final class Math2{
      * @param uY coordonnée Y du point u
      * @return retourne la norme d'un vecteur.
      */
-    static double norm(double uX, double uY){
+    public static double norm(double uX, double uY){
         return Math.sqrt(squaredNorm(uX,uY));
     }
 
@@ -132,7 +132,7 @@ public final class Math2{
      * @param pY coordonnée Y du point P
      * @return retourne la longeur de la projection du vecteur AP sur le vecteur AB.
      */
-    static double projectionLength(double aX, double aY, double bX, double bY, double pX, double pY){
+    public static double projectionLength(double aX, double aY, double bX, double bY, double pX, double pY){
         double uX = Math.abs(aX - pX);
         double uY = Math.abs(aY - pY);
         double vX = Math.abs(aX-bX);

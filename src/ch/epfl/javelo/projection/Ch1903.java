@@ -12,7 +12,7 @@ public final class Ch1903 {
      *
      * @param lon longitude
      * @param lat latitude
-     * @return retourne la coordonnée E (est) du point de longitude lon et latitude lat dans le système WGS84.
+     * @return retourne la coordonnée E (est) avec les points de longitude lon et latitude lat.
      */
     public static double e(double lon, double lat){
         lon = Math.toDegrees(lon);
@@ -31,7 +31,7 @@ public final class Ch1903 {
      *
      * @param lon longitude
      * @param lat latitude
-     * @return retourne la coordonnée N (nord) du point de longitude lon et latitude lat dans le système WGS84.
+     * @return retourne la coordonnée N (nord) avec les points de longitude lon et latitude lat.
      */
     public static double n(double lon, double lat){
         lon = Math.toDegrees(lon);
@@ -51,7 +51,7 @@ public final class Ch1903 {
      *
      * @param e cordonnée est
      * @param n coordonnée nort
-     * @return retourne la longitude dans le système WGS84.
+     * @return retourne la longitude.
      */
     public static double lon(double e, double n){
 
@@ -71,7 +71,7 @@ public final class Ch1903 {
      *
      * @param e coordonnée est
      * @param n coordonnée nord
-     * @return  retourne la latitude dans le système WGS84.
+     * @return  retourne la latitude.
      */
     public static double lat(double e, double n){
 
