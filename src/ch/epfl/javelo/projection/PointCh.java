@@ -14,7 +14,7 @@ import ch.epfl.javelo.Preconditions;
 public record PointCh(double e, double n) {
 
     /**
-     *Constructeur compacte, vérifie que le point est en suisse.
+     *Constructeur compact, vérifie que le point est en suisse.
      *
      * @param e La coordonnée E du point.
      * @param n La coordonnée N du point.
