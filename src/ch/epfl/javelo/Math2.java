@@ -2,7 +2,6 @@ package ch.epfl.javelo;
 
 /**
  *
- *
  * @author Harrishan Raveendran (345291)
  */
 public final class Math2{
