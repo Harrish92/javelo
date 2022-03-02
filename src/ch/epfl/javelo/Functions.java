@@ -82,7 +82,7 @@ public final class Functions {
             }
             double delta = xMax/samples.length;
             int i = (int) Math.floor(operand/delta);
-            return Math2.interpolate( samples[i], samples[i+1], operand - i * delta);
+            return Math2.interpolate( samples[i], samples[i+1], operand - i);
         }
     }
 }
