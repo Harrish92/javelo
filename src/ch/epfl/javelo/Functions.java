@@ -80,9 +80,9 @@ public final class Functions {
             if(operand <= 0){
                 return samples[0];
             }
-            double delta = xMax/samples.length;
+            double delta = xMax/(samples.length - 1);
             int i = (int) Math.floor(operand/delta);
-            return Math2.interpolate( samples[i], samples[i+1], operand - i);
+            return Math2.interpolate( samples[i], samples[i+1], (operand - i*delta)/delta);
         }
     }
 }

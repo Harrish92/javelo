@@ -17,9 +17,13 @@ class FunctionsTest {
     @Test
     void sampledErrorTest(){
         float[] tab = {};
+        float[] tab2 = new float[]{2, -5};
+        float[] tab1 = new float[]{4};
         double x=3;
-        assertThrows(IllegalArgumentException.class, (Executable) Functions.sampled(tab, x));
-
+        assertThrows(IllegalArgumentException.class, () -> Functions.sampled(tab, x));
+        assertThrows(IllegalArgumentException.class, () -> Functions.sampled(tab1, x));
+        assertThrows(IllegalArgumentException.class, () -> Functions.sampled(tab2, 0));
+        assertThrows(IllegalArgumentException.class, () -> Functions.sampled(tab2, -3));
     }
 
     @Test
@@ -35,6 +39,8 @@ class FunctionsTest {
         assertEquals(3, Functions.sampled(tab, xMax).applyAsDouble(2));
         assertEquals(0, Functions.sampled(tab, xMax).applyAsDouble(0.333), 0.001);
         assertEquals(2.5, Functions.sampled(tab, xMax).applyAsDouble(1.5));
-        //assertEquals(2.5, Math2.interpolate(2, 3, 0.5));
+        xMax = 20;
+        assertEquals(2.5, Functions.sampled(tab, xMax).applyAsDouble(7.5));
+        assertEquals(3.5, Functions.sampled(tab, xMax).applyAsDouble(15));
     }
 }
