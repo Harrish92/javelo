@@ -2,6 +2,8 @@ package ch.epfl.javelo.data;
 
 import ch.epfl.javelo.Preconditions;
 
+import java.util.StringJoiner;
+
 /**
  * Représente les attributs sous la forme d'un nombre binaire
  *
@@ -14,13 +16,15 @@ public record AttributeSet(long bits) {
      * @param bits
      */
     public AttributeSet {
-        int x = 0;
+        /*int x = 0;
         long max = 0L;
         while(x < Attribute.COUNT){
             max += Math.pow(2, x);
             x++;
         }
-        Preconditions.checkArgument(bits <= max);
+        Preconditions.checkArgument(bits <= max);*/
+        Preconditions.checkArgument(bits < 1L << Attribute.COUNT );
+
     }
 
     /**
@@ -45,22 +49,29 @@ public record AttributeSet(long bits) {
      * @return vrai si la liste contient l'attribut, faux autrement.
      */
     public boolean contains(Attribute attribute) {
-        return false;
+        return (attribute.ordinal() >> bits) % 2 == 1;
 
     }
 
     /**
-     *
-     * @param that
-     * @return
+     * Vérifie si cette liste (this) et la liste d'attributs
+     * passée en argument correspondes.
+     * @param that une autre liste d'attributs
+     * @return vrai si les deux listes correspondent, faux autrement.
      */
     public boolean intersects(AttributeSet that) {
-        return false;
+        return bits == that.bits;
     }
 
     @Override
     public String toString() {
-        return "";
+        StringJoiner str = new StringJoiner(", ", "{", "}");
+        for(int i = 0; i < Attribute.COUNT; i++) {
+            if(i >> bits % 2 == 1){
+                str.add(Attribute.values()[i].keyValue());
+            }
+        }
+        return str.toString();
     }
 
 }
