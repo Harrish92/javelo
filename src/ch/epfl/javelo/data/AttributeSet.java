@@ -15,7 +15,7 @@ public record AttributeSet(long bits) {
      * constructeur compact
      * @param bits
      */
-    public AttributeSet {
+    public AttributeSet {//TODO: changer consdition
         /*int x = 0;
         long max = 0L;
         while(x < Attribute.COUNT){
@@ -23,8 +23,7 @@ public record AttributeSet(long bits) {
             x++;
         }
         Preconditions.checkArgument(bits <= max);*/
-        Preconditions.checkArgument(bits < 1L << Attribute.COUNT );
-
+        Preconditions.checkArgument(bits < 1L << Attribute.COUNT);
     }
 
     /**
@@ -35,7 +34,7 @@ public record AttributeSet(long bits) {
     public static AttributeSet of(Attribute... attributes) {
         long attributeSet = 0L;
         for(Attribute attribute : attributes) {
-            if((attribute.ordinal() >> attributeSet) % 2 == 0) {
+            if((attributeSet >> attribute.ordinal()) % 2 == 0) {
                 attributeSet += 1L << attribute.ordinal();
                 //attributeSet+= Math.pow(2, attribute.ordinal());
             }
@@ -49,7 +48,7 @@ public record AttributeSet(long bits) {
      * @return vrai si la liste contient l'attribut, faux autrement.
      */
     public boolean contains(Attribute attribute) {
-        return (attribute.ordinal() >> bits) % 2 == 1;
+        return (bits >> attribute.ordinal()) % 2 == 1;
 
     }
 
@@ -68,7 +67,7 @@ public record AttributeSet(long bits) {
     public String toString() {
         StringJoiner str = new StringJoiner(", ", "{", "}");
         for(int i = 0; i < Attribute.COUNT; i++) {
-            if(i >> bits % 2 == 1){
+            if(bits >> i % 2 == 1){
                 str.add(Attribute.values()[i].keyValue());
             }
         }
