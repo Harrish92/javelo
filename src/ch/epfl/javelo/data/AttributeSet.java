@@ -63,6 +63,7 @@ public record AttributeSet(long bits) {
         return bits == that.bits;
     }
 
+    //Renvoie la liste des attributs sous forme de chaine de caractères.
     @Override
     public String toString() {
         StringJoiner str = new StringJoiner(", ", "{", "}");
