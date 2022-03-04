@@ -13,7 +13,7 @@ public final class Math2{
     /**
      * @param x un entier
      * @param y un entier
-     * @return retourne un entier qui est la valeur supérieure de la division entre x et y.
+     * @return un entier qui est la valeur supérieure de la division entre x et y.
      */
     public static int ceilDiv(int x, int y){
         Preconditions.checkArgument(x >= 0);
@@ -26,7 +26,7 @@ public final class Math2{
      * @param y0 valeur de y en x0
      * @param y1 valeur de y en x
      * @param x nombre à virgule
-     * @return retourne une interpolation sous la forme de y = a*x+y0
+     * @return une interpolation sous la forme de y = a*x+y0
      */
     public static double interpolate(double y0, double y1, double x){
         double a;
@@ -45,9 +45,9 @@ public final class Math2{
      * @param min minimum de l'intervalle
      * @param v un entier
      * @param max maximum de l'intervalle
-     * @return retourne la valeur de max, si v est supérieur au bord supérieur de l'intervalle.
-     *         retourn la valeur de min si v est inférieur au bord inférieur de l'intervalle.
-     *         Sinon retourne la valeur de v.
+     * @return la valeur de max, si v est supérieur au bord supérieur de l'intervalle.
+     *         La valeur de min si v est inférieur au bord inférieur de l'intervalle.
+     *         Sinon la valeur de v.
      */
     public static int clamp(int min, int v, int max){
         Preconditions.checkArgument(max > min);

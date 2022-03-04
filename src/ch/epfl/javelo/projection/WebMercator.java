@@ -10,36 +10,36 @@ public class WebMercator {
     /**
      *
      * @param lon longitude
-     * @return retourne la cordoonnée x.
+     * @return la cordoonnée x.
      */
-    static double x(double lon){
+    public static double x(double lon){
         return 1/(2*Math.PI) * (lon + Math.PI);
     }
 
     /**
      *
      * @param lat latitude
-     * @return retourne la cordoonnée y.
+     * @return la cordoonnée y.
      */
-    static double y(double lat){
+    public static double y(double lat){
         return (Math.PI - Math2.asinh(Math.tan(lat))) / (2*Math.PI);
     }
 
     /**
      *
      * @param x coordonnée x
-     * @return retourne la longitude
+     * @return la longitude.
      */
-    static double lon(double x){
+    public static double lon(double x){
         return 2*Math.PI*x-Math.PI;
     }
 
     /**
      *
      * @param y coordonnée y
-     * @return retourne la latitude.
+     * @return la latitude.
      */
-    static double lat(double y){
+    public static double lat(double y){
         return Math.atan(Math.sinh(Math.PI - 2*Math.PI*y));
     }
 
