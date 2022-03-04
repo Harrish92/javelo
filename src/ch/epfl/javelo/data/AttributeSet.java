@@ -15,7 +15,7 @@ public record AttributeSet(long bits) {
      * constructeur compact
      * @param bits
      */
-    public AttributeSet {//TODO: changer consdition
+    public AttributeSet {
         /*int x = 0;
         long max = 0L;
         while(x < Attribute.COUNT){
@@ -23,7 +23,7 @@ public record AttributeSet(long bits) {
             x++;
         }
         Preconditions.checkArgument(bits <= max);*/
-        Preconditions.checkArgument(bits < 1L << Attribute.COUNT);
+        Preconditions.checkArgument(bits >> Attribute.COUNT == 0);
     }
 
     /**

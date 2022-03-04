@@ -8,10 +8,10 @@ class AttributeSetTest {
 
     @Test
     void erreurTest() {
-        long finalBits = 1L << (Attribute.COUNT + 1);
-        System.out.println(finalBits);
+        long finalBits = 1L << Attribute.COUNT;
         assertThrows(IllegalArgumentException.class, ()
                 -> new AttributeSet(finalBits));
+        assertDoesNotThrow(() -> new AttributeSet(1L << Attribute.COUNT - 1));
     }
 
     @Test
