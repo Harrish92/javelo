@@ -59,7 +59,12 @@ public record AttributeSet(long bits) {
      * @return vrai si les deux listes correspondent, faux autrement.
      */
     public boolean intersects(AttributeSet that) {
-        return bits == that.bits;
+        for(int i = 0; i < Attribute.COUNT; i++) {
+            if((bits >> i) % 2 == 1 && (that.bits() >> i) % 2 == 1){
+                return true;
+            }
+        }
+        return false;
     }
 
     //Renvoie la liste des attributs sous forme de chaine de caractères.

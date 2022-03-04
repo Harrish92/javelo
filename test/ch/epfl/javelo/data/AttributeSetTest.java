@@ -35,7 +35,7 @@ class AttributeSetTest {
         assertFalse(att2.contains(Attribute.values()[Attribute.COUNT-2]));
         assertTrue(att2.contains(Attribute.values()[Attribute.COUNT-3]));
         assertTrue(att2.bits() == bits);
-        assertFalse(att2.intersects(new AttributeSet(1L << 3)));
+        assertTrue(att2.intersects(new AttributeSet(1L << 3)));
         assertTrue(att2.intersects(new AttributeSet(bits)));
     }
 
