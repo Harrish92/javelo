@@ -1,5 +1,6 @@
 package ch.epfl.javelo.data;
 
+import ch.epfl.javelo.Bits;
 import ch.epfl.javelo.Preconditions;
 
 import java.nio.IntBuffer;
@@ -30,7 +31,7 @@ public record GraphNodes(IntBuffer buffer) {
      * @return la coordonée E du noeud identité.
      */
     public double nodeE(int nodeId){
-        return buffer.get(nodeId + OFFSET_E);
+        return buffer.get(nodeId*NODE_INTS + OFFSET_E);
     }
 
     /**
@@ -39,7 +40,7 @@ public record GraphNodes(IntBuffer buffer) {
      * @return la coordonnée N du noeud identité
      */
     public double nodeN(int nodeId){
-        return buffer.get(nodeId + OFFSET_N);
+        return buffer.get(nodeId*NODE_INTS + OFFSET_N);
     }
 
     /**
@@ -48,7 +49,7 @@ public record GraphNodes(IntBuffer buffer) {
      * @return le nombre d'arrêts sortant du noeud identité
      */
     public int outDegree(int nodeId){
-        int nb = buffer.get(nodeId + OFFSET_OUT_EDGES);
+        int nb = buffer.get(nodeId*NODE_INTS + OFFSET_OUT_EDGES);
         return nb >>> 28;
     }
 
@@ -60,8 +61,10 @@ public record GraphNodes(IntBuffer buffer) {
      */
     public int edgeId(int nodeId, int edgeIndex){
         Preconditions.checkArgument(0 <= edgeIndex && edgeIndex < outDegree(nodeId));
-        int nb = buffer.get(nodeId + OFFSET_OUT_EDGES);
-        return nb << 4;
+        int nb = buffer.get(nodeId*NODE_INTS + OFFSET_OUT_EDGES);
+        nb = Bits.extractUnsigned(nb, 0, 28);
+        nb += edgeIndex;
+        return nb;
     }
 
 }
