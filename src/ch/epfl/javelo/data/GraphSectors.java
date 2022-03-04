@@ -16,7 +16,10 @@ import java.util.List;
  * @author Yoan Giovannini (303934)
  */
 public record GraphSectors(ByteBuffer buffer) {
-
+    //Longueur d'un secteur en octets.
+    private static final int SECTOR_LENGTH = Integer.BYTES + Short.BYTES;
+    //Décalage pour obtenir le nombre de noeuds d'un secteur.
+    private static final int OFFSET_NBN = Integer.BYTES;
 
     /**
      * Représente un secteur
@@ -47,10 +50,9 @@ public record GraphSectors(ByteBuffer buffer) {
         for(int y = secteur0Y; y < secteur1Y; y++){
             for(int x = secteur0X; x < secteur1X; x++){
                 int secteur = y * 128 + x;
-                short indexN = buffer.getShort(secteur);
-                int nbN = buffer.getInt(secteur);
-
-                //listeSecteurs.add(new Sector(indexN, ));
+                int indexN = buffer.getInt(secteur * SECTOR_LENGTH);
+                short nbN = buffer.getShort(secteur * SECTOR_LENGTH + OFFSET_NBN);
+                listeSecteurs.add(new Sector(indexN, indexN + nbN));
             }
         }
         return listeSecteurs;
