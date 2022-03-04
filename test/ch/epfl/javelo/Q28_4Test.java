@@ -12,18 +12,23 @@ public class Q28_4Test {
     public void ofIntTest(){
         int actual = Q28_4.ofInt(128);
         int expected = 2048;
+
         assertEquals(expected, actual);
+
     }
 
     @Test
     public void asDoubleTest(){
-        double actual = Q28_4.asDouble(0b10011100);
-        double expected = 1;
+        double actual = Q28_4.asDouble(2048);
+        double expected = 128;
         assertEquals(expected, actual);
     }
 
     @Test
     public void asFloatTest(){
-        Q28_4.asFloat(100);
+        float actual  = Q28_4.asFloat(12);
+        float expected = 0.75f;
+        assertEquals(expected, actual);
+
     }
 }
