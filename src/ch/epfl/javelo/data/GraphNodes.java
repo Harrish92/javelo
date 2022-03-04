@@ -21,7 +21,7 @@ public record GraphNodes(IntBuffer buffer) {
      * @return le nombre total de noeuds.
      */
     public int count(){
-        return (int) (buffer.capacity() / 3);
+        return (int) (buffer.capacity() / NODE_INTS);
     }
 
     /**
