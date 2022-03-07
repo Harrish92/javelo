@@ -2,6 +2,7 @@ package ch.epfl.javelo.data;
 
 import ch.epfl.javelo.Bits;
 import ch.epfl.javelo.Preconditions;
+import ch.epfl.javelo.Q28_4;
 
 import java.nio.IntBuffer;
 
@@ -31,7 +32,7 @@ public record GraphNodes(IntBuffer buffer) {
      * @return la coordonée E du noeud identité.
      */
     public double nodeE(int nodeId){
-        return buffer.get(nodeId*NODE_INTS + OFFSET_E);
+        return Q28_4.asDouble(buffer.get(nodeId*NODE_INTS + OFFSET_E));
     }
 
     /**
@@ -40,7 +41,7 @@ public record GraphNodes(IntBuffer buffer) {
      * @return la coordonnée N du noeud identité
      */
     public double nodeN(int nodeId){
-        return buffer.get(nodeId*NODE_INTS + OFFSET_N);
+        return Q28_4.asDouble(buffer.get(nodeId*NODE_INTS + OFFSET_N));
     }
 
     /**
@@ -51,6 +52,7 @@ public record GraphNodes(IntBuffer buffer) {
     public int outDegree(int nodeId){
         int nb = buffer.get(nodeId*NODE_INTS + OFFSET_OUT_EDGES);
         return nb >>> 28;
+
     }
 
     /**
