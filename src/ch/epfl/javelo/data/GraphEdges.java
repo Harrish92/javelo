@@ -11,7 +11,7 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
      * @param edgeId arrête identité
      * @return vrai ssi l'arrête
      */
-    public boolean isInverted(int edgeId){
+/*    public boolean isInverted(int edgeId){
 
     }
 
@@ -39,5 +39,5 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
 
     }
 
-
+*/
 }

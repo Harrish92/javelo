@@ -1,38 +1,71 @@
 package ch.epfl.javelo;
 
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class BitsTest {
+import static ch.epfl.test.TestRandomizer.RANDOM_ITERATIONS;
+import static ch.epfl.test.TestRandomizer.newRandom;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    // res 1010111111101011101010111110000
-    // 01|01010111111101011101010111110000
-
-
+class BitsTest {
     @Test
-    void NegLengthTest(){
-        assertThrows(IllegalArgumentException.class, ()->{
-            var b = Bits.extractUnsigned(0b11001010111111101011101010111110, -1, 4);
+    void bitsExtractThrowsWithInvalidStart() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            Bits.extractUnsigned(0, -1, 1);
+        });
+        assertThrows(IllegalArgumentException.class, () -> {
+            Bits.extractUnsigned(0, Integer.SIZE, 1);
+        });
+        assertThrows(IllegalArgumentException.class, () -> {
+            Bits.extractSigned(0, -1, 1);
+        });
+        assertThrows(IllegalArgumentException.class, () -> {
+            Bits.extractSigned(0, Integer.SIZE, 1);
         });
     }
 
     @Test
-     void UnsignedLength32(){
-        assertThrows(IllegalArgumentException.class, ()->{
-            var b = Bits.extractUnsigned(0b11001010111111101011101010111110, -1, 32);
+    void bitsExtractThrowsWithInvalidLength() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            Bits.extractUnsigned(0, 10, -1);
+        });
+        assertThrows(IllegalArgumentException.class, () -> {
+            Bits.extractUnsigned(0, 0, Integer.SIZE);
+        });
+        assertThrows(IllegalArgumentException.class, () -> {
+            Bits.extractSigned(0, 10, -1);
+        });
+        assertThrows(IllegalArgumentException.class, () -> {
+            Bits.extractSigned(0, 0, Integer.SIZE + 1);
         });
     }
 
     @Test
-    void extractSignedTest(){
-        var b = Bits.extractSigned(0b11001010111111101011101010111110,8,4); // value en binaire :
-        assertEquals(-6, b);
+    void bitsExtractWorksOnFullLength() {
+        var rng = newRandom();
+        for (int i = 0; i < RANDOM_ITERATIONS; i += 1) {
+            var v = rng.nextInt();
+            assertEquals(v, Bits.extractSigned(v, 0, Integer.SIZE));
+        }
+        for (int i = 0; i < RANDOM_ITERATIONS; i += 1) {
+            var v = 1 + rng.nextInt(-1, Integer.MAX_VALUE);
+            assertEquals(v, Bits.extractUnsigned(v, 0, Integer.SIZE - 1));
+        }
     }
 
     @Test
-    void extractUnSignedTest(){
-        var b = Bits.extractUnsigned(0b11001010111111101011101010111110,8,4);
-        assertEquals(10, b);
-    }
+    void bitsExtractWorksOnRandomValues() {
+        var rng = newRandom();
+        for (int i = 0; i < RANDOM_ITERATIONS; i += 1) {
+            var value = rng.nextInt();
+            var start = rng.nextInt(0, Integer.SIZE - 1);
+            var length = rng.nextInt(1, Integer.SIZE - start);
 
+            var expectedU = (value >> start) & (1 << length) - 1;
+            var mask = 1 << (length - 1);
+            var expectedS = (expectedU ^ mask) - mask;
+            assertEquals(expectedU, Bits.extractUnsigned(value, start, length));
+            assertEquals(expectedS, Bits.extractSigned(value, start, length));
+        }
+    }
 }

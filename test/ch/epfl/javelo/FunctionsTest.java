@@ -1,46 +1,100 @@
 package ch.epfl.javelo;
 
-import ch.epfl.javelo.projection.PointWebMercator;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
 
+import static ch.epfl.test.TestRandomizer.RANDOM_ITERATIONS;
+import static ch.epfl.test.TestRandomizer.newRandom;
 import static org.junit.jupiter.api.Assertions.*;
 
 class FunctionsTest {
-
     @Test
-    void constantTest(){
-        assertEquals(7, Functions.constant(7).applyAsDouble(-2));
-        assertEquals(-3, Functions.constant(-3).applyAsDouble(5));
+    void functionsConstantIsConstant() {
+        var rng = newRandom();
+        for (var y : new double[]{Double.NEGATIVE_INFINITY, -20.22, 0, 20.22}) {
+            var f = Functions.constant(y);
+            for (int i = 0; i < RANDOM_ITERATIONS; i += 1) {
+                var x = rng.nextDouble(-100_000, 100_000);
+                assertEquals(y, f.applyAsDouble(x));
+            }
+        }
     }
 
     @Test
-    void sampledErrorTest(){
-        float[] tab = {};
-        float[] tab2 = new float[]{2, -5};
-        float[] tab1 = new float[]{4};
-        double x=3;
-        assertThrows(IllegalArgumentException.class, () -> Functions.sampled(tab, x));
-        assertThrows(IllegalArgumentException.class, () -> Functions.sampled(tab1, x));
-        assertThrows(IllegalArgumentException.class, () -> Functions.sampled(tab2, 0));
-        assertThrows(IllegalArgumentException.class, () -> Functions.sampled(tab2, -3));
+    void functionsSampledThrowsWithLessThanTwoSamples() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            Functions.sampled(new float[]{}, 1);
+        });
+        assertThrows(IllegalArgumentException.class, () -> {
+            Functions.sampled(new float[]{0}, 1);
+        });
     }
 
     @Test
-    void sampledValuesTest(){
-        float[] tab = new float[]{-1, 2, 3, 3.5F, -2};
-        double xMax = 4;
-        assertEquals(-1, Functions.sampled(tab, xMax).applyAsDouble(-5));
-        assertEquals(2, Functions.sampled(tab, xMax).applyAsDouble(1));
-        assertEquals(-1, Functions.sampled(tab, xMax).applyAsDouble(0));
-        assertEquals(3.5, Functions.sampled(tab, xMax).applyAsDouble(3));
-        assertEquals(-2, Functions.sampled(tab, xMax).applyAsDouble(4));
-        assertEquals(-2, Functions.sampled(tab, xMax).applyAsDouble(7));
-        assertEquals(3, Functions.sampled(tab, xMax).applyAsDouble(2));
-        assertEquals(0, Functions.sampled(tab, xMax).applyAsDouble(0.333), 0.001);
-        assertEquals(2.5, Functions.sampled(tab, xMax).applyAsDouble(1.5));
-        xMax = 20;
-        assertEquals(2.5, Functions.sampled(tab, xMax).applyAsDouble(7.5));
-        assertEquals(3.5, Functions.sampled(tab, xMax).applyAsDouble(15));
+    void functionsSampledWorksWhenEvaluatedCloseToXMax() {
+        var rng = newRandom();
+        var halfWidth = 5000;
+        for (int l = 2; l < 40; l += 1) {
+            var samples = new float[l];
+            for (int i = 0; i < samples.length; i += 1)
+                samples[i] = rng.nextFloat(-halfWidth, halfWidth);
+            var xMax = rng.nextDouble(l, 4 * l);
+            var f = Functions.sampled(samples, xMax);
+
+            assertDoesNotThrow(() -> {
+                var xL = xMax;
+                var xH = xMax;
+                for (int i = 0; i < RANDOM_ITERATIONS; i += 1) {
+                    var yL = f.applyAsDouble(xL);
+                    var yH = f.applyAsDouble(xH);
+                    xL = Math.nextDown(xL);
+                    xH = Math.nextUp(xH);
+                }
+            });
+        }
+    }
+
+    @Test
+    void functionsSampledIsConstantLeftAndRightOfSamples() {
+        var rng = newRandom();
+        var halfWidth = 5000;
+        for (int i = 0; i < RANDOM_ITERATIONS; i += 1) {
+            var sampleCount = rng.nextInt(2, 20);
+            var samples = new float[sampleCount];
+            for (int j = 0; j < sampleCount; j += 1)
+                samples[j] = rng.nextFloat(-halfWidth, halfWidth);
+            var xMax = rng.nextDouble(Math.nextUp(0), 100);
+            var f = Functions.sampled(samples, xMax);
+            assertEquals(samples[0], f.applyAsDouble(Math.nextDown(0)));
+            assertEquals(samples[0], f.applyAsDouble(-1000));
+            assertEquals(samples[sampleCount - 1], f.applyAsDouble(Math.nextUp(xMax)));
+            assertEquals(samples[sampleCount - 1], f.applyAsDouble(xMax + 1000));
+        }
+    }
+
+    @Test
+    void functionsSampledInterpolatesBetweenSamples() {
+        var rng = newRandom();
+        var halfWidth = 5000;
+        for (int i = 0; i < RANDOM_ITERATIONS; i += 1) {
+            var sampleCount = rng.nextInt(2, 20);
+            var samples = new float[sampleCount];
+            for (int j = 0; j < sampleCount; j += 1)
+                samples[j] = rng.nextFloat(-halfWidth, halfWidth);
+            var xMax = rng.nextDouble(50, 100);
+            var f = Functions.sampled(samples, xMax);
+            var interSampleDistance = xMax / (sampleCount - 1);
+            var minDeltaX = interSampleDistance / 4;
+            for (int j = 1; j < sampleCount; j += 1) {
+                var xL = (j - 1) * interSampleDistance;
+                var yL = samples[j - 1];
+                var xR = j * interSampleDistance;
+                var yR = samples[j];
+                var x = rng.nextDouble(xL + minDeltaX, xR - minDeltaX);
+                var y = f.applyAsDouble(x);
+                var expectedSlope = (yR - yL) / interSampleDistance;
+                var actualSlope = (y - yL) / (x - xL);
+                assertEquals(expectedSlope, actualSlope, 1e-3);
+            }
+        }
     }
 }
