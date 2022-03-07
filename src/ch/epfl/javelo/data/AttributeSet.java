@@ -70,9 +70,9 @@ public record AttributeSet(long bits) {
     //Renvoie la liste des attributs sous forme de chaine de caractères.
     @Override
     public String toString() {
-        StringJoiner str = new StringJoiner(", ", "{", "}");
+        StringJoiner str = new StringJoiner(",", "{", "}");
         for(int i = 0; i < Attribute.COUNT; i++) {
-            if(bits >> i % 2 == 1){
+            if((bits >> i) % 2 == 1){
                 str.add(Attribute.values()[i].keyValue());
             }
         }
