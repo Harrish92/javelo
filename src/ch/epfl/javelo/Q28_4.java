@@ -20,7 +20,7 @@ public final class Q28_4 {
      * @return un valeure entière dans le format Q.28
      */
     public static int ofInt(int i){
-        return (int) Math.scalb(i, 4);
+        return i << 4;
 
     }
 
