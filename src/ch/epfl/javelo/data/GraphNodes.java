@@ -51,7 +51,7 @@ public record GraphNodes(IntBuffer buffer) {
      */
     public int outDegree(int nodeId){
         int nb = buffer.get(nodeId*NODE_INTS + OFFSET_OUT_EDGES);
-        return nb >>> 28;
+        return nb >>> 28 ;
 
     }
 
@@ -62,7 +62,7 @@ public record GraphNodes(IntBuffer buffer) {
      * @return l'identité de l'arrête à l'index donné.
      */
     public int edgeId(int nodeId, int edgeIndex){
-        Preconditions.checkArgument(0 <= edgeIndex && edgeIndex < outDegree(nodeId));
+        assert(0 <= edgeIndex && edgeIndex < outDegree(nodeId)); //faire assertion
         int nb = buffer.get(nodeId*NODE_INTS + OFFSET_OUT_EDGES);
         nb = Bits.extractUnsigned(nb, 0, 28);
         nb += edgeIndex;
