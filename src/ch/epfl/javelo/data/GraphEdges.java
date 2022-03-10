@@ -139,7 +139,6 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
             tab[c]  = f1;
             ++c;
         }
-        System.out.println(numberOfElements);
         for(int i = 2; i < numberOfElements; i++){
             int nb2 = elevations.get(i);
             for(int j = 1; j >= 0; j--){
@@ -147,7 +146,6 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
                 float f2 = Q28_4.asFloat(extract2);
                 f1 += f2;
                 if(f2 != 0){
-                    System.out.println(f1);
 
                     if(isInverted(edgeId)){
                         tab[pts-1] = f1;
@@ -211,7 +209,7 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
      * @return l'identité de l'ensemble des attributs attachés à l'arrête portant l'identité edgeId.
      */
     public int attributesIndex(int edgeId){
-        return 0;
+        return edgesBuffer.getShort(edgeId*EDGESBUFFER_INTS + OFFSET_EDGESBUFFER_ATTRIBUTESID);
     }
 
 
