@@ -93,24 +93,25 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
             return tab;
         int profile = profileIds.get(edgeId * PROFILEIDS_INTS + OFFSET_PROFILESIDS_TYPE);
         int profile_type = profile >>> 30;
+        int index_element = Bits.extractUnsigned(profile, 0, 30);
         switch (profile_type) {
             case 1:
-                return profileType1(pts, tab, edgeId);
+                return profileType1(pts, tab, edgeId, index_element);
             case 2:
-                return profileType2(pts, tab, edgeId);
+                return profileType2(pts, tab, edgeId, index_element);
 
             case 3:
-                return profileType3(pts, tab, edgeId);
+                return profileType3(pts, tab, edgeId, index_element);
 
         }
         return null;
     }
 
 
-    private float [] profileType1(int pts, float[] tab, int edgeId){
+    private float [] profileType1(int pts, float[] tab, int edgeId, int index_element){
         int c = 0;
         int counting = pts;
-        for(int i = 1; i <= counting; i++){
+        for(int i = index_element; i <= counting; i++){
             int nb = elevations.get(i);
 
             if(isInverted(edgeId)){
@@ -126,8 +127,8 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
 
     }
 
-    private float[] profileType2(int pts, float[] tab, int edgeId){
-        int nb1 = elevations.get(1);
+    private float[] profileType2(int pts, float[] tab, int edgeId, int index_element){
+        int nb1 = elevations.get(index_element);
         float f1 = Q28_4.asFloat(nb1);
         double e = (double) (pts-1) / (double) 2;
         int c = 0;
@@ -139,7 +140,7 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
             tab[c]  = f1;
             ++c;
         }
-        for(int i = 2; i < numberOfElements; i++){
+        for(int i = index_element+1; i < numberOfElements; i++){
             int nb2 = elevations.get(i);
             for(int j = 1; j >= 0; j--){
                 int extract2 = Bits.extractSigned(nb2, j*8, 8);
@@ -165,8 +166,8 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
 
     }
 
-    private float[] profileType3(int pts,float [] tab, int edgeId){
-        int nb1 = elevations.get(1);
+    private float[] profileType3(int pts,float [] tab, int edgeId, int index_element){
+        int nb1 = elevations.get(index_element);
         float f1 = Q28_4.asFloat(nb1);
         double e = (double) (pts-1) / (double) 4;
         int c = 0;
@@ -178,7 +179,7 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
             tab[c]  = f1;
             ++c;
         }
-        for(int i = 2; i < numberOfElements; i++){
+        for(int i = index_element+1; i < numberOfElements; i++){
             int nb2 = elevations.get(i);
             for(int j = 3; j >= 0; j--){
                 int extract2 = Bits.extractSigned(nb2, j*4, 4);
