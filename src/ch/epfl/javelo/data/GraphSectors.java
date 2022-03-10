@@ -1,5 +1,6 @@
 package ch.epfl.javelo.data;
 
+import ch.epfl.javelo.Preconditions;
 import ch.epfl.javelo.projection.PointCh;
 import ch.epfl.javelo.projection.PointWebMercator;
 import ch.epfl.javelo.projection.SwissBounds;
@@ -47,12 +48,17 @@ public record GraphSectors(ByteBuffer buffer) {
         int secteur0Y = (int) Math.floor((center.n() - distance - SwissBounds.MIN_N)/deltaSN);
         int secteur1X = (int) Math.floor((center.e() + distance - SwissBounds.MIN_E)/deltaSE);
         int secteur1Y = (int) Math.floor((center.n() + distance - SwissBounds.MIN_N)/deltaSN);
-        for(int y = secteur0Y; y < secteur1Y; y++){
-            for(int x = secteur0X; x < secteur1X; x++){
+        //TODO: valeurs négatives ??? comportement distance hors map
+        Preconditions.checkArgument(secteur0X >= 0 || secteur0Y >= 0 || secteur1X >= 0 || secteur1Y >= 0 || distance >= 0);
+        System.out.println(secteur0X+"::"+secteur0Y+"___"+secteur1X+"::"+secteur1Y);
+        for(int y = secteur0Y; y <= secteur1Y; y++){
+            for(int x = secteur0X; x <= secteur1X; x++){
                 int secteur = y * 128 + x;
                 int indexN = buffer.getInt(secteur * SECTOR_LENGTH);
                 short nbN = buffer.getShort(secteur * SECTOR_LENGTH + OFFSET_NBN);
-                listeSecteurs.add(new Sector(indexN, indexN + nbN));
+                if(nbN != 0) {
+                    listeSecteurs.add(new Sector(indexN, indexN + nbN));
+                }
             }
         }
         return listeSecteurs;
