@@ -7,7 +7,6 @@ import ch.epfl.javelo.Q28_4;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
-import java.util.ArrayList;
 
 public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuffer elevations) {
     private static final int OFFSET_EDGESBUFFER_INVERTED = 0;
@@ -98,12 +97,11 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
             case 1:
                 return profileType1(pts, tab, edgeId);
             case 2:
-                break;
+                return profileType2(pts, tab, edgeId);
 
             case 3:
                 return profileType3(pts, tab, edgeId);
-            case 4:
-                break;
+
         }
         return null;
     }
@@ -131,9 +129,9 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
     private float[] profileType2(int pts, float[] tab, int edgeId){
         int nb1 = elevations.get(1);
         float f1 = Q28_4.asFloat(nb1);
-        double e = (double) pts / (double) 4;
+        double e = (double) (pts-1) / (double) 2;
         int c = 0;
-        int numberOfElements = (int) Math.ceil(e) + 1;
+        int numberOfElements = (int) Math.ceil(e) + 2;
         if(isInverted(edgeId)){
             tab[pts-1] = f1;
             --pts;
@@ -141,13 +139,16 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
             tab[c]  = f1;
             ++c;
         }
-        for(int i = 2; i <= numberOfElements; i++){
+        System.out.println(numberOfElements);
+        for(int i = 2; i < numberOfElements; i++){
             int nb2 = elevations.get(i);
-            for(int j = 3; j >= 0; j--){
-                int extract2 = Bits.extractSigned(nb2, j*4, 4);
+            for(int j = 1; j >= 0; j--){
+                int extract2 = Bits.extractSigned(nb2, j*8, 8);
                 float f2 = Q28_4.asFloat(extract2);
                 f1 += f2;
                 if(f2 != 0){
+                    System.out.println(f1);
+
                     if(isInverted(edgeId)){
                         tab[pts-1] = f1;
                         --pts;
@@ -169,9 +170,9 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
     private float[] profileType3(int pts,float [] tab, int edgeId){
         int nb1 = elevations.get(1);
         float f1 = Q28_4.asFloat(nb1);
-        double e = (double) pts / (double) 4;
+        double e = (double) (pts-1) / (double) 4;
         int c = 0;
-        int numberOfElements = (int) Math.ceil(e) + 1;
+        int numberOfElements = (int) Math.ceil(e) + 2;
         if(isInverted(edgeId)){
             tab[pts-1] = f1;
             --pts;
@@ -179,7 +180,7 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
             tab[c]  = f1;
             ++c;
         }
-        for(int i = 2; i <= numberOfElements; i++){
+        for(int i = 2; i < numberOfElements; i++){
             int nb2 = elevations.get(i);
             for(int j = 3; j >= 0; j--){
                 int extract2 = Bits.extractSigned(nb2, j*4, 4);
