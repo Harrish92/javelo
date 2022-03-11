@@ -50,8 +50,9 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
      * @return la longueur en mètre de edgeId.
      */
     public double length(int edgeId){
-        int nb = edgesBuffer.getShort(edgeId*EDGESBUFFER_INTS + OFFSET_EDGESBUFFER_LENGTH);
-        return Q28_4.asDouble(nb);
+        short nb = edgesBuffer.getShort(edgeId*EDGESBUFFER_INTS + OFFSET_EDGESBUFFER_LENGTH);
+        int mon_integer = Short.toUnsignedInt(nb);
+        return Q28_4.asDouble(mon_integer);
     }
 
     /**
@@ -61,8 +62,9 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
      */
 
     public double elevationGain(int edgeId){
-        int nb = edgesBuffer.getShort(edgeId * EDGESBUFFER_INTS + OFFSET_EDGESBUFFER_ELEVATIONGAIN);
-        return Q28_4.asDouble(nb);
+        short nb = edgesBuffer.getShort(edgeId * EDGESBUFFER_INTS + OFFSET_EDGESBUFFER_ELEVATIONGAIN);
+        int mon_integer = Short.toUnsignedInt(nb);
+        return Q28_4.asDouble(mon_integer);
 
     }
 
@@ -107,7 +109,14 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
         return null;
     }
 
-
+    /**
+     *
+     * @param pts nombre d'échantillons
+     * @param tab tableau de type float
+     * @param edgeId arrête identité
+     * @param index_element identité du premier échantillon du profil
+     * @return le tableau avec les échantillons du profil de type 1 pour ProfileSamples.
+     */
     private float [] profileType1(int pts, float[] tab, int edgeId, int index_element){
         int c = 0;
         int counting = pts;
@@ -127,12 +136,20 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
 
     }
 
+    /**
+     *
+     * @param pts nombre d'échantillons
+     * @param tab tableau de type float
+     * @param edgeId arrête identité
+     * @param index_element identité du premier échantillon du profil
+     * @return le tableau avec les échantillons du profil de type 2 pour ProfileSamples.
+     */
     private float[] profileType2(int pts, float[] tab, int edgeId, int index_element){
         int nb1 = elevations.get(index_element);
         float f1 = Q28_4.asFloat(nb1);
         double e = (double) (pts-1) / (double) 2;
         int c = 0;
-        int numberOfElements = (int) Math.ceil(e) + 2;
+        int numberOfElements = (int) Math.ceil(e) + index_element;
         if(isInverted(edgeId)){
             tab[pts-1] = f1;
             --pts;
@@ -140,7 +157,7 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
             tab[c]  = f1;
             ++c;
         }
-        for(int i = index_element+1; i < numberOfElements; i++){
+        for(int i = index_element+1; i <= numberOfElements; i++){
             int nb2 = elevations.get(i);
             for(int j = 1; j >= 0; j--){
                 int extract2 = Bits.extractSigned(nb2, j*8, 8);
@@ -166,12 +183,20 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
 
     }
 
+    /**
+     *
+     * @param pts nombre d'échantillons
+     * @param tab tableau de type float
+     * @param edgeId arrête identité
+     * @param index_element identité du premier échantillon du profil
+     * @return le tableau avec les échantillons du profil de type 3 pour ProfileSamples.
+     */
     private float[] profileType3(int pts,float [] tab, int edgeId, int index_element){
         int nb1 = elevations.get(index_element);
         float f1 = Q28_4.asFloat(nb1);
         double e = (double) (pts-1) / (double) 4;
         int c = 0;
-        int numberOfElements = (int) Math.ceil(e) + 2;
+        int numberOfElements = (int) Math.ceil(e) + index_element;
         if(isInverted(edgeId)){
             tab[pts-1] = f1;
             --pts;
@@ -179,7 +204,7 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
             tab[c]  = f1;
             ++c;
         }
-        for(int i = index_element+1; i < numberOfElements; i++){
+        for(int i = index_element+1; i <= numberOfElements; i++){
             int nb2 = elevations.get(i);
             for(int j = 3; j >= 0; j--){
                 int extract2 = Bits.extractSigned(nb2, j*4, 4);
@@ -210,7 +235,8 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
      * @return l'identité de l'ensemble des attributs attachés à l'arrête portant l'identité edgeId.
      */
     public int attributesIndex(int edgeId){
-        return edgesBuffer.getShort(edgeId*EDGESBUFFER_INTS + OFFSET_EDGESBUFFER_ATTRIBUTESID);
+        short nb = edgesBuffer.getShort(edgeId*EDGESBUFFER_INTS + OFFSET_EDGESBUFFER_ATTRIBUTESID);
+        return Short.toUnsignedInt(nb);
     }
 
 

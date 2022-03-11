@@ -30,8 +30,8 @@ public class GraphEdgesTest {
 
         ShortBuffer elevations = ShortBuffer.wrap(new short[]{
                 (short) 0,
-                (short) 0x180C, (short) 0xFEFF,
-                (short) 0xFFFE, (short) 0xF000
+                (short) 0x180C , (short) 0xFEFF, /// 1,2,3, 4,5,6
+                (short) 0xFFFE, (short) 0xF000   /// 7,8,9  10
         });
 
         GraphEdges edges =
