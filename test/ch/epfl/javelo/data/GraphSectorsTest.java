@@ -24,20 +24,22 @@ class GraphSectorsTest {
         b.put(6, new byte[] {(byte) 0, (byte) 0, (byte) 0, (byte) 13, (byte) 0, (byte) 100});
         b.put(12, new byte[] {(byte) 0, (byte) 0, (byte) 0, (byte) 123, (byte) 0, (byte) 0});
         b.put(18, new byte[] {(byte) 0, (byte) 0, (byte) 0, (byte) 56, (byte) 1, (byte) 0});
-        b.put(129*6, new byte[] {(byte) 1, (byte) 35, (byte) 1, (byte) 1, (byte) 9, (byte) 87});
-        b.put(130*6, new byte[] {(byte) 2, (byte) 0, (byte) 0, (byte) 0, (byte) 23, (byte) 24});
+        b.put(128*6, new byte[] {(byte) 0, (byte) 0, (byte) 0, (byte) 88, (byte) 0, (byte) 87});
+        b.put(129*6, new byte[] {(byte) 0, (byte) 0, (byte) 1, (byte) 0, (byte) 0, (byte) 24});
         b.put(128*127*6, new byte[] {(byte) 0, (byte) 0, (byte) 0, (byte) 1, (byte) 0, (byte) 11});
         GraphSectors s = new GraphSectors(b);
         List<Sector> liste = new ArrayList<>();
         liste.add(new Sector(1,12));
         liste.add(new Sector(13,113));
-        liste.add(new Sector(19071233,19073624));
+        liste.add(new Sector(88, 175));
+        liste.add(new Sector(256, 280));
         int d = 2000;
+        assertThrows(IllegalArgumentException.class,() -> s.sectorsInArea(new PointCh(SwissBounds.MIN_E, SwissBounds.MIN_N), -1).get(0));
         for(int i = 0; i < liste.size(); i++) {
-            //assertEquals(liste.get(i), s.sectorsInArea(new PointCh(SwissBounds.MIN_E + d, SwissBounds.MIN_N + d), d).get(i));
+            assertEquals(liste.get(i), s.sectorsInArea(new PointCh(SwissBounds.MIN_E + 2726.5625, SwissBounds.MIN_N + 1726.5625), 1).get(i));
         }
-        //assertThrows(IllegalArgumentException.class,() -> s.sectorsInArea(new PointCh(SwissBounds.MIN_E, SwissBounds.MIN_N), -1).get(0));
-        //assertEquals(liste.get(0), s.sectorsInArea(new PointCh(SwissBounds.MIN_E, SwissBounds.MIN_N), d).get(0));
-        assertEquals(liste.get(0), s.sectorsInArea(new PointCh(SwissBounds.MAX_E, SwissBounds.MAX_N), d).get(0));
+        for(int i = 0; i < liste.size(); i++) {
+            assertEquals(liste.get(i), s.sectorsInArea(new PointCh(SwissBounds.MIN_E, SwissBounds.MIN_N), 3000).get(i));
+        }
     }
 }
