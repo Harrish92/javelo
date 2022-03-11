@@ -54,6 +54,7 @@ public record GraphSectors(ByteBuffer buffer) {
         secteur1Y = Math2.clamp(0, secteur1Y, 127);
         for(int y = secteur0Y; y <= secteur1Y; y++){
             for(int x = secteur0X; x <= secteur1X; x++){
+                //TODO: secteur max
                 int secteur = y * 128 + x;
                 int indexN = buffer.getInt(secteur * SECTOR_LENGTH);
                 int nbN = Short.toUnsignedInt(buffer.getShort(secteur * SECTOR_LENGTH + OFFSET_NBN));
