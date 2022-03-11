@@ -169,7 +169,7 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
                         tab[pts-1] = f1;
                         --pts;
                     }else{
-                        tab[c]  = f2;
+                        tab[c]  = f1;
                         ++c;
                     }
 
@@ -215,7 +215,7 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
                         tab[pts-1] = f1;
                         --pts;
                     }else{
-                        tab[c]  = f2;
+                        tab[c]  = f1;
                         ++c;
                     }
 
@@ -226,6 +226,7 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
             }
         }
         return tab;
+
     }
 
 

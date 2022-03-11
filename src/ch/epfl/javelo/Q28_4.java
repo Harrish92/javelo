@@ -30,7 +30,7 @@ public final class Q28_4 {
      * @return le changement de base de Q28_4 à un double.
      */
     public static double asDouble(int q28_4){
-        return Math.scalb(q28_4, -4);
+        return Math.scalb((double) q28_4, -4);
     }
 
     /**
