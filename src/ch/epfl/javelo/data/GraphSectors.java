@@ -1,5 +1,6 @@
 package ch.epfl.javelo.data;
 
+import ch.epfl.javelo.Math2;
 import ch.epfl.javelo.Preconditions;
 import ch.epfl.javelo.projection.PointCh;
 import ch.epfl.javelo.projection.PointWebMercator;
@@ -27,10 +28,7 @@ public record GraphSectors(ByteBuffer buffer) {
      * @param startNodeId index du premier noeud du secteur.
      * @param endNodeId index du noeud juste après le dernier du secteur.
      */
-    private record Sector(int startNodeId, int endNodeId) {
-
-
-    }
+    public record Sector(int startNodeId, int endNodeId) {}
 
 
     /**
@@ -41,6 +39,7 @@ public record GraphSectors(ByteBuffer buffer) {
      * @return une liste de secteurs.
      */
     public List<Sector> sectorsInArea(PointCh center, double distance) {
+        Preconditions.checkArgument(distance >= 0);
         ArrayList<Sector> listeSecteurs = new ArrayList<>();
         double deltaSE = SwissBounds.WIDTH/128;
         double deltaSN = SwissBounds.HEIGHT/128;
@@ -48,14 +47,17 @@ public record GraphSectors(ByteBuffer buffer) {
         int secteur0Y = (int) Math.floor((center.n() - distance - SwissBounds.MIN_N)/deltaSN);
         int secteur1X = (int) Math.floor((center.e() + distance - SwissBounds.MIN_E)/deltaSE);
         int secteur1Y = (int) Math.floor((center.n() + distance - SwissBounds.MIN_N)/deltaSN);
-        //TODO: valeurs négatives ??? comportement distance hors map
-        Preconditions.checkArgument(secteur0X >= 0 || secteur0Y >= 0 || secteur1X >= 0 || secteur1Y >= 0 || distance >= 0);
         System.out.println(secteur0X+"::"+secteur0Y+"___"+secteur1X+"::"+secteur1Y);
+        secteur0X = Math2.clamp(0,secteur0X,127);
+        secteur0Y = Math2.clamp(0, secteur0Y, 127);
+        secteur1X = Math2.clamp(0, secteur1X, 127);
+        secteur1Y = Math2.clamp(0, secteur1Y, 127);
         for(int y = secteur0Y; y <= secteur1Y; y++){
             for(int x = secteur0X; x <= secteur1X; x++){
+                //TODO: secteur max
                 int secteur = y * 128 + x;
                 int indexN = buffer.getInt(secteur * SECTOR_LENGTH);
-                short nbN = buffer.getShort(secteur * SECTOR_LENGTH + OFFSET_NBN);
+                int nbN = Short.toUnsignedInt(buffer.getShort(secteur * SECTOR_LENGTH + OFFSET_NBN));
                 if(nbN != 0) {
                     listeSecteurs.add(new Sector(indexN, indexN + nbN));
                 }

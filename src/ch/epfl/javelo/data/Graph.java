@@ -62,7 +62,7 @@ public final class Graph {
             GraphNodes nodes2 = new GraphNodes(nodesBuffer);
         }*/
         String paths[] = {"nodes.bin", "sectors.bin", "edges.bin", "profile_Ids.bin",
-                "elevations.bin", "attributes.bin"};//TODO: nodesIds ?
+                "elevations.bin", "attributes.bin"};//TODO: nodesIds: pour les test
         MappedByteBuffer[] buffers = new MappedByteBuffer[paths.length];
         for(int i = 0; i < paths.length; i++){
             try (FileChannel channel = FileChannel.open(basePath.resolve(paths[i]))) {
@@ -70,10 +70,11 @@ public final class Graph {
             }
         }
         GraphNodes nodes = new GraphNodes(buffers[0].asIntBuffer());
-        GraphSectors sectors = new GraphSectors(buffers[1].asReadOnlyBuffer());//TODO: readonly?
-        GraphEdges edges = new GraphEdges(buffers[2].asReadOnlyBuffer(),
+        GraphSectors sectors = new GraphSectors(buffers[1]);
+        GraphEdges edges = new GraphEdges(buffers[2],
                 buffers[3].asIntBuffer(), buffers[4].asShortBuffer());
-        buffers[5].array();
+
+        //buffers[5];
         return new Graph(nodes, sectors, edges, null);
     }
 
@@ -176,7 +177,6 @@ public final class Graph {
      * @param edgeId l'identité de l'arête.
      * @return une fonction.
      */
-    //TODO: quand retourner NaN ?
     public DoubleUnaryOperator edgeProfile(int edgeId) {
         return Functions.sampled(edges.profileSamples(edgeId), edgeLength(edgeId));
 
