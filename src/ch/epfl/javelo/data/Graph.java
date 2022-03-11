@@ -1,16 +1,22 @@
 package ch.epfl.javelo.data;
 
+import ch.epfl.javelo.Functions;
 import ch.epfl.javelo.projection.PointCh;
 
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
+import java.nio.Buffer;
+import java.nio.IntBuffer;
+import java.nio.LongBuffer;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.function.DoubleUnaryOperator;
 
 /**
- * La classe Graph représente de graphe de javelo.
+ * La classe Graph représente le graphe de javelo.
  * @author Yoan Giovannini (303934)
  */
 public final class Graph {
@@ -41,12 +47,34 @@ public final class Graph {
      */
     public static Graph loadFrom(Path basePath) throws IOException {
         //TODO: finir cette méthode
-        try {
-            Path nodesPath = basePath.resolve("nodes.bin");
-            Path sectorsPath = basePath.resolve("sectors.bin");
-            Path edgesPath = basePath.resolve("edges.bin");
-        } finally {}
-        return null;
+        /*Path nodesPath = basePath.resolve("nodes.bin");
+        Path sectorsPath = basePath.resolve("sectors.bin");
+        Path edgesPath = basePath.resolve("edges.bin");
+        IntBuffer nodesBuffer;
+        try (
+                FileChannel nodesChannel = FileChannel.open(basePath.resolve("nodes.bin"));
+                FileChannel sectorsChannel = FileChannel.open(basePath.resolve("sectors.bin"));
+                FileChannel edgesChannel = FileChannel.open(basePath.resolve("edges.bin"));
+        ) {
+            nodesBuffer =nodesChannel.map(FileChannel.MapMode.READ_ONLY, 0, nodesChannel.size())
+                    .asIntBuffer();
+
+            GraphNodes nodes2 = new GraphNodes(nodesBuffer);
+        }*/
+        String paths[] = {"nodes.bin", "sectors.bin", "edges.bin", "profile_Ids.bin",
+                "elevations.bin", "attributes.bin"};//TODO: nodesIds ?
+        MappedByteBuffer[] buffers = new MappedByteBuffer[paths.length];
+        for(int i = 0; i < paths.length; i++){
+            try (FileChannel channel = FileChannel.open(basePath.resolve(paths[i]))) {
+                buffers[i] = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
+            }
+        }
+        GraphNodes nodes = new GraphNodes(buffers[0].asIntBuffer());
+        GraphSectors sectors = new GraphSectors(buffers[1].asReadOnlyBuffer());//TODO: readonly?
+        GraphEdges edges = new GraphEdges(buffers[2].asReadOnlyBuffer(),
+                buffers[3].asIntBuffer(), buffers[4].asShortBuffer());
+        buffers[5].array();
+        return new Graph(nodes, sectors, edges, null);
     }
 
     /**
@@ -143,11 +171,14 @@ public final class Graph {
     }
 
     /**
-     *
+     * Créé une fonction qui représente le profil de l'arête d'identité
+     * donnée en argument.
      * @param edgeId l'identité de l'arête.
-     * @return
+     * @return une fonction.
      */
+    //TODO: quand retourner NaN ?
     public DoubleUnaryOperator edgeProfile(int edgeId) {
-        return null;
+        return Functions.sampled(edges.profileSamples(edgeId), edgeLength(edgeId));
+
     }
 }
