@@ -5,7 +5,7 @@ package ch.epfl.sigcheck;
 // possible, que les noms et les types des différentes entités à définir
 // pour cette étape du projet sont corrects.
 
-/*final class SignatureChecks_3 {
+final class SignatureChecks_3 {
     private SignatureChecks_3() {}
 
     void checkGraphNodes() throws Exception {
@@ -71,4 +71,4 @@ package ch.epfl.sigcheck;
     ch.epfl.javelo.data.GraphEdges v13;
     java.nio.ShortBuffer v14;
     float[] v15;
-}*/
+}

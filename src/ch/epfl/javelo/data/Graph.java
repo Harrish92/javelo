@@ -3,12 +3,7 @@ package ch.epfl.javelo.data;
 import ch.epfl.javelo.Functions;
 import ch.epfl.javelo.projection.PointCh;
 
-import javax.swing.*;
-import java.awt.*;
 import java.io.IOException;
-import java.nio.Buffer;
-import java.nio.IntBuffer;
-import java.nio.LongBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Path;

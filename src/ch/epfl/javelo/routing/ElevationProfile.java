@@ -7,7 +7,7 @@ import java.util.DoubleSummaryStatistics;
 import java.util.function.DoubleUnaryOperator;
 
 /**
- *
+ * Représente le profil d'une arête.
  * @author Yoan Giovannini (303934)
  */
 public final class ElevationProfile {
@@ -16,6 +16,11 @@ public final class ElevationProfile {
     private float[] elevationSamples;
     private DoubleUnaryOperator profile;
 
+    /**
+     * Constructeur de la classe.
+     * @param length la longueur du profil.
+     * @param elevationSamples les points du profil.
+     */
     public ElevationProfile(double length, float[] elevationSamples) {
         Preconditions.checkArgument(length > 0 && elevationSamples.length >= 2);
         this.length = length;
@@ -23,18 +28,34 @@ public final class ElevationProfile {
         profile = Functions.sampled(elevationSamples, length);
     }
 
+    /**
+     * Calcule la longueur du profil.
+     * @return la longueur en mètre.
+     */
     public double length() {
         return length;
     }
 
+    /**
+     * Calcule l'altitude du point le plus bas du profil.
+     * @return une altitude.
+     */
     public double minElevation() {
         return statistics().getMin();
     }
 
+    /**
+     * Calcule l'altitude du point le plus haut du profil.
+     * @return une altitude.
+     */
     public double maxElevation() {
         return statistics().getMax();
     }
 
+    /**
+     * Calcule statistiques du profil.
+     * @return les statistiques du profil.
+     */
     private DoubleSummaryStatistics statistics() {
         DoubleSummaryStatistics s = new DoubleSummaryStatistics();
         for(double point : elevationSamples) {
