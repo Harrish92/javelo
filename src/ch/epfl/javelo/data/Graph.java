@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.DoubleUnaryOperator;
 
@@ -41,7 +42,6 @@ public final class Graph {
      * @return le graphe.
      */
     public static Graph loadFrom(Path basePath) throws IOException {
-        //TODO: finir cette méthode
         /*Path nodesPath = basePath.resolve("nodes.bin");
         Path sectorsPath = basePath.resolve("sectors.bin");
         Path edgesPath = basePath.resolve("edges.bin");
@@ -57,7 +57,7 @@ public final class Graph {
             GraphNodes nodes2 = new GraphNodes(nodesBuffer);
         }*/
         String paths[] = {"nodes.bin", "sectors.bin", "edges.bin", "profile_Ids.bin",
-                "elevations.bin", "attributes.bin"};//TODO: nodesIds: pour les test
+                "elevations.bin", "attributes.bin"};//nodesIds: pour les test
         MappedByteBuffer[] buffers = new MappedByteBuffer[paths.length];
         for(int i = 0; i < paths.length; i++){
             try (FileChannel channel = FileChannel.open(basePath.resolve(paths[i]))) {
@@ -69,8 +69,11 @@ public final class Graph {
         GraphEdges edges = new GraphEdges(buffers[2],
                 buffers[3].asIntBuffer(), buffers[4].asShortBuffer());
 
-        //buffers[5];
-        return new Graph(nodes, sectors, edges, null);
+        ArrayList<AttributeSet> attributeSetList = new ArrayList<>();
+        for( long bits : buffers[5].asLongBuffer().array()){
+            attributeSetList.add(new AttributeSet(bits));
+        }
+        return new Graph(nodes, sectors, edges, attributeSetList);
     }
 
     /**
@@ -79,6 +82,10 @@ public final class Graph {
      */
     public int nodeCount() {
         return nodes.count();
+    }
+
+    public PointCh nodePoint(int nodeId){
+        return new PointCh(nodes.nodeE(nodeId), nodes.nodeN(nodeId));
     }
 
     /**
