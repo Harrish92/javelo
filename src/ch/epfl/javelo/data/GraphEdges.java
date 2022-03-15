@@ -147,84 +147,37 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
      * @return le tableau avec les échantillons du profil de type 2 pour ProfileSamples.
      */
     private float[] profileType2(int pts, float[] tab, int edgeId, int index_element){
-        int nb1 = elevations.get(index_element);
-        float f1 = Q28_4.asFloat(nb1);
-        int counting = 0;
+
+        float echantillon1 = Q28_4.asFloat(Short.toUnsignedInt(elevations.get(index_element)));
         if(isInverted(edgeId)){
-            tab[pts-1] = f1;
+            tab[pts-1] = echantillon1;
         }else{
-            tab[counting]  = f1;
+            tab[0] = echantillon1;
         }
-        ++ counting;
-        for(int i = index_element+1; i < pts + index_element; i += 2){
-            int nb2 = elevations.get(i);
-            for(int j = 1; j >= 0; j--){
-                int extract2 = Bits.extractSigned(nb2, j*8, 8);
-                float f2 = Q28_4.asFloat(extract2);
-                f1 += f2;
-                if(f2 != 0){
-
+        int counting = 1, offset = 1;
+        for(int i=index_element+1; i < pts + index_element; i+= 2){
+            for (int j = 1; j >= 0; j--){
+                float echantillon2 = Q28_4.asFloat(Bits.extractSigned(elevations.get(index_element+ offset), j*8,
+                        8));
+                echantillon1 += echantillon2;
+                if(counting < pts){
                     if(isInverted(edgeId)){
-                        tab[pts-(counting + 1)] = f1;
+                        tab[pts - (counting + 1)] = echantillon1;
                     }else{
-                        tab[counting]  = f1;
+                        tab[counting] = echantillon1;
                     }
-                    ++counting;
                 }
-
-
-
+                ++counting;
             }
-        }
-        for(int i = 0; i < tab.length; i++){
-            System.out.println(tab[i]);
+            ++offset;
+
+
         }
         return tab;
-
-
-
-/*
-        int nb1 = elevations.get(index_element);
-        float f1 = Q28_4.asFloat(nb1);
-        if(isInverted(edgeId)){
-            tab[pts-1] = f1;
-        }else{
-            tab[0]  = f1;
-
-        }
-        for(int i = index_element+1; i < pts + index_element; i++){
-
-            int nb2 = elevations.get(i);
-            for(int j = 1; j >= 0; j--){
-                int extract2 = Bits.extractSigned(nb2, j*8, 8);
-                float f2 = Q28_4.asFloat(extract2);
-                f1 += f2;
-                if(f2 != 0){
-                    if(isInverted(edgeId)){
-                        tab[pts - (i - index_element + 1 - j)] = f1;
-
-                    }else{
-                        tab[i - (index_element) + 1 - j]  = f1;
-
-                        System.out.print(f1);
-                        System.out.print(" ");
-                        System.out.println(i - (index_element) + 1 - j);
-
-
-
-                    }
-
-                }
-
-
-
-            }
-        }
-        return tab;
-
- */
 
     }
+
+
 
     /**
      *
@@ -253,7 +206,7 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
                 int extract2 = Bits.extractSigned(nb2, j*4, 4);
                 float f2 = Q28_4.asFloat(extract2);
                 f1 += f2;
-                if(f2 != 0){
+                if(c < pts){
                     if(isInverted(edgeId)){
                         tab[pts-1] = f1;
                         --pts;
