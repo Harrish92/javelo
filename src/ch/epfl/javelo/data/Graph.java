@@ -37,25 +37,11 @@ public final class Graph {
     }
 
     /**
-     *Charge le graphe depuis un répertoire.
+     * Charge le graphe depuis un répertoire.
      * @param basePath le chemin vers le répertoire.
      * @return le graphe.
      */
     public static Graph loadFrom(Path basePath) throws IOException {
-        /*Path nodesPath = basePath.resolve("nodes.bin");
-        Path sectorsPath = basePath.resolve("sectors.bin");
-        Path edgesPath = basePath.resolve("edges.bin");
-        IntBuffer nodesBuffer;
-        try (
-                FileChannel nodesChannel = FileChannel.open(basePath.resolve("nodes.bin"));
-                FileChannel sectorsChannel = FileChannel.open(basePath.resolve("sectors.bin"));
-                FileChannel edgesChannel = FileChannel.open(basePath.resolve("edges.bin"));
-        ) {
-            nodesBuffer =nodesChannel.map(FileChannel.MapMode.READ_ONLY, 0, nodesChannel.size())
-                    .asIntBuffer();
-
-            GraphNodes nodes2 = new GraphNodes(nodesBuffer);
-        }*/
         String paths[] = {"nodes.bin", "sectors.bin", "edges.bin", "profile_Ids.bin",
                 "elevations.bin", "attributes.bin"};//nodesIds: pour les test
         MappedByteBuffer[] buffers = new MappedByteBuffer[paths.length];
@@ -84,13 +70,18 @@ public final class Graph {
         return nodes.count();
     }
 
+    /**
+     * Calcule la position du noeud d'identité donnée en argument.
+     * @param nodeId l'identité d'un noeud.
+     * @return la position du noeud.
+     */
     public PointCh nodePoint(int nodeId){
         return new PointCh(nodes.nodeE(nodeId), nodes.nodeN(nodeId));
     }
 
     /**
      * Compte le nombre d'arêtes sortant du noeud donné en argument.
-     * @param nodeId un noeud.
+     * @param nodeId l'identité d'un noeud.
      * @return le nombre d'arêtes sortant du noeud.
      */
     public int nodeOutDegree(int nodeId) {
@@ -113,15 +104,17 @@ public final class Graph {
      * @param searchDistance le rayon de recherche.
      * @return l'identité du noeud le plus proche.
      */
-    //TODO: optimiser
     public int nodeClosestTo(PointCh point, double searchDistance) {
         int nID = 0;
-        double d = searchDistance;
-        int nbN = nodeCount();
-        for(int i = sectors.buffer().getInt(0); i < nbN; i++){
-            PointCh pt = new PointCh(nodes.nodeE(i), nodes.nodeN(i));
-            if(point.squaredDistanceTo(pt) < d){
-                nID = i;
+        double d = Math.pow(searchDistance, 2);
+        GraphSectors.Sector[] sectorList = (GraphSectors.Sector[]) sectors.sectorsInArea(point, searchDistance).toArray();
+        for(GraphSectors.Sector sector : sectorList){
+            for(int i = sector.startNodeId(); i <= sector.endNodeId(); i++) {
+                PointCh pt = new PointCh(nodes.nodeE(i), nodes.nodeN(i));
+                if(point.squaredDistanceTo(pt) <= d){
+                    nID = i;
+                    d = point.distanceTo(pt);
+                }
             }
         }
         return nID;
