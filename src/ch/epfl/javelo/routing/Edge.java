@@ -29,7 +29,7 @@ public record Edge(int fromNodId, int toNodeId, PointCh fromPoint, PointCh toPoi
      * @return une instance de edge avec les attributs donnés.
      */
     public static Edge of(Graph graph,int edgeId, int fromNodeId, int toNodeId){
-        return null;
+        return null; //Edge(fromNodeId, toNodeId, graph);
     }
 
     /**
