@@ -1,4 +1,4 @@
 package ch.epfl.javelo.routing;
 
-public class RoutePoint {
+public class RoutePointTest {
 }
