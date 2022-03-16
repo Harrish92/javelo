@@ -157,9 +157,9 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
         int counting = 1, offset = 1;
         for(int i=index_element+1; i < pts + index_element; i+= 2){
             for (int j = 1; j >= 0; j--){
-                float echantillon2 = Q28_4.asFloat(Bits.extractSigned(elevations.get(index_element+ offset), j*8,
+                float difference = Q28_4.asFloat(Bits.extractSigned(elevations.get(index_element+ offset), j*8,
                         8));
-                echantillon1 += echantillon2;
+                echantillon1 += difference;
                 if(counting < pts){
                     if(isInverted(edgeId)){
                         tab[pts - (counting + 1)] = echantillon1;
@@ -188,38 +188,30 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
      * @return le tableau avec les échantillons du profil de type 3 pour ProfileSamples.
      */
     private float[] profileType3(int pts,float [] tab, int edgeId, int index_element){
-        int nb1 = elevations.get(index_element);
-        float f1 = Q28_4.asFloat(nb1);
-        double e = (double) (pts-1) / (double) 4;
-        int c = 0;
-        int numberOfElements = (int) Math.ceil(e) + index_element;
+        float echantillon1 = Q28_4.asFloat(Short.toUnsignedInt(elevations.get(index_element)));
         if(isInverted(edgeId)){
-            tab[pts-1] = f1;
-            --pts;
+            tab[pts-1] = echantillon1;
         }else{
-            tab[c]  = f1;
-            ++c;
+            tab[0] = echantillon1;
         }
-        for(int i = index_element+1; i <= numberOfElements; i++){
-            int nb2 = elevations.get(i);
-            for(int j = 3; j >= 0; j--){
-                int extract2 = Bits.extractSigned(nb2, j*4, 4);
-                float f2 = Q28_4.asFloat(extract2);
-                f1 += f2;
-                if(c < pts){
+        int counting = 1, offset = 1;
+        for(int i=index_element+1; i < pts + index_element; i+= 4){
+            for (int j = 3; j >= 0; j--){
+                float difference = Q28_4.asFloat(Bits.extractSigned(elevations.get(index_element+ offset), j*4,
+                        4));
+                echantillon1 += difference;
+                if(counting < pts){
                     if(isInverted(edgeId)){
-                        tab[pts-1] = f1;
-                        --pts;
+                        tab[pts - (counting + 1)] = echantillon1;
                     }else{
-                        tab[c]  = f1;
-                        ++c;
+                        tab[counting] = echantillon1;
                     }
-
                 }
-
-
-
+                ++counting;
             }
+            ++offset;
+
+
         }
         return tab;
 

@@ -1,5 +1,7 @@
 package ch.epfl.javelo.routing;
 
+import ch.epfl.javelo.Functions;
+import ch.epfl.javelo.Math2;
 import ch.epfl.javelo.data.Graph;
 import ch.epfl.javelo.projection.PointCh;
 
@@ -29,16 +31,17 @@ public record Edge(int fromNodId, int toNodeId, PointCh fromPoint, PointCh toPoi
      * @return une instance de edge avec les attributs donnés.
      */
     public static Edge of(Graph graph,int edgeId, int fromNodeId, int toNodeId){
-        return null; //Edge(fromNodeId, toNodeId, graph);
+        return new Edge(fromNodeId, toNodeId, graph.nodePoint(fromNodeId), graph.nodePoint(toNodeId),
+                graph.edgeLength(edgeId) , graph.edgeProfile(edgeId));
     }
 
     /**
      *
      * @param point point coordonnée
-     * @return la position qui se trouve au long de l'arête, en mètre, le plus proche de
+     * @return la position qui se trouve sur le  long de l'arête, en mètre, la plus proche du point.
      */
     public double positionClosestTo(PointCh point){
-        return 0.0;
+        return Math2.projectionLength(fromPoint.e(), fromPoint.n(), toPoint.e(), toPoint.n(), point.e(), point.n());
     }
 
     /**
@@ -47,7 +50,9 @@ public record Edge(int fromNodId, int toNodeId, PointCh fromPoint, PointCh toPoi
      * @return le point se trouvant à la position donnée sur l'arête.
      */
     public PointCh pointAt(double position){
-        return null;
+        double pourcentage = position / length;
+        return new PointCh(Math2.interpolate(fromPoint.e(), toPoint.e(), pourcentage),
+                Math2.interpolate(fromPoint.n(), toPoint.n(), pourcentage));
     }
 
     /**
@@ -56,6 +61,6 @@ public record Edge(int fromNodId, int toNodeId, PointCh fromPoint, PointCh toPoi
      * @return l'altitude, en mètre, de la position donnée sur l'arrête.
      */
     public double elevationAt(double position){
-        return 0.0;
+        return profile.applyAsDouble(position);
     }
 }
