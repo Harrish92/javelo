@@ -11,7 +11,7 @@ import java.util.function.DoubleUnaryOperator;
  *
  * @author Harrishan Raveendran (345291)
  *
- * @param fromNodId l'identité du noeud de départ de l'arête
+ * @param fromNodeId l'identité du noeud de départ de l'arête
  * @param toNodeId l'identité du noeud d'arrivée de l'arête
  * @param fromPoint le point de départ de l'arête
  * @param toPoint le point d'arrivée de l'arête
@@ -19,12 +19,13 @@ import java.util.function.DoubleUnaryOperator;
  * @param profile le profil en long de l'arête
  */
 
-public record Edge(int fromNodId, int toNodeId, PointCh fromPoint, PointCh toPoint, double length,
+public record Edge(int fromNodeId, int toNodeId, PointCh fromPoint, PointCh toPoint, double length,
                    DoubleUnaryOperator profile) {
 
     /**
      *
      * @param graph graphe
+     *
      * @param edgeId l'identité de l'arête
      * @param fromNodeId l'identité du noeud de départ de l'arête
      * @param toNodeId l'identité du noeud d'arrivée de l'arête

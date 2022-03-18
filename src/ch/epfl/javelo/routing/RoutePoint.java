@@ -19,7 +19,7 @@ public record RoutePoint(PointCh point, double position, double distanceToRefere
      * @return un point identique au récepteur (this) mais dont la position est décalée de la différence donnée,
      * qui peut être positive ou négative
      */
-    RoutePoint withPositionShiftedBy(double positionDifference){
+    public RoutePoint withPositionShiftedBy(double positionDifference){
         return new RoutePoint(point, position + positionDifference, distanceToReference);
     }
 
@@ -28,7 +28,7 @@ public record RoutePoint(PointCh point, double position, double distanceToRefere
      * @param that instance de RoutePoint
      * @return this si sa distance à la référence est inférieure ou égale à celle de that, et that sinon
      */
-    RoutePoint min(RoutePoint that){
+    public RoutePoint min(RoutePoint that){
         if(this.distanceToReference <= that.distanceToReference){
             return this;
         }else{
@@ -45,7 +45,7 @@ public record RoutePoint(PointCh point, double position, double distanceToRefere
      * @return this si sa distance à la référence est inférieure ou égale à thatDistanceToReference,
      * et une nouvelle instance de RoutePoint dont les attributs sont les arguments passés à min sinon.
      */
-    RoutePoint min(PointCh thatPoint, double thatPosition, double thatDistanceToReference){
+    public RoutePoint min(PointCh thatPoint, double thatPosition, double thatDistanceToReference){
         if(this.distanceToReference <= thatDistanceToReference){
             return this;
         }else{
