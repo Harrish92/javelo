@@ -1,9 +1,11 @@
 package ch.epfl.javelo.data;
 
 import ch.epfl.javelo.Functions;
+import ch.epfl.javelo.Preconditions;
 import ch.epfl.javelo.projection.PointCh;
 
 import java.io.IOException;
+import java.nio.LongBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Path;
@@ -42,24 +44,40 @@ public final class Graph {
      * @return le graphe.
      */
     public static Graph loadFrom(Path basePath) throws IOException {
-        String paths[] = {"nodes.bin", "sectors.bin", "edges.bin", "profile_Ids.bin",
+        /*String paths[] = {"nodes.bin", "sectors.bin", "edges.bin", "profile_ids.bin",
                 "elevations.bin", "attributes.bin"};//nodesIds: pour les test
         MappedByteBuffer[] buffers = new MappedByteBuffer[paths.length];
         for(int i = 0; i < paths.length; i++){
             try (FileChannel channel = FileChannel.open(basePath.resolve(paths[i]))) {
                 buffers[i] = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
             }
-        }
-        GraphNodes nodes = new GraphNodes(buffers[0].asIntBuffer());
-        GraphSectors sectors = new GraphSectors(buffers[1]);
-        GraphEdges edges = new GraphEdges(buffers[2],
-                buffers[3].asIntBuffer(), buffers[4].asShortBuffer());
+        }*/
+        GraphNodes nodes = new GraphNodes(bufferFromPath(basePath, "nodes.bin").asIntBuffer());
+        GraphSectors sectors = new GraphSectors(bufferFromPath(basePath, "sectors.bin"));
+        GraphEdges edges = new GraphEdges(bufferFromPath(basePath, "edges.bin"),
+                bufferFromPath(basePath, "profile_ids.bin").asIntBuffer(),
+                bufferFromPath(basePath, "elevations.bin").asShortBuffer());
 
         ArrayList<AttributeSet> attributeSetList = new ArrayList<>();
-        for( long bits : buffers[5].asLongBuffer().array()){
+        LongBuffer attBuffer = bufferFromPath(basePath, "attributes.bin").asLongBuffer();
+        for(int i = 0; i < attBuffer.capacity(); i++){
+            long bits = attBuffer.get(i);
             attributeSetList.add(new AttributeSet(bits));
         }
         return new Graph(nodes, sectors, edges, attributeSetList);
+    }
+
+    /**
+     * Créée un buffer à partir d'un fichier.
+     * @param basePath le chemin vers le répertoire.
+     * @param path le nom du fichier.
+     * @return un buffer d'octets.
+     * @throws IOException si le channel ne peut pas être ouvert.
+     */
+    private static MappedByteBuffer bufferFromPath(Path basePath, String path) throws IOException {
+        try (FileChannel channel = FileChannel.open(basePath.resolve(path))) {
+            return channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
+        }
     }
 
     /**
@@ -105,13 +123,14 @@ public final class Graph {
      * @return l'identité du noeud le plus proche.
      */
     public int nodeClosestTo(PointCh point, double searchDistance) {
-        int nID = 0;
-        double d = Math.pow(searchDistance, 2);
-        GraphSectors.Sector[] sectorList = (GraphSectors.Sector[]) sectors.sectorsInArea(point, searchDistance).toArray();
+        int nID = -1;
+        Preconditions.checkArgument(searchDistance >= 0);
+        double d = searchDistance;//Math.pow(searchDistance, 2);
+        ArrayList<GraphSectors.Sector> sectorList = (ArrayList<GraphSectors.Sector>) sectors.sectorsInArea(point, searchDistance);
         for(GraphSectors.Sector sector : sectorList){
             for(int i = sector.startNodeId(); i <= sector.endNodeId(); i++) {
                 PointCh pt = new PointCh(nodes.nodeE(i), nodes.nodeN(i));
-                if(point.squaredDistanceTo(pt) <= d){
+                if(point.distanceTo(pt) <= d){
                     nID = i;
                     d = point.distanceTo(pt);
                 }
