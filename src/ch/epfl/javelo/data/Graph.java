@@ -125,14 +125,14 @@ public final class Graph {
     public int nodeClosestTo(PointCh point, double searchDistance) {
         int nID = -1;
         Preconditions.checkArgument(searchDistance >= 0);
-        double d = searchDistance;//Math.pow(searchDistance, 2);
+        double d = Math.pow(searchDistance, 2);
         ArrayList<GraphSectors.Sector> sectorList = (ArrayList<GraphSectors.Sector>) sectors.sectorsInArea(point, searchDistance);
         for(GraphSectors.Sector sector : sectorList){
             for(int i = sector.startNodeId(); i <= sector.endNodeId(); i++) {
                 PointCh pt = new PointCh(nodes.nodeE(i), nodes.nodeN(i));
-                if(point.distanceTo(pt) <= d){
+                if(point.squaredDistanceTo(pt) <= d){
                     nID = i;
-                    d = point.distanceTo(pt);
+                    d = point.squaredDistanceTo(pt);
                 }
             }
         }
