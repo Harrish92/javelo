@@ -164,7 +164,7 @@ public final class Graph {
      * @return un ensemble d'attributs.
      */
     public AttributeSet edgeAttributes(int edgeId) {
-        return new AttributeSet(edges.attributesIndex(edgeId));
+        return  attributeSets.get(edges.attributesIndex(edgeId));
     }
 
     /**

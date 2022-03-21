@@ -1,5 +1,6 @@
 package ch.epfl.javelo.routing;
 
+import ch.epfl.javelo.Math2;
 import ch.epfl.javelo.Preconditions;
 
 import java.util.ArrayList;
@@ -29,10 +30,22 @@ public final class ElevationProfileComputer {
         while (Float.isNaN(points[k])){k--;}
         Arrays.fill(points, k, points.length, points[k]);
         //phase 3
-        long bg = 0;
-        long bd = 0;
-        for(int l = j; l <= k; l++){
-
+        float bg = 0;
+        float bd = 0;
+        int c = 0;
+        for(int l = j + 1; l <= k; l++){
+            if(Float.isNaN(points[l])){
+                bg = points[l-1];
+                c = 1;
+                while (Float.isNaN(points[l])){++l;++c;}
+                bd = points[l];
+                /*Arrays.fill(points,l-c,l-1, );
+                Math2.interpolate(bg, bd, 1/(c+2));*/
+                //+que 1 trou
+                for(int d = 1; d < c; ++d){
+                    points[l - c + d] = (float) Math2.interpolate(bg, bd, d/(c-1));//TODO: verifier
+                }
+            }
         }
         return new ElevationProfile(nbPoints*maxStepLength, points);
     }
