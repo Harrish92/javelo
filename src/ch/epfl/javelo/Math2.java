@@ -132,10 +132,10 @@ public final class Math2{
      * @return retourne la longeur de la projection du vecteur AP sur le vecteur AB.
      */
     public static double projectionLength(double aX, double aY, double bX, double bY, double pX, double pY){
-        double uX = Math.abs(aX - pX);
-        double uY = Math.abs(aY - pY);
-        double vX = Math.abs(aX-bX);
-        double vY = Math.abs(aY-bY);
+        double uX = aX - pX;
+        double uY = aY - pY;
+        double vX = aX-bX;
+        double vY = aY-bY;
         return (dotProduct(uX, uY, vX, vY) / norm(vX, vY));
     }
 
