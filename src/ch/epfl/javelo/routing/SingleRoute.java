@@ -131,14 +131,15 @@ public final class SingleRoute implements Route {
         }
 
         int index = Arrays.binarySearch(tab, position);
-        if(index == 0){
+        if(index >= 0){
             return edges.get(index).elevationAt(position);
         }
-        if (index < 0) {
-            index = -index - 1;
-
+        int new_index = -index - 1;
+        if(new_index == 0){
+            return edges.get(new_index).elevationAt(position);
+        }else{
+            return edges.get(new_index-1).elevationAt(position);
         }
-        return edges.get(index-1).elevationAt(position);
 
     }
 
