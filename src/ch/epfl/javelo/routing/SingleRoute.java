@@ -1,5 +1,6 @@
 package ch.epfl.javelo.routing;
 
+import ch.epfl.javelo.Math2;
 import ch.epfl.javelo.Preconditions;
 import ch.epfl.javelo.projection.PointCh;
 
@@ -101,12 +102,10 @@ public final class SingleRoute implements Route {
         if(index == 0){
             return edges.get(index).pointAt(position);
         }
-        if(index > 0){
-            return edges.get(index-1).pointAt(position);
-        }else{
-            index = -index -1;
-            return edges.get(index-1).pointAt(position);
+        if (index < 0) {
+            index = -index - 1;
         }
+        return edges.get(index-1).pointAt(position);
     }
 
     /**
@@ -117,30 +116,71 @@ public final class SingleRoute implements Route {
      */
     @Override
     public double elevationAt(double position) {
+        double[] tab = new double[edges.size()+1];
+        double longueur = 0;
+        tab[0] = longueur;
+
         if(position < 0)
             position = 0;
         if(position > this.length())
             position = this.length();
 
-        return 0d;
+        for(int i=0; i < edges.size(); ++i){
+            longueur += edges.get(i).length();
+            tab[i+1] = longueur;
+        }
+
+        int index = Arrays.binarySearch(tab, position);
+        if(index == 0){
+            return edges.get(index).elevationAt(position);
+        }
+        if (index < 0) {
+            index = -index - 1;
+
+        }
+        return edges.get(index-1).elevationAt(position);
 
     }
 
     /**
      *
-     * @param position
-     * @return
+     * @param position sur l'arête
+     * @return  l'identité du nœud appartenant à l'itinéraire et se trouvant le plus proche de la position donnée
      */
     @Override
     public int nodeClosestTo(double position) {
+        double[] tab = new double[edges.size()+1];
+        double longueur = 0;
+        tab[0] = longueur;
+
         if(position < 0)
             position = 0;
         if(position > this.length())
             position = this.length();
 
-        return 0;
+        for(int i=0; i < edges.size(); ++i){
+            longueur += edges.get(i).length();
+            tab[i+1] = longueur;
+        }
+
+        int index = Arrays.binarySearch(tab, position);
+        if(index >= 0){
+            return edges.get(index).fromNodeId();
+        }
+        int new_index = -index - 1;
+        if(new_index == 0){
+            return edges.get(new_index).fromNodeId();
+        }else{
+            return edges.get(new_index-1).fromNodeId();
+        }
+
     }
 
+    /**
+     *
+     * @param point un point de coordonée
+     * @return le point de l'itinéraire se trouvant le plus proche du point de référence donné
+     */
     @Override
     public RoutePoint pointClosestTo(PointCh point) {
         return null;
