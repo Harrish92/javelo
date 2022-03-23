@@ -25,7 +25,6 @@ public final class SingleRoute implements Route {
     public SingleRoute(List<Edge> edges){
         Preconditions.checkArgument(!edges.isEmpty());
         this.edges = edges;
-        //new SingleRoute(edges);
 
 
     }
@@ -48,8 +47,8 @@ public final class SingleRoute implements Route {
     @Override
     public double length() {
         double length = 0;
-        for(int i=1; i < edges.size(); ++i){
-            length += Math.abs((double) (edges.get(i).length() - edges.get(i-1).length()));
+        for(int i=0; i < edges.size(); ++i){
+            length += edges.get(i).length();
         }
         return length;
     }
@@ -99,13 +98,15 @@ public final class SingleRoute implements Route {
         }
         int index = Arrays.binarySearch(tab, position);
 
-        if(index == 0){
+        if(index >= 0){
             return edges.get(index).pointAt(position);
         }
-        if (index < 0) {
-            index = -index - 1;
+        int new_index = -index - 1;
+        if(new_index == 0){
+            return edges.get(new_index).pointAt(position);
+        }else{
+            return edges.get(new_index-1).pointAt(position);
         }
-        return edges.get(index-1).pointAt(position);
     }
 
     /**
@@ -184,6 +185,18 @@ public final class SingleRoute implements Route {
      */
     @Override
     public RoutePoint pointClosestTo(PointCh point) {
-        return null;
+        int index = 0;
+        double min = edges.get(0).positionClosestTo(point);
+
+        for(int i=0; i < edges.size(); ++i){
+            double max = edges.get(i).positionClosestTo(point);
+            if(max < min)
+                index = i;
+                min = max;
+        }
+        PointCh pch = edges.get(index).pointAt(min);
+        double position = min;
+        double distanceToReference = point.distanceTo(pch);
+        return new RoutePoint(pch, position, distanceToReference);
     }
 }
