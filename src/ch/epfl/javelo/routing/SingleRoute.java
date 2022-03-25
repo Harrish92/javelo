@@ -20,7 +20,7 @@ public final class SingleRoute implements Route {
 
     /**
      *
-     * @param edges liste cone
+     * @param edges liste d'edge
      *  Constructeur public qui retourne l'itinéraire simple composé des arêtes données,
      *  ou lève IllegalArgumentException si la liste d'arêtes est vide.
      */
