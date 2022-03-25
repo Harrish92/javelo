@@ -14,7 +14,8 @@ import java.util.List;
  */
 
 public final class SingleRoute implements Route {
-    private List<Edge> edges;
+    private final List<Edge> edges;
+    private final double[] tab;
 
     /**
      *
@@ -27,6 +28,21 @@ public final class SingleRoute implements Route {
         this.edges = edges;
 
 
+        tab = new double[edges.size()+1]; // 6 elements
+        double longueur = 0;
+        tab[0] = longueur;
+
+        for(int i=0; i < this.edges.size(); i++){
+            longueur += this.edges.get(i).length();
+            tab[i+1] = longueur;
+        }
+
+    }
+
+    /** Constructeur de copie */
+
+    public SingleRoute(SingleRoute that){
+        this(that.edges);
     }
 
     /**
@@ -47,8 +63,8 @@ public final class SingleRoute implements Route {
     @Override
     public double length() {
         double length = 0;
-        for(int i=0; i < edges.size(); ++i){
-            length += edges.get(i).length();
+        for (Edge edge : edges) {
+            length += edge.length();
         }
         return length;
     }
@@ -69,10 +85,10 @@ public final class SingleRoute implements Route {
     @Override
     public List<PointCh> points() {
         List<PointCh> list  = new ArrayList<>();
-        for(int i=0; i < edges.size(); ++i){
-            list.add(edges.get(i).fromPoint());
-            list.add(edges.get(i).toPoint());
+        for (Edge edge : edges) {
+            list.add(edge.fromPoint());
         }
+        list.add(edges.get(edges.size()-1).toPoint());
         return list;
     }
 
@@ -83,30 +99,22 @@ public final class SingleRoute implements Route {
      */
     @Override
     public PointCh pointAt(double position) {
-        double[] tab = new double[edges.size()+1];
-        double longueur = 0;
-        tab[0] = longueur;
+        position = Math2.clamp(0, position, this.length());
 
-        if(position < 0)
-            position = 0;
-        if(position > this.length())
-            position = this.length();
-
-        for(int i=0; i < edges.size(); ++i){
-            longueur += edges.get(i).length();
-            tab[i+1] = longueur;
-        }
         int index = Arrays.binarySearch(tab, position);
 
-        if(index >= 0){
+        if(index > 0){
+            index -= 1;
+            position -= tab[index];
             return edges.get(index).pointAt(position);
         }
-        int new_index = -index - 1;
-        if(new_index == 0){
-            return edges.get(new_index).pointAt(position);
-        }else{
-            return edges.get(new_index-1).pointAt(position);
+        if(index == 0){
+            return edges.get(index).pointAt(position);
         }
+        index = -index - 2;
+        position-= tab[index];
+        return edges.get(index).pointAt(position);
+
     }
 
     /**
@@ -117,21 +125,23 @@ public final class SingleRoute implements Route {
      */
     @Override
     public double elevationAt(double position) {
-        double[] tab = new double[edges.size()+1];
-        double longueur = 0;
-        tab[0] = longueur;
-
-        if(position < 0)
-            position = 0;
-        if(position > this.length())
-            position = this.length();
-
-        for(int i=0; i < edges.size(); ++i){
-            longueur += edges.get(i).length();
-            tab[i+1] = longueur;
-        }
+        position = Math2.clamp(0, position, this.length());
 
         int index = Arrays.binarySearch(tab, position);
+
+        if(index > 0){
+            index -= 1;
+            position -= tab[index];
+            return edges.get(index).elevationAt(position);
+        }
+        if(index == 0){
+            return edges.get(index).elevationAt(position);
+        }
+        index = -index - 2;
+        position-= tab[index];
+        return edges.get(index).elevationAt(position);
+
+        /*
         if(index >= 0){
             return edges.get(index).elevationAt(position);
         }
@@ -142,6 +152,8 @@ public final class SingleRoute implements Route {
             return edges.get(new_index-1).elevationAt(position);
         }
 
+         */
+
     }
 
     /**
@@ -151,20 +163,21 @@ public final class SingleRoute implements Route {
      */
     @Override
     public int nodeClosestTo(double position) {
-        double[] tab = new double[edges.size()+1];
-        double longueur = 0;
-        tab[0] = longueur;
+        position = Math2.clamp(0, position, this.length());
 
-        if(position < 0)
-            position = 0;
-        if(position > this.length())
-            position = this.length();
+        int index = Arrays.binarySearch(tab, position);
 
-        for(int i=0; i < edges.size(); ++i){
-            longueur += edges.get(i).length();
-            tab[i+1] = longueur;
+        if(index > 0){
+            index -= 1;
+            return edges.get(index).fromNodeId();
         }
+        if(index == 0){
+            return edges.get(index).fromNodeId();
+        }
+        index = -index - 2;
+        return edges.get(index).fromNodeId();
 
+        /*
         int index = Arrays.binarySearch(tab, position);
         if(index >= 0){
             return edges.get(index).fromNodeId();
@@ -176,6 +189,8 @@ public final class SingleRoute implements Route {
             return edges.get(new_index-1).fromNodeId();
         }
 
+         */
+
     }
 
     /**
@@ -186,17 +201,18 @@ public final class SingleRoute implements Route {
     @Override
     public RoutePoint pointClosestTo(PointCh point) {
         int index = 0;
-        double min = edges.get(0).positionClosestTo(point);
+        double dtf_min = point.distanceTo(edges.get(0).pointAt(edges.get(0).positionClosestTo(point)));
 
-        for(int i=0; i < edges.size(); ++i){
-            double max = edges.get(i).positionClosestTo(point);
-            if(max < min)
+        for(int i=1; i < edges.size(); ++i){
+            double dtf_max = point.distanceTo(edges.get(i).pointAt(edges.get(i).positionClosestTo(point)));
+            if(dtf_max < dtf_min) {
+                dtf_min = dtf_max;
                 index = i;
-                min = max;
+            }
         }
+        double min = edges.get(index).positionClosestTo(point);
         PointCh pch = edges.get(index).pointAt(min);
-        double position = min;
-        double distanceToReference = point.distanceTo(pch);
-        return new RoutePoint(pch, position, distanceToReference);
+        double position = min + tab[index];
+        return new RoutePoint(pch, position, dtf_min);
     }
 }
