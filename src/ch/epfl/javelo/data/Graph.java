@@ -192,7 +192,9 @@ public final class Graph {
      * @return une fonction.
      */
     public DoubleUnaryOperator edgeProfile(int edgeId) {
+        if(!edges.hasProfile(edgeId)){
+            return Functions.constant(Double.NaN);
+        }
         return Functions.sampled(edges.profileSamples(edgeId), edgeLength(edgeId));
-
     }
 }
