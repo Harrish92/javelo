@@ -6,6 +6,7 @@ import ch.epfl.javelo.projection.PointCh;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -23,28 +24,21 @@ public final class SingleRoute implements Route {
      *  Constructeur public qui retourne l'itinéraire simple composé des arêtes données,
      *  ou lève IllegalArgumentException si la liste d'arêtes est vide.
      */
-    public SingleRoute(List<Edge> edges){
+    public SingleRoute(List<Edge> edges) {
         Preconditions.checkArgument(!edges.isEmpty());
-        this.edges = edges;
+        this.edges = List.copyOf(edges);
 
 
-        tab = new double[edges.size()+1]; // 6 elements
+        tab = new double[edges.size() + 1];
         double longueur = 0;
         tab[0] = longueur;
 
-        for(int i=0; i < this.edges.size(); i++){
+        for (int i = 0; i < this.edges.size(); i++) {
             longueur += this.edges.get(i).length();
-            tab[i+1] = longueur;
+            tab[i + 1] = longueur;
         }
 
     }
-
-    /** Constructeur de copie */
-
-    public SingleRoute(SingleRoute that){
-        this(that.edges);
-    }
-
     /**
      *
      * @param position position de l'arête
@@ -141,19 +135,6 @@ public final class SingleRoute implements Route {
         position-= tab[index];
         return edges.get(index).elevationAt(position);
 
-        /*
-        if(index >= 0){
-            return edges.get(index).elevationAt(position);
-        }
-        int new_index = -index - 1;
-        if(new_index == 0){
-            return edges.get(new_index).elevationAt(position);
-        }else{
-            return edges.get(new_index-1).elevationAt(position);
-        }
-
-         */
-
     }
 
     /**
@@ -169,27 +150,22 @@ public final class SingleRoute implements Route {
 
         if(index > 0){
             index -= 1;
-            return edges.get(index).fromNodeId();
+            position -= tab[index];
+            if((edges.get(index).length() / 2) > position){
+                return edges.get(index).fromNodeId();
+            }
+            return edges.get(index).toNodeId();
         }
         if(index == 0){
             return edges.get(index).fromNodeId();
         }
         index = -index - 2;
-        return edges.get(index).fromNodeId();
-
-        /*
-        int index = Arrays.binarySearch(tab, position);
-        if(index >= 0){
+        position -= tab[index];
+        if((edges.get(index).length() / 2) > position){
             return edges.get(index).fromNodeId();
         }
-        int new_index = -index - 1;
-        if(new_index == 0){
-            return edges.get(new_index).fromNodeId();
-        }else{
-            return edges.get(new_index-1).fromNodeId();
-        }
+        return edges.get(index).toNodeId();
 
-         */
 
     }
 
