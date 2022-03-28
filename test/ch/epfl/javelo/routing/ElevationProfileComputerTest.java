@@ -1,168 +1,212 @@
 package ch.epfl.javelo.routing;
 
-import ch.epfl.javelo.Math2;
-import ch.epfl.javelo.Preconditions;
-import ch.epfl.javelo.data.Graph;
+import ch.epfl.javelo.projection.PointCh;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.function.DoubleUnaryOperator;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static ch.epfl.javelo.routing.ElevationProfileComputer.elevationProfile;
+import static ch.epfl.test.TestRandomizer.RANDOM_ITERATIONS;
+import static ch.epfl.test.TestRandomizer.newRandom;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ElevationProfileComputerTest {
-
+    @Test
+    void elevationProfileComputerThrowsWithZeroMaxStepLength() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            elevationProfile(new FakeRoute(), 0);
+        });
+    }
 
     @Test
-    void ElevationProfileComputerOneEdge() throws IOException {
-        ArrayList<Edge> liste = new ArrayList<>();
-        Graph graph = Graph.loadFrom(Path.of("lausanne"));
-        liste.add(Edge.of(graph, graph.nodeOutEdgeId(2033, 0),2033,2034));
-        SingleRoute route = new SingleRoute(liste);
-        ElevationProfile profile = ElevationProfileComputer.elevationProfile(route, 2);
-        System.out.println(profile.totalAscent());
-        assertEquals(liste.get(0).length(), profile.length(), 1e-3);
-        for(int i = -1; i < 40; i++) {
-            assertEquals(route.elevationAt(i), profile.elevationAt(i), 1e-2);
+    void elevationProfileComputerWorksWithCompletelyUnknownProfile() {
+        for (int i = 1; i < 10; i += 1) {
+            var route = new FakeRoute(i, x -> Double.NaN);
+            var profile = elevationProfile(route, 500);
+
+            assertEquals(route.length(), profile.length());
+            assertEquals(0, profile.minElevation());
+            assertEquals(0, profile.maxElevation());
+            assertEquals(0, profile.totalAscent());
+            assertEquals(0, profile.totalDescent());
+            assertEquals(0, profile.elevationAt(Math.nextDown(0)));
+            assertEquals(0, profile.elevationAt(500));
+            assertEquals(0, profile.elevationAt(Math.nextUp(route.length())));
         }
     }
 
     @Test
-    void ElevationProfileComputerMultipleEdges() throws IOException {
-        ArrayList<Edge> liste = new ArrayList<>();
-        Graph graph = Graph.loadFrom(Path.of("lausanne"));
-        for (int i = 0; i < 10; i++) {
-            liste.add(Edge.of(graph, graph.nodeOutEdgeId(2033+i, 0),2033+i,2034+i));
-        }
-        SingleRoute route = new SingleRoute(liste);
-        ElevationProfile profile = ElevationProfileComputer.elevationProfile(route, 2);
-        System.out.println(profile.totalAscent());
-        assertEquals(route.length(), profile.length(), 1e-3);
-        for(int i = -1; i < 300; i++) {
-            assertEquals(route.elevationAt(i), profile.elevationAt(i), 9e-1);
+    void elevationProfileComputerWorksWithHoleAtBeginning() {
+        var elevation = 500d;
+        var route = new FakeRoute(1, x -> x < FakeRoute.EDGE_LENGTH / 2d ? Double.NaN : elevation);
+        var profile = elevationProfile(route, 1);
+        assertEquals(elevation, profile.minElevation());
+        assertEquals(elevation, profile.maxElevation());
+        assertEquals(0, profile.totalAscent());
+        assertEquals(0, profile.totalDescent());
+        for (double p = 0; p < route.length(); p += 1) {
+            assertEquals(elevation, profile.elevationAt(p));
         }
     }
 
     @Test
-    void ElevationProfileComputerError() {
-        assertThrows(IllegalArgumentException.class, () -> ElevationProfileComputer.elevationProfile(null, 0));
-        assertThrows(IllegalArgumentException.class, () -> ElevationProfileComputer.elevationProfile(null, -1));
+    void elevationProfileComputerWorksWithHoleAtEnd() {
+        var elevation = 500d;
+        var route = new FakeRoute(1, x -> x > FakeRoute.EDGE_LENGTH / 2d ? Double.NaN : elevation);
+        var profile = elevationProfile(route, 1);
+        assertEquals(elevation, profile.minElevation());
+        assertEquals(elevation, profile.maxElevation());
+        assertEquals(0, profile.totalAscent());
+        assertEquals(0, profile.totalDescent());
+        for (double p = 0; p < route.length(); p += 1) {
+            assertEquals(elevation, profile.elevationAt(p));
+        }
     }
 
     @Test
-    void ElevationProfileComputerSimplified() {
-        float[] l = {1,2,3,4,5,6,7,8};
-        assertArrayEquals(l, elevationProfileT(l, 1));
-        l[0] = Float.NaN;
-        l[1] = Float.NaN;
-        l[2] = Float.NaN;
-        l[7] = Float.NaN;
-        //assertArrayEquals(new float[] {4,4,4,4,5,6,7,7}, elevationProfileT(l, 1));
-        l[4] = Float.NaN;
-        l[5] = Float.NaN;
-        System.out.println(Math2.interpolate(4, 7, 1/2.0));
-        assertArrayEquals(new float[] {4,4,4,4,5,6,7,7}, elevationProfileT(l, 1));
+    void elevationProfileComputerWorksWithMissingValuesInTheMiddle() {
+        var startElevation = 100;
+        var endElevation = startElevation + FakeRoute.EDGE_LENGTH;
+        DoubleUnaryOperator edgeProfile = x -> {
+            if (x < 0.1)
+                return startElevation;
+            else if (x > FakeRoute.EDGE_LENGTH - 0.1)
+                return endElevation;
+            else
+                return Double.NaN;
+        };
+        var route = new FakeRoute(1, edgeProfile);
+        var profile = elevationProfile(route, 1);
+        assertEquals(endElevation - startElevation, profile.totalAscent(), 1);
+        assertEquals(0, profile.totalDescent());
+        assertEquals(startElevation, profile.minElevation());
+        assertEquals(endElevation, profile.maxElevation());
+        for (double p = 0; p < route.length(); p += 1) {
+            var elevation = startElevation + (endElevation - startElevation) * (p / FakeRoute.EDGE_LENGTH);
+            assertEquals(elevation, profile.elevationAt(p), 1e-2);
+        }
     }
 
-    public static float[] elevationProfileT(float[] liste, double maxStepLength) {
-        Preconditions.checkArgument(maxStepLength > 0);
-        //int nbPoints = (int) (Math.ceil(liste.length / maxStepLength)) + 1;
-        float[] points = liste;
-        //phase 1
-        int j = 0;
-        while(Float.isNaN(points[j])) {j++;}
-        Arrays.fill(points, 0, j, points[j]);
-        //phase 2
-        int k = points.length - 1;
-        while (Float.isNaN(points[k])){k--;}
-        Arrays.fill(points, k, points.length, points[k]);
-        //phase 3
-        float bg = 0;
-        float bd = 0;
-        int c = 0;
-        for(int l = j + 1; l <= k; l++){
-            if(Float.isNaN(points[l])){
-                bg = points[l-1];
-                c = 1;
-                while (Float.isNaN(points[l])){++l;++c;}
-                bd = points[l];
-                /*Arrays.fill(points,l-c,l-1, );
-                Math2.interpolate(bg, bd, 1/(c+2));*/
-                //plus que 1 trou ?
-                for (int d = 1; d <= c - 1; ++d) {
-                    points[l - c + d] = (float) Math2.interpolate(bg, bd, (double)d / c);
-                }
+    @Test
+    void elevationProfileComputerWorksWithHolesOfDifferentLengths() {
+        var samples = new double[1001];
+
+        var holeLength = 0;
+        var remainingNaNsToInsert = 0;
+        for (int i = 0; i < samples.length; i += 1) {
+            if (remainingNaNsToInsert == 0) {
+                samples[i] = i;
+                holeLength += 1;
+                remainingNaNsToInsert = holeLength;
+            } else {
+                samples[i] = Double.NaN;
+                remainingNaNsToInsert -= 1;
             }
         }
-        return points;
+        samples[samples.length - 1] = samples.length - 1;
+
+        var route = new FakeRoute(1, x -> samples[(int) Math.rint(x)]);
+        var profile = elevationProfile(route, 1);
+        for (int i = 0; i < FakeRoute.EDGE_LENGTH; i += 1)
+            assertEquals(i, profile.elevationAt(i), 1e-4);
     }
-    //TTT
+
     @Test
-    void elevationProfileComputerWorksOnArrays() throws IOException {
-
-        Graph graph = Graph.loadFrom(Path.of("lausanne"));
-        //Route route = new ClasseImplementantRoute(Edge.of(graph, graph.nodeOutEdgeId(2022,0),2022,2023));
-        float[] expected1 = {1, 2, 3, 4, 5};
-        float[] tableau1 = {1, 2, 3, Float.NaN, 5};
-        float[] expected2 = {1, 2, 3, 4, 5};
-        float[] tableau2 = {1, 2, Float.NaN, Float.NaN, 5};
-        float[] expected3 = {1, 2, 3, 4, 4};
-        float[] tableau3 = {1, 2, 3, 4, Float.NaN};
-        float[] expected4 = {2, 2, 3, 4, 5};
-        float[] tableau4 = {Float.NaN, 2, 3, 4, 5};
-        float[] expected5= {3,3,3,10.5f,18,19.33f,20.66f,22,23,23,23,23};
-        float[] tableau5 = {Float.NaN,Float.NaN,3,Float.NaN, 18, Float.NaN, Float.NaN, 22,23, Float.NaN,Float.NaN,Float.NaN};
-        assertArrayEquals(expected1, elevationTableau(tableau1));
-        assertArrayEquals(expected2, elevationTableau(tableau2));
-        assertArrayEquals(expected3, elevationTableau(tableau3));
-        assertArrayEquals(expected4, elevationTableau(tableau4));
-
-        assertEquals(3, nbSamples(15,8));
-
+    void elevationProfileComputerWorksWithFullyKnownProfile() {
+        DoubleUnaryOperator edgeProfile =
+                x -> 600d + 500d * Math.sin(2d * Math.PI / FakeRoute.EDGE_LENGTH);
+        var route = new FakeRoute(1, edgeProfile);
+        var profile = elevationProfile(route, 0.1);
+        var rng = newRandom();
+        for (int i = 0; i < RANDOM_ITERATIONS; i += 1) {
+            var p = rng.nextDouble(0, route.length());
+            assertEquals(edgeProfile.applyAsDouble(p), profile.elevationAt(p), 1e-3);
+        }
     }
 
-    private float[] elevationTableau(float[] tableau) {
-        float[] elevationSamples = tableau;
-        int nbPoints = 5; //faut définir ici le nb de samples
-        //le code de ta méthode pour remplir le tableau/interpoler
-        float[] points = new float[nbPoints];
-        double stepLength = 1;
-        points = tableau;
-        //phase 1
-        int j = 0;
-        while(Float.isNaN(points[j])) {j++;}
-        Arrays.fill(points, 0, j, points[j]);
-        //phase 2
-        int k = points.length - 1;
-        while (Float.isNaN(points[k])){k--;}
-        Arrays.fill(points, k, points.length, points[k]);
-        //phase 3
-        float bg = 0;
-        float bd = 0;
-        int c = 0;
-        for(int l = j + 1; l <= k; l++){
-            if(Float.isNaN(points[l])){
-                bg = points[l-1];
-                c = 1;
-                while (Float.isNaN(points[l])){++l;++c;}
-                bd = points[l];
-                /*Arrays.fill(points,l-c,l-1, );
-                Math2.interpolate(bg, bd, 1/(c+2));*/
-                //plus que 1 trou ?
-                for (int d = 1; d <= c - 1; ++d) {
-                    points[l - c + d] = (float) Math2.interpolate(bg, bd, (double) d / c);
-                }
+    private static final class FakeRoute implements Route {
+        private static final double ORIGIN_E = 2_600_000;
+        private static final double ORIGIN_N = 1_200_000;
+        private static final double EDGE_LENGTH = 1_000;
+
+        private final int edgesCount;
+        private final DoubleUnaryOperator edgeProfile;
+
+        public FakeRoute(int edgesCount, DoubleUnaryOperator edgeProfile) {
+            this.edgesCount = edgesCount;
+            this.edgeProfile = edgeProfile;
+        }
+
+        public FakeRoute() {
+            this(1, x -> Double.NaN);
+        }
+
+        @Override
+        public int indexOfSegmentAt(double position) {
+            return 0;
+        }
+
+        @Override
+        public double length() {
+            return Math.nextDown(edgesCount * EDGE_LENGTH);
+        }
+
+        @Override
+        public List<Edge> edges() {
+            var points = points();
+            var edges = new ArrayList<Edge>(edgesCount);
+            for (int i = 0; i < edgesCount; i += 1) {
+                var p1 = points.get(i);
+                var p2 = points.get(i + 1);
+                edges.add(new Edge(i, i + 1, p1, p2, EDGE_LENGTH, edgeProfile));
+            }
+            return Collections.unmodifiableList(edges);
+        }
+
+        @Override
+        public List<PointCh> points() {
+            var points = new ArrayList<PointCh>(edgesCount + 1);
+            for (int i = 0; i < edgesCount + 1; i += 1)
+                points.add(new PointCh(ORIGIN_E + i * EDGE_LENGTH, ORIGIN_N));
+            return Collections.unmodifiableList(points);
+        }
+
+        @Override
+        public PointCh pointAt(double position) {
+            position = max(0, min(position, length()));
+            return new PointCh(ORIGIN_E + position, ORIGIN_N);
+        }
+
+        @Override
+        public double elevationAt(double position) {
+            position = max(0, min(position, length()));
+            return edgeProfile.applyAsDouble(position % EDGE_LENGTH);
+        }
+
+        @Override
+        public int nodeClosestTo(double position) {
+            position = max(0, min(position, length()));
+            return (int) Math.rint(position / EDGE_LENGTH);
+        }
+
+        @Override
+        public RoutePoint pointClosestTo(PointCh point) {
+            if (point.e() <= ORIGIN_E) {
+                var origin = new PointCh(ORIGIN_E, ORIGIN_N);
+                return new RoutePoint(origin, 0, point.distanceTo(origin));
+            } else if (point.e() >= ORIGIN_E + edgesCount * EDGE_LENGTH) {
+                var lastPoint = new PointCh(ORIGIN_E + edgesCount * EDGE_LENGTH, ORIGIN_N);
+                return new RoutePoint(lastPoint, 0, point.distanceTo(lastPoint));
+            } else {
+                var p = new PointCh(point.e(), ORIGIN_N);
+                return new RoutePoint(p, point.e() - ORIGIN_E, point.n() - ORIGIN_N);
             }
         }
-        return points;
-    }
-
-    private int nbSamples(double length, double maxStepLength){
-        //ton calcul de nbSamples dans la classe
-        int nbSamples = (int)Math.ceil(length/maxStepLength)+1;
-        return nbSamples;
     }
 }
