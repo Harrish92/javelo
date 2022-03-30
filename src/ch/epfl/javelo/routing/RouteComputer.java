@@ -41,10 +41,10 @@ public class RouteComputer {
      * @param endNodeId le noeud d'arrivée.
      * @return un itinéraire ou null s'il en existe aucun.
      */
-    /*public Route bestRouteBetween(int startNodeId, int endNodeId) {
+    public Route bestRouteBetween(int startNodeId, int endNodeId) {
         int nbN = graph.nodeCount();
         double[] distance = new double[nbN];
-        WeightedNode[] predecesseur = new WeightedNode[nbN];
+        int[] predecesseur = new int[nbN];
         int[] predecesseurEdgeId = new int[nbN];
         for(int nID = 0; nID < nbN; nID++){
             distance[nID] = (int) Double.POSITIVE_INFINITY;
@@ -54,33 +54,38 @@ public class RouteComputer {
         PriorityQueue<WeightedNode> enExploration = new PriorityQueue<>();
         enExploration.add(new WeightedNode(startNodeId, 0));
         while(!enExploration.isEmpty()) {
-            WeightedNode N = enExploration.remove();
-            if(N.nodeId == endNodeId) {
+            int N = enExploration.remove().nodeId;
+            System.out.println(enExploration.size());
+            if(N == endNodeId) {
+                System.out.println("FINNNNN");
                 //TERMINER
                 ArrayList<Edge> edgesList = new ArrayList<>();
-                while(predecesseur[N.nodeId] != 0) {//TODO: verifier
-                    Edge edge = Edge.of(graph, predecesseurEdgeId[predecesseur[N.nodeId]], N, predecesseur[N.nodeId]);
+                while(predecesseur[N] != 0) {//TODO: verifier
+                    Edge edge = Edge.of(graph, predecesseurEdgeId[predecesseur[N]], N, predecesseur[N]);
                     edgesList.add(edge);
-                    N = predecesseur[N.nodeId];
+                    N = predecesseur[N];
                 }
                 SingleRoute route = new SingleRoute(edgesList);
+                return route;
             }
             for(int i = 0; i < graph.nodeOutDegree(N); i++) {//TODO: costfunction ?
                 int edgeId = graph.nodeOutEdgeId(N, i);
                 int Np = graph.edgeTargetNodeId(edgeId);
-                double d = distance[N] + graph.edgeLength(edgeId);
+                CostFunction costFunction = new CityBikeCF(graph);
+                //double d = distance[N] * costFunction.costFactor(N, edgeId) + graph.edgeLength(edgeId);
+                double d = distance[N] + graph.edgeLength(edgeId)*costFunction.costFactor(N, edgeId);
                 if(d < distance[Np]){
                     distance[Np] = d;
                     predecesseur[Np] = N;
                     predecesseurEdgeId[Np] = edgeId;
-                    enExploration.add(Np);
+                    enExploration.add(new WeightedNode(Np, (float) d));
                 }
             }
         }
         return null;
-    }*/
-    /* //pas weightednode
-    public Route bestRouteBetween(int startNodeId, int endNodeId) {
+    }
+    //pas weightednode
+    /*public Route bestRouteBetween(int startNodeId, int endNodeId) {
         int nbN = graph.nodeCount();
         double[] distance = new double[nbN];
         int[] predecesseur = new int[nbN];
@@ -117,6 +122,6 @@ public class RouteComputer {
             }
         }
         return null;
-    }
-    */
+    }*/
+
 }

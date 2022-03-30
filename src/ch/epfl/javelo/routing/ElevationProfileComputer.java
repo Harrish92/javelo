@@ -29,16 +29,17 @@ public final class ElevationProfileComputer {
         //nbPoints = 2;
         float[] points = new float[nbPoints];
         for(int i = 0; i < nbPoints; i++) {
-            double position = i*stepLength;
+            double position = Math.ceil(i*stepLength);
             points[i] = (float) route.elevationAt(position);
         }
         //phase 1
         int j = 0;
-        while(Float.isNaN(points[j])) {j++;}
+        while(Float.isNaN(points[j]) && j < points.length - 1) {j++;}
+        if(Float.isNaN(points[j])){points[j] = 0;}
         Arrays.fill(points, 0, j, points[j]);
         //phase 2
         int k = points.length - 1;
-        while (Float.isNaN(points[k])){k--;}
+        while (Float.isNaN(points[k]) && k > 0){k--;}
         Arrays.fill(points, k, points.length, points[k]);
         //phase 3
         float bg = 0;
@@ -58,7 +59,7 @@ public final class ElevationProfileComputer {
                 }
             }
         }
-        return new ElevationProfile(nbPoints*stepLength, points);
+        return new ElevationProfile(route.length(), points);
     }
 
 
