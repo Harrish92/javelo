@@ -4,6 +4,8 @@ import ch.epfl.javelo.data.Graph;
 import org.w3c.dom.Node;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.PriorityQueue;
 
 /**
@@ -51,24 +53,28 @@ public class RouteComputer {
             predecesseur[nID] = 0;
         }
         distance[startNodeId] = 0;
+        predecesseur[startNodeId] = startNodeId;
         PriorityQueue<WeightedNode> enExploration = new PriorityQueue<>();
         enExploration.add(new WeightedNode(startNodeId, 0));
         while(!enExploration.isEmpty()) {
             int N = enExploration.remove().nodeId;
+            while (N == Double.NEGATIVE_INFINITY){
+                N = enExploration.remove().nodeId;
+            }
             System.out.println(enExploration.size());
             if(N == endNodeId) {
-                System.out.println("FINNNNN");
                 //TERMINER
                 ArrayList<Edge> edgesList = new ArrayList<>();
-                while(predecesseur[N] != 0) {//TODO: verifier
-                    Edge edge = Edge.of(graph, predecesseurEdgeId[predecesseur[N]], N, predecesseur[N]);
+                while(predecesseur[N] != N) {
+                    Edge edge = Edge.of(graph, predecesseurEdgeId[N], predecesseur[N], N);
                     edgesList.add(edge);
                     N = predecesseur[N];
                 }
+                Collections.reverse(edgesList);
                 SingleRoute route = new SingleRoute(edgesList);
                 return route;
             }
-            for(int i = 0; i < graph.nodeOutDegree(N); i++) {//TODO: costfunction ?
+            for(int i = 0; i < graph.nodeOutDegree(N); i++) {
                 int edgeId = graph.nodeOutEdgeId(N, i);
                 int Np = graph.edgeTargetNodeId(edgeId);
                 CostFunction costFunction = new CityBikeCF(graph);
@@ -79,6 +85,7 @@ public class RouteComputer {
                     predecesseur[Np] = N;
                     predecesseurEdgeId[Np] = edgeId;
                     enExploration.add(new WeightedNode(Np, (float) d));
+                    //distance[N] = Double.NEGATIVE_INFINITY; ca marche pas
                 }
             }
         }
