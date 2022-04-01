@@ -162,13 +162,11 @@ public class MultiRoute implements Route{
      */
     @Override
     public RoutePoint pointClosestTo(PointCh point) {
-        double MIN_E = 2485000;
-        double MIN_N = 1075000;
 
         double longueur = 0;
-        RoutePoint ShortestDist = new RoutePoint(new PointCh(MIN_E, MIN_N), 0, Double.POSITIVE_INFINITY);
+        RoutePoint ShortestDist = RoutePoint.NONE;
         for (Route segment : segments) {
-            ShortestDist = ShortestDist.min(segment.pointClosestTo(point)).withPositionShiftedBy(longueur);
+            ShortestDist = ShortestDist.min(segment.pointClosestTo(point).withPositionShiftedBy(longueur));
             longueur += segment.length();
         }
         return ShortestDist;

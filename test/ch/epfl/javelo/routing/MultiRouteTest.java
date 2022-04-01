@@ -89,45 +89,6 @@ public class MultiRouteTest {
         assertEquals(expected, actual);
     }
 
-    @Test
-    public void pointsTest(){
-        List<Route> lr = new ArrayList<>();
-        List<Edge> le1 = new ArrayList<>();
-        List<Edge> le2 = new ArrayList<>();
-
-        Edge e1 = new Edge(0, 1, new PointCh(MIN_E , MIN_N ), new PointCh(MIN_E + 10, MIN_N),
-                10, operand -> operand);
-        Edge e2 = new Edge(1, 2, new PointCh(MIN_E+10, MIN_N), new PointCh(MIN_E + 20, MIN_N),
-                10, operand -> operand);
-
-        Edge e3 = new Edge(1, 2, new PointCh(MIN_E+10, MIN_N), new PointCh(MIN_E + 20, MIN_N ),
-                10, operand -> operand);
-        Edge e4 = new Edge(3, 4, new PointCh(MIN_E+20, MIN_N), new PointCh(MIN_E + 28, MIN_N),
-                8, operand -> operand);
-
-        le1.add(e1);
-        le1.add(e2);
-        lr.add(new SingleRoute(le1));
-
-        le2.add(e3);
-        le2.add(e4);
-
-        lr.add(new SingleRoute(le2));
-
-        List<PointCh> expected = new ArrayList<>();
-        expected.add(new PointCh(MIN_E , MIN_N ));
-        expected.add(new PointCh(MIN_E + 10, MIN_N));
-        expected.add(new PointCh(MIN_E + 20, MIN_N));
-        expected.add(new PointCh(MIN_E + 28, MIN_N));
-
-        MultiRoute mr = new MultiRoute(lr);
-
-        List<PointCh> actual = mr.points();
-
-        assertEquals(expected, actual);
-    }
-
-
 
     @Test
     public void indexOfSegmentAtTest(){
@@ -640,7 +601,7 @@ public class MultiRouteTest {
         lr3.add(mr);
         lr3.add(mr2);
         MultiRoute mr3 = new MultiRoute(lr3);
-        double position =rng.nextDouble(0,120);
+        double position = 5;
         PointCh point = new PointCh(MIN_E + position, MIN_N );
 
         RoutePoint expected = new RoutePoint(point, position, 0);
@@ -1175,6 +1136,7 @@ public class MultiRouteTest {
     public void pointTest2(){
 
         List<Route> lr = new ArrayList<>();
+        List<Route> lr2 = new ArrayList<>();
         List<Route> lr3 = new ArrayList<>();
 
         List<Edge> le1 = new ArrayList<>();
@@ -1229,111 +1191,6 @@ public class MultiRouteTest {
 
         assertEquals(expected, actual);
     }
-
-    /*
-    @Test
-    public void pointsTest3(){
-
-
-        List<Route> lr = new ArrayList<>();
-        List<Route> lr2 = new ArrayList<>();
-        List<Route> lr3 = new ArrayList<>();
-
-        List<Edge> le1 = new ArrayList<>();
-        List<Edge> le2 = new ArrayList<>();
-        List<Edge> le3 = new ArrayList<>();
-        List<Edge> le4 = new ArrayList<>();
-        List<Edge> le5 = new ArrayList<>();
-        List<Edge> le6 = new ArrayList<>();
-
-
-        Edge e1 = new Edge(0, 1, new PointCh(MIN_E , MIN_N ), new PointCh(MIN_E + 10, MIN_N),
-                10, operand -> operand);
-        Edge e2 = new Edge(1, 2, new PointCh(MIN_E + 10 , MIN_N ), new PointCh(MIN_E + 20, MIN_N),
-                10, operand -> operand+1);
-
-        le1.add(e1);
-        le1.add(e2);
-
-        Edge e3 = new Edge(2, 3, new PointCh(MIN_E + 20 , MIN_N ), new PointCh(MIN_E + 30, MIN_N),
-                10, operand -> operand+2);
-        Edge e4 = new Edge(3, 4, new PointCh(MIN_E + 30 , MIN_N ), new PointCh(MIN_E + 40, MIN_N),
-                10, operand -> operand+3);
-
-        le2.add(e3);
-        le2.add(e4);
-
-        Edge e5 = new Edge(2, 3, new PointCh(MIN_E + 40 , MIN_N ), new PointCh(MIN_E + 50, MIN_N),
-                10, operand -> operand+4);
-        Edge e6 = new Edge(3, 4, new PointCh(MIN_E + 50 , MIN_N ), new PointCh(MIN_E + 60, MIN_N),
-                10, operand -> operand+5);
-
-        le3.add(e5);
-        le3.add(e6);
-
-        Edge e7 = new Edge(3, 4, new PointCh(MIN_E + 60 , MIN_N ), new PointCh(MIN_E + 70, MIN_N),
-                10, operand -> operand+6);
-        Edge e8 = new Edge(4, 5, new PointCh(MIN_E + 70 , MIN_N ), new PointCh(MIN_E + 80, MIN_N),
-                10, operand -> operand+7);
-
-        le4.add(e7);
-        le4.add(e8);
-
-        Edge e9 = new Edge(4, 5, new PointCh(MIN_E + 80 , MIN_N ), new PointCh(MIN_E + 90, MIN_N),
-                10, operand -> operand+8);
-        Edge e10 = new Edge(5, 6, new PointCh(MIN_E + 90 , MIN_N ), new PointCh(MIN_E + 100, MIN_N),
-                10, operand -> operand+9);
-
-        le5.add(e9);
-        le5.add(e10);
-
-        Edge e11 = new Edge(6, 7, new PointCh(MIN_E + 100 , MIN_N ), new PointCh(MIN_E + 110, MIN_N),
-                10, operand -> operand+10);
-        Edge e12 = new Edge(7, 8, new PointCh(MIN_E + 110 , MIN_N ), new PointCh(MIN_E + 120, MIN_N),
-                10, operand -> operand+11);
-
-        le6.add(e11);
-        le6.add(e12);
-
-
-        lr.add(new SingleRoute(le1));
-        lr.add(new SingleRoute(le2));
-        lr.add(new SingleRoute(le3));
-        lr2.add(new SingleRoute(le4));
-        lr2.add(new SingleRoute(le5));
-        lr2.add(new SingleRoute(le6));
-
-        MultiRoute mr = new MultiRoute(lr);
-
-        MultiRoute mr2 = new MultiRoute(lr2);
-
-        lr3.add(mr);
-        lr3.add(mr2);
-        MultiRoute mr3 = new MultiRoute(lr3);
-
-        List<PointCh> expected = new ArrayList<>();
-        expected.add(new PointCh(MIN_E , MIN_N ));
-        expected.add(new PointCh(MIN_E + 10 , MIN_N ));
-        expected.add(new PointCh(MIN_E + 20 , MIN_N ));
-        expected.add(new PointCh(MIN_E + 30 , MIN_N ));
-        expected.add(new PointCh(MIN_E + 40 , MIN_N ));
-        expected.add(new PointCh(MIN_E + 50 , MIN_N ));
-        expected.add(new PointCh(MIN_E + 60 , MIN_N ));
-        expected.add(new PointCh(MIN_E + 70 , MIN_N ));
-        expected.add(new PointCh(MIN_E + 80 , MIN_N ));
-        expected.add(new PointCh(MIN_E + 90 , MIN_N ));
-        expected.add(new PointCh(MIN_E + 100 , MIN_N ));
-        expected.add( new PointCh(MIN_E + 110 , MIN_N ));
-        expected.add(new PointCh(MIN_E + 120, MIN_N));
-
-        List<PointCh> actual = mr3.points();
-
-        assertEquals(expected, actual);
-    }
-
-     */
-
-
 
     @Test
     private static List<Edge> verticalEdges(int edgesCount) {
