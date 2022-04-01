@@ -33,4 +33,5 @@ public abstract interface Route {
 
     //Retourne le point de l'itinéraire se trouvant le plus proche du point de référence donné.
     public abstract RoutePoint pointClosestTo(PointCh point);
+
 }

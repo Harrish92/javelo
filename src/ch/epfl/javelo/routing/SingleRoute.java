@@ -6,7 +6,6 @@ import ch.epfl.javelo.projection.PointCh;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -41,7 +40,7 @@ public final class SingleRoute implements Route {
     }
     /**
      *
-     * @param position position de l'arête
+     * @param position position de l'itinéraire simple
      * @return l'index du segment de l'itinéraire contenant la position donnée,
      * qui vaut toujours 0 dans le cas d'un itinéraire simple
      */
@@ -88,7 +87,7 @@ public final class SingleRoute implements Route {
 
     /**
      *
-     * @param position position sur l'arête
+     * @param position position sur l'itinéraire simple
      * @return le point se trouvant à la position donnée le long de l'itinéraire
      */
     @Override
@@ -139,7 +138,7 @@ public final class SingleRoute implements Route {
 
     /**
      *
-     * @param position sur l'arête
+     * @param position sur l'itinéraire simple
      * @return  l'identité du nœud appartenant à l'itinéraire et se trouvant le plus proche de la position donnée
      */
     @Override
@@ -177,18 +176,22 @@ public final class SingleRoute implements Route {
     @Override
     public RoutePoint pointClosestTo(PointCh point) {
         int index = 0;
-        double dtf_min = point.distanceTo(edges.get(0).pointAt(edges.get(0).positionClosestTo(point)));
+        double dtf_min = Double.POSITIVE_INFINITY;
 
-        for(int i=1; i < edges.size(); ++i){
-            double dtf_max = point.distanceTo(edges.get(i).pointAt(edges.get(i).positionClosestTo(point)));
+        for(int i=0; i < edges.size(); ++i){
+            double projection = Math2.clamp(0, edges.get(i).positionClosestTo(point), edges.get(i).length());
+            double dtf_max = point.distanceTo(edges.get(i).pointAt(projection));
             if(dtf_max < dtf_min) {
                 dtf_min = dtf_max;
                 index = i;
             }
         }
-        double min = edges.get(index).positionClosestTo(point);
+
+        double min = Math2.clamp(0, edges.get(index).positionClosestTo(point), edges.get(index).length());
         PointCh pch = edges.get(index).pointAt(min);
         double position = min + tab[index];
         return new RoutePoint(pch, position, dtf_min);
     }
+
+
 }

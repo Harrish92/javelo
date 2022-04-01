@@ -208,5 +208,6 @@ class ElevationProfileComputerTest {
                 return new RoutePoint(p, point.e() - ORIGIN_E, point.n() - ORIGIN_N);
             }
         }
+
     }
 }
