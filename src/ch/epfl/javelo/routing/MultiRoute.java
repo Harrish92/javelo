@@ -167,9 +167,9 @@ public class MultiRoute implements Route{
 
         double longueur = 0;
         RoutePoint ShortestDist = new RoutePoint(new PointCh(MIN_E, MIN_N), 0, Double.POSITIVE_INFINITY);
-        for(int i=0; i < segments.size(); i++){
-            ShortestDist = ShortestDist.min(segments.get(i).pointClosestTo(point)).withPositionShiftedBy(longueur);
-            longueur += segments.get(i).length();
+        for (Route segment : segments) {
+            ShortestDist = ShortestDist.min(segment.pointClosestTo(point)).withPositionShiftedBy(longueur);
+            longueur += segment.length();
         }
         return ShortestDist;
     }
