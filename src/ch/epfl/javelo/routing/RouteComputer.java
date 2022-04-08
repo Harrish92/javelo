@@ -92,45 +92,4 @@ public class RouteComputer {
         }
         return null;
     }
-    //Version non optimisée
-    /*public Route bestRouteBetweenV0(int startNodeId, int endNodeId) {
-        int nbN = graph.nodeCount();
-        double[] distance = new double[nbN];
-        int[] predecesseur = new int[nbN];
-        int[] predecesseurEdgeId = new int[nbN];
-        for(int nID = 0; nID < nbN; nID++){
-            distance[nID] = (int) Double.POSITIVE_INFINITY;
-            predecesseur[nID] = 0;
-        }
-        distance[startNodeId] = 0;
-        predecesseur[startNodeId] = startNodeId;
-        PriorityQueue<WeightedNode> enExploration = new PriorityQueue<>();
-        enExploration.add(new WeightedNode(startNodeId, 0));
-        while(!enExploration.isEmpty()) {
-            int N = enExploration.remove().nodeId;
-            if(N == endNodeId) {
-                //TERMINER
-                ArrayList<Edge> edgesList = new ArrayList<>();
-                while(predecesseur[N] != N) {
-                    Edge edge = Edge.of(graph, predecesseurEdgeId[N], predecesseur[N], N);
-                    edgesList.add(edge);
-                    N = predecesseur[N];
-                }
-                Collections.reverse(edgesList);
-                return new SingleRoute(edgesList);
-            }
-            for(int i = 0; i < graph.nodeOutDegree(N); i++) {
-                int edgeId = graph.nodeOutEdgeId(N, i);
-                int Np = graph.edgeTargetNodeId(edgeId);
-                double d = distance[N] + graph.edgeLength(edgeId)*costFct.costFactor(N, edgeId);
-                if(d < distance[Np]){
-                    distance[Np] = d;
-                    predecesseur[Np] = N;
-                    predecesseurEdgeId[Np] = edgeId;
-                    enExploration.add(new WeightedNode(Np, (float) d));
-                }
-            }
-        }
-        return null;
-    }*/
 }
