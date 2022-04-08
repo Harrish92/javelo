@@ -10,7 +10,8 @@ public final class Preconditions {
     /**
      * Classe non instantiable
      */
-    private Preconditions() {}
+    private Preconditions() {
+    }
 
     /**
      * Lève une exception de type IllegalArgumentException
@@ -20,7 +21,7 @@ public final class Preconditions {
      * @throws IllegalArgumentException si le paramètre est faux.
      */
     public static void checkArgument(boolean shouldBeTrue) {
-        if(!shouldBeTrue){
+        if (!shouldBeTrue) {
             throw new IllegalArgumentException();
         }
     }

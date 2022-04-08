@@ -8,7 +8,7 @@ package ch.epfl.javelo.projection;
  */
 public final class SwissBounds {
 
-    //
+    //coordonnées maximum et minimum de e et n en Suisse.
     public final static double MIN_E = 2485000;
     public final static double MAX_E = 2834000;
     public final static double MIN_N = 1075000;
@@ -20,7 +20,8 @@ public final class SwissBounds {
     /**
      * classe non instantiable
      */
-    private SwissBounds(){}
+    private SwissBounds() {
+    }
 
     /**
      * Vérifie si les coordonnées données en paramètre sont en suisse.

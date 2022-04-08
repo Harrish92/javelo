@@ -6,15 +6,14 @@ import ch.epfl.javelo.Preconditions;
  * Un point en suisse caractérisé par ses coordonnées dans
  * le système suisse.
  *
- * @author Yoan Giovannini (303934)
- *
  * @param e La coordonnée E (est).
  * @param n La coordonnée N (nord).
+ * @author Yoan Giovannini (303934)
  */
 public record PointCh(double e, double n) {
 
     /**
-     *Constructeur compact, vérifie que le point est en suisse.
+     * Constructeur compact, vérifie que le point est en suisse.
      *
      * @param e La coordonnée E du point.
      * @param n La coordonnée N du point.
@@ -24,7 +23,7 @@ public record PointCh(double e, double n) {
     }
 
     /**
-     *Calcule la distance au carré entre deux points.
+     * Calcule la distance au carré entre deux points.
      *
      * @param that Un autre point.
      * @return La distance au carré.
@@ -34,7 +33,7 @@ public record PointCh(double e, double n) {
     }
 
     /**
-     *Calcule la distance entre ce point et un autre point.
+     * Calcule la distance entre ce point et un autre point.
      *
      * @param that Un autre point.
      * @return La distance.
@@ -47,6 +46,7 @@ public record PointCh(double e, double n) {
 
     /**
      * Calcule la longitude du point dans le système WGS84.
+     *
      * @return La longitude en radians.
      */
     public double lon() {
@@ -55,6 +55,7 @@ public record PointCh(double e, double n) {
 
     /**
      * Calcule la latitude du point dans le système WGS84.
+     *
      * @return La latitude en radians.
      */
     public double lat() {
