@@ -94,4 +94,26 @@ class RouteComputerTest {
         assertEquals(expected20kE, actualPointAt20kE, 1);
         assertEquals(expected20kN, actualPointAt20kN, 1);
     }
+
+    @Test
+    void Stage6Test() throws IOException{
+            Graph g = Graph.loadFrom(Path.of("lausanne"));
+            CostFunction cf = new CityBikeCF(g);
+            RouteComputer rc = new RouteComputer(g, cf);
+            Route r = rc.bestRouteBetween(159049, 117669);
+            KmlPrinter.write("javelo.kml", r);
+    }
+
+    @Test
+    void TimeTest() throws IOException {
+            Graph g = Graph.loadFrom(Path.of("ch_west"));
+            CostFunction cf = new CityBikeCF(g);
+            RouteComputer rc = new RouteComputer(g, cf);
+            long t0 = System.nanoTime();
+            Route r = rc.bestRouteBetween(2046055, 2694240);
+            System.out.printf("Itinéraire calculé en %d ms\n",
+                    (System.nanoTime() - t0) / 1_000_000);
+    }
+
+
 }
