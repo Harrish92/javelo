@@ -3,6 +3,8 @@ package ch.epfl.javelo;
 /**
  *
  * @author Harrishan Raveendran (345291)
+ *
+ * Math2 propose des méthodes pour faire des calculs mathématiques
  */
 public final class Math2{
 
@@ -51,15 +53,9 @@ public final class Math2{
      */
     public static int clamp(int min, int v, int max){
         Preconditions.checkArgument(max > min);
-        if(v < min){
+        if(v < min)
             return min;
-        }else{
-            if(v > max){
-                return max;
-            }else{
-                return v;
-            }
-        }
+        return Math.min(v, max);
 
     }
 
@@ -68,15 +64,9 @@ public final class Math2{
      */
     public static double clamp(double  min, double v, double max){
         Preconditions.checkArgument(max > min);
-        if(v < min){
+        if(v < min)
             return min;
-        }else{
-            if(v > max){
-                return max;
-            }else{
-                return v;
-            }
-        }
+        return Math.min(v, max);
 
     }
 
@@ -86,7 +76,7 @@ public final class Math2{
      * @return retourne y = asinh(x) en fonction de la valeur de x.
      */
     public static double asinh(double x){
-        return Math.log(x+Math.sqrt(1+Math.pow(x,2)));
+        return Math.log(x + Math.sqrt(1 + Math.pow(x,2)));
     }
 
     /**
@@ -98,7 +88,7 @@ public final class Math2{
      * @return retourne le produit scalaire entre deux vecteurs.
      */
     public static double dotProduct(double uX, double uY, double vX, double vY){
-        return Math.fma(uX, vX, uY*vY);
+        return Math.fma(uX, vX, uY * vY);
     }
 
     /**
@@ -118,7 +108,7 @@ public final class Math2{
      * @return retourne la norme d'un vecteur.
      */
     public static double norm(double uX, double uY){
-        return Math.sqrt(squaredNorm(uX,uY));
+        return Math.sqrt(squaredNorm(uX, uY));
     }
 
     /**
@@ -132,11 +122,7 @@ public final class Math2{
      * @return retourne la longeur de la projection du vecteur AP sur le vecteur AB.
      */
     public static double projectionLength(double aX, double aY, double bX, double bY, double pX, double pY){
-        double uX = aX - pX;
-        double uY = aY - pY;
-        double vX = aX-bX;
-        double vY = aY-bY;
-        return (dotProduct(uX, uY, vX, vY) / norm(vX, vY));
+        return (dotProduct( aX - pX, aY - pY, aX-bX, aY-bY) / norm(aX-bX, aY-bY));
     }
 
 

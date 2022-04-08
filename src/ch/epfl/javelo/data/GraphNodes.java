@@ -1,16 +1,18 @@
 package ch.epfl.javelo.data;
 
 import ch.epfl.javelo.Bits;
-import ch.epfl.javelo.Preconditions;
 import ch.epfl.javelo.Q28_4;
 
 import java.nio.IntBuffer;
 
 /**
+ * GraphNodes représente le tableau de tous les nœuds du graphe.
  *
  * @author Harrishan Raveendran (345291)
+ *
+ *
+ * @param buffer mémoire tampon qui contient la valeur des attributs de tous les nœuds du graphe
  */
-
 public record GraphNodes(IntBuffer buffer) {
 
     private static final int OFFSET_E = 0;
@@ -23,7 +25,7 @@ public record GraphNodes(IntBuffer buffer) {
      * @return le nombre total de noeuds.
      */
     public int count(){
-        return (int) (buffer.capacity() / NODE_INTS);
+        return (buffer.capacity() / NODE_INTS);
     }
 
     /**
@@ -50,8 +52,7 @@ public record GraphNodes(IntBuffer buffer) {
      * @return le nombre d'arrêts sortant du noeud identité
      */
     public int outDegree(int nodeId){
-        int nb = buffer.get(nodeId*NODE_INTS + OFFSET_OUT_EDGES);
-        return nb >>> 28;
+        return  buffer.get(nodeId*NODE_INTS + OFFSET_OUT_EDGES) >>> 28;
     }
 
     /**
@@ -61,11 +62,7 @@ public record GraphNodes(IntBuffer buffer) {
      * @return l'identité de l'arrête à l'index donné.
      */
     public int edgeId(int nodeId, int edgeIndex){
-        //assert(0 <= edgeIndex && edgeIndex < outDegree(nodeId)); //faire assertion
-        int nb = buffer.get(nodeId*NODE_INTS + OFFSET_OUT_EDGES);
-        nb = Bits.extractUnsigned(nb, 0, 28);
-        nb += edgeIndex;
-        return nb;
+        return Bits.extractUnsigned(buffer.get(nodeId*NODE_INTS + OFFSET_OUT_EDGES), 0, 28) + edgeIndex;
     }
 
 }

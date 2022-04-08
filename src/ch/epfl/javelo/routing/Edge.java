@@ -11,6 +11,8 @@ import java.util.function.DoubleUnaryOperator;
  *
  * @author Harrishan Raveendran (345291)
  *
+ * réprésente une arrête d'un itinéraire
+ *
  * @param fromNodeId l'identité du noeud de départ de l'arête
  * @param toNodeId l'identité du noeud d'arrivée de l'arête
  * @param fromPoint le point de départ de l'arête
@@ -24,8 +26,7 @@ public record Edge(int fromNodeId, int toNodeId, PointCh fromPoint, PointCh toPo
 
     /**
      *
-     * @param graph graphe
-     *
+     * @param graph instance de Graph
      * @param edgeId l'identité de l'arête
      * @param fromNodeId l'identité du noeud de départ de l'arête
      * @param toNodeId l'identité du noeud d'arrivée de l'arête
@@ -39,7 +40,7 @@ public record Edge(int fromNodeId, int toNodeId, PointCh fromPoint, PointCh toPo
     /**
      *
      * @param point point coordonnée
-     * @return la position qui se trouve sur le  long de l'arête, en mètre, la plus proche du point.
+     * @return la position qui se trouve sur le  long de l'arête la plus proche du point.
      */
     public double positionClosestTo(PointCh point){
         return Math2.projectionLength(fromPoint.e(), fromPoint.n(), toPoint.e(), toPoint.n(), point.e(), point.n());
@@ -47,19 +48,18 @@ public record Edge(int fromNodeId, int toNodeId, PointCh fromPoint, PointCh toPo
 
     /**
      *
-     * @param position une position
+     * @param position en mètre
      * @return le point se trouvant à la position donnée sur l'arête.
      */
     public PointCh pointAt(double position){
-        double pourcentage = position / length;
-        return new PointCh(Math2.interpolate(fromPoint.e(), toPoint.e(), pourcentage),
-                Math2.interpolate(fromPoint.n(), toPoint.n(), pourcentage));
+        return new PointCh(Math2.interpolate(fromPoint.e(), toPoint.e(), position / length),
+                Math2.interpolate(fromPoint.n(), toPoint.n(), position / length));
     }
 
     /**
      *
-     * @param position une position
-     * @return l'altitude, en mètre, de la position donnée sur l'arrête.
+     * @param position en mètre
+     * @return l'altitude de la position donnée sur l'arrête.
      */
     public double elevationAt(double position){
         return profile.applyAsDouble(position);

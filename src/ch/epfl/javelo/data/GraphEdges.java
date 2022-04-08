@@ -9,8 +9,16 @@ import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 
 /**
+ * GraphEdges représente le tableau de toutes les arêtes du graphe
  *
  * @author Harrishan Raveendran (345291)
+ */
+
+/**
+ * @param edgesBuffer mémoire tampon contenant les attributs des edges.
+ * @param profileIds mémoire tampon contenant les attributs des profils.
+ * @param elevations mémoire tampon contenant tous les échantillons des profils,
+ *                   qu'ils soient compressés ou non.
  */
 public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuffer elevations) {
     private static final int OFFSET_EDGESBUFFER_INVERTED = 0;
@@ -43,9 +51,8 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
         int nb = edgesBuffer.getInt(edgeId * EDGESBUFFER_INTS + OFFSET_EDGESBUFFER_INVERTED);
         if(nb >= 0){
             return nb;
-        }else{
-            return ~nb;
         }
+        return ~nb;
     }
 
     /**
@@ -90,29 +97,27 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
      * Retourne un tableau vide si edgeId ne possède pas de profil
      */
     public float[] profileSamples(int edgeId) {
+        if (!hasProfile(edgeId)){
+            return new float[0];
+        }
+
         int l = edgesBuffer.getShort(edgeId * EDGESBUFFER_INTS + OFFSET_EDGESBUFFER_LENGTH);
         int q28_4of2 = Q28_4.ofInt(2);
         int pts = 1 + Math2.ceilDiv(l, q28_4of2);
+        int profile_type = profileIds.get(edgeId * PROFILEIDS_INTS + OFFSET_PROFILESIDS_TYPE) >>> 30;
+        int index_element = Bits.extractUnsigned(profileIds.get(edgeId * PROFILEIDS_INTS + OFFSET_PROFILESIDS_TYPE),
+                0, 30);
         float[] tab = new float[pts];
-
-        if (!hasProfile(edgeId)){
-            float[] aux = new float[0];
-            return aux;
-        }
-        int profile = profileIds.get(edgeId * PROFILEIDS_INTS + OFFSET_PROFILESIDS_TYPE);
-        int profile_type = profile >>> 30;
-        int index_element = Bits.extractUnsigned(profile, 0, 30);
         switch (profile_type) {
-            case 1:
-                return profileType1(pts, tab, edgeId, index_element);
             case 2:
                 return profileType2(pts, tab, edgeId, index_element);
-
             case 3:
                 return profileType3(pts, tab, edgeId, index_element);
+            default:
+                return profileType1(pts, tab, edgeId, index_element); // case 1
 
         }
-        return null;
+
     }
 
     /**
@@ -124,9 +129,7 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
      */
     private float [] profileType1(int pts, float[] tab, int edgeId, int firstSampleIndex){
         for(int i = firstSampleIndex; i < firstSampleIndex + pts; i++){
-            short nb = elevations.get(i);
-            float echantillon = Q28_4.asFloat(Short.toUnsignedInt(nb));
-            System.out.println(echantillon);
+            float echantillon = Q28_4.asFloat(Short.toUnsignedInt(elevations.get(i)));
             if(isInverted(edgeId)){
                 tab[pts-(i - firstSampleIndex + 1)] = echantillon;
             }else{
@@ -147,24 +150,23 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
      * @return le tableau avec les échantillons du profil de type 2 pour ProfileSamples.
      */
     private float[] profileType2(int pts, float[] tab, int edgeId, int index_element){
-
-        float echantillon1 = Q28_4.asFloat(Short.toUnsignedInt(elevations.get(index_element)));
+        float echantillon = Q28_4.asFloat(Short.toUnsignedInt(elevations.get(index_element)));
         if(isInverted(edgeId)){
-            tab[pts-1] = echantillon1;
+            tab[pts-1] = echantillon;
         }else{
-            tab[0] = echantillon1;
+            tab[0] = echantillon;
         }
+
         int counting = 1, offset = 1;
         for(int i=index_element+1; i < pts + index_element; i+= 2){
             for (int j = 1; j >= 0; j--){
-                float difference = Q28_4.asFloat(Bits.extractSigned(elevations.get(index_element+ offset), j*8,
+                echantillon += Q28_4.asFloat(Bits.extractSigned(elevations.get(index_element+ offset), j*8,
                         8));
-                echantillon1 += difference;
                 if(counting < pts){
                     if(isInverted(edgeId)){
-                        tab[pts - (counting + 1)] = echantillon1;
+                        tab[pts - (counting + 1)] = echantillon;
                     }else{
-                        tab[counting] = echantillon1;
+                        tab[counting] = echantillon;
                     }
                 }
                 ++counting;
@@ -188,23 +190,25 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
      * @return le tableau avec les échantillons du profil de type 3 pour ProfileSamples.
      */
     private float[] profileType3(int pts,float [] tab, int edgeId, int index_element){
-        float echantillon1 = Q28_4.asFloat(Short.toUnsignedInt(elevations.get(index_element)));
+        float echantillon = Q28_4.asFloat(Short.toUnsignedInt(elevations.get(index_element)));
         if(isInverted(edgeId)){
-            tab[pts-1] = echantillon1;
+            tab[pts-1] = echantillon;
         }else{
-            tab[0] = echantillon1;
+            tab[0] = echantillon;
         }
+
         int counting = 1, offset = 1;
         for(int i=index_element+1; i < pts + index_element; i+= 4){
             for (int j = 3; j >= 0; j--){
-                float difference = Q28_4.asFloat(Bits.extractSigned(elevations.get(index_element+ offset), j*4,
+                echantillon += Q28_4.asFloat(Bits.extractSigned(elevations.get(index_element+ offset), j*4,
                         4));
-                echantillon1 += difference;
+
                 if(counting < pts){
+
                     if(isInverted(edgeId)){
-                        tab[pts - (counting + 1)] = echantillon1;
+                        tab[pts - (counting + 1)] = echantillon;
                     }else{
-                        tab[counting] = echantillon1;
+                        tab[counting] = echantillon;
                     }
                 }
                 ++counting;

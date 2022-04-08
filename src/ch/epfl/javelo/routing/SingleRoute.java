@@ -11,6 +11,8 @@ import java.util.List;
 /**
  * @author Harrishan Raveendran (345291)
  *
+ *
+ * représente un itinéraire simple
  */
 
 public final class SingleRoute implements Route {
@@ -105,7 +107,7 @@ public final class SingleRoute implements Route {
             return edges.get(index).pointAt(position);
         }
         index = -index - 2;
-        position-= tab[index];
+        position -= tab[index];
         return edges.get(index).pointAt(position);
 
     }
@@ -179,8 +181,9 @@ public final class SingleRoute implements Route {
         double dtf_min = Double.POSITIVE_INFINITY;
 
         for(int i=0; i < edges.size(); ++i){
-            double projection = Math2.clamp(0, edges.get(i).positionClosestTo(point), edges.get(i).length());
-            double dtf_max = point.distanceTo(edges.get(i).pointAt(projection));
+            double dtf_max = point.distanceTo(edges.get(i).pointAt
+                    (Math2.clamp(0, edges.get(i).positionClosestTo(point), edges.get(i).length())));
+
             if(dtf_max < dtf_min) {
                 dtf_min = dtf_max;
                 index = i;
@@ -188,9 +191,7 @@ public final class SingleRoute implements Route {
         }
 
         double min = Math2.clamp(0, edges.get(index).positionClosestTo(point), edges.get(index).length());
-        PointCh pch = edges.get(index).pointAt(min);
-        double position = min + tab[index];
-        return new RoutePoint(pch, position, dtf_min);
+        return new RoutePoint(edges.get(index).pointAt(min), min + tab[index], dtf_min);
     }
 
 

@@ -4,6 +4,8 @@ import ch.epfl.javelo.Math2;
 
 /**
  * @author Harrishan Raveendran (345291)
+ *
+ * permet la conversion entre les coordonnées WSG 84 et les coordonnées Web Mercator
  */
 public class WebMercator {
 
@@ -13,7 +15,7 @@ public class WebMercator {
      * @return la cordoonnée x.
      */
     public static double x(double lon){
-        return 1/(2*Math.PI) * (lon + Math.PI);
+        return 1 / (2 * Math.PI) * (lon + Math.PI);
     }
 
     /**
@@ -22,7 +24,7 @@ public class WebMercator {
      * @return la cordoonnée y.
      */
     public static double y(double lat){
-        return (Math.PI - Math2.asinh(Math.tan(lat))) / (2*Math.PI);
+        return (Math.PI - Math2.asinh( Math.tan(lat))) / (2 * Math.PI);
     }
 
     /**
@@ -31,7 +33,7 @@ public class WebMercator {
      * @return la longitude.
      */
     public static double lon(double x){
-        return 2*Math.PI*x-Math.PI;
+        return 2 * Math.PI * x - Math.PI;
     }
 
     /**
@@ -40,7 +42,7 @@ public class WebMercator {
      * @return la latitude.
      */
     public static double lat(double y){
-        return Math.atan(Math.sinh(Math.PI - 2*Math.PI*y));
+        return Math.atan( Math.sinh(Math.PI - 2 * Math.PI * y));
     }
 
 }

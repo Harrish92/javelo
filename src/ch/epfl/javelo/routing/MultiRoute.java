@@ -10,8 +10,8 @@ import java.util.List;
 /**
  * @author Harrishan Raveendran (345291)
  *
+ *
  */
-
 
 public class MultiRoute implements Route{
     private final List<Route> segments;
@@ -42,6 +42,7 @@ public class MultiRoute implements Route{
                 position -= segment.length();
             } else {
                 index += segment.indexOfSegmentAt(position);
+                break;
             }
         }
         return index;
@@ -49,59 +50,59 @@ public class MultiRoute implements Route{
 
     /**
      *
-     * @return la longueur de l'itinéraire, en mètres
+     * @return la longueur de l'itinéraire
      */
     @Override
     public double length() {
-        double longueur = 0;
+        double length = 0;
         for(Route segment : segments){
-            longueur +=  segment.length();
+            length +=  segment.length();
         }
-        return longueur;
+        return length;
     }
 
     /**
      *
-     * @return la totalité des arêtes de l'itinéraire
+     * @return tous des arêtes de l'itinéraire
      */
     @Override
     public List<Edge> edges() {
-        List<Edge> le = new ArrayList<>();
+        List<Edge> list_edge = new ArrayList<>();
         for (Route segment: segments) {
-            le.addAll(segment.edges());
+            list_edge.addAll(segment.edges());
         }
-        return le;
+        return list_edge;
     }
 
     /**
      *
-     * @return retourne la totalité des points situés aux extrémités des arêtes de l'itinéraire,
+     * @return retourne tous les points situés aux extrémités des arêtes de l'itinéraire,
      * sans doublons
      */
     @Override
     public List<PointCh> points() {
-        List<PointCh> lch = new ArrayList<>();
+        List<PointCh> list_pch = new ArrayList<>();
 
         for (Route segment : segments) {
 
-            for (int j = 0; j < segment.points().size(); j++) {
-                if(lch.size() != 0){
-                    if (!lch.get(lch.size()-1).equals(segment.points().get(j))) {
-                        lch.add(segment.points().get(j));
+            for (PointCh points : segment.points()) {
+                if(list_pch.size() != 0){
+                    if (!list_pch.get(list_pch.size()-1).equals(points)) {
+                        list_pch.add(points);
                     }
                 }else{
-                    lch.add(segment.points().get(0));
+                    list_pch.add(segment.points().get(0));
                 }
 
             }
         }
 
-        return lch;
+        return list_pch;
     }
 
     /**
      *
-     * @param position position sur le long de l'itinéraire
+     * @param position sur le long de l'itinéraire
      * @return le point se trouvant à la position donnée le long de l'itinéraire
      */
     @Override
@@ -119,7 +120,7 @@ public class MultiRoute implements Route{
 
     /**
      *
-     * @param position position sur le long de l'itinéraire
+     * @param position sur le long de l'itinéraire
      * @return l'altitude à la position donnée le long de l'itinéraire,
      * qui peut valoir NaN si l'arête contenant cette position n'a pas de profil
      */
@@ -139,7 +140,7 @@ public class MultiRoute implements Route{
 
     /**
      *
-     * @param position position sur le long de l'itinéraire
+     * @param position sur le long de l'itinéraire
      * @return l'identité du nœud appartenant à l'itinéraire et se trouvant le plus proche de la position donnée
      */
     @Override

@@ -3,6 +3,8 @@ package ch.epfl.javelo;
 /**
  *
  * @author Harrishan Raveendran (345291)
+ *
+ * Q28_4 permet la conversion des nombres entre la représentation Q28.4 et d'autres représentation
  */
 
 public final class Q28_4 {
