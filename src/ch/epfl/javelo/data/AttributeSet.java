@@ -13,16 +13,9 @@ public record AttributeSet(long bits) {
 
     /**
      * constructeur compact
-     * @param bits
+     * @param bits représente une séquence de bits
      */
     public AttributeSet {
-        /*int x = 0;
-        long max = 0L;
-        while(x < Attribute.COUNT){
-            max += Math.pow(2, x);
-            x++;
-        }
-        Preconditions.checkArgument(bits <= max);*/
         Preconditions.checkArgument(bits >> Attribute.COUNT == 0);
     }
 
@@ -34,10 +27,8 @@ public record AttributeSet(long bits) {
     public static AttributeSet of(Attribute... attributes) {
         long attributeSet = 0L;
         for(Attribute attribute : attributes) {
-            if((attributeSet >> attribute.ordinal()) % 2 == 0) {
+            if((attributeSet >> attribute.ordinal()) % 2 == 0)
                 attributeSet += 1L << attribute.ordinal();
-                //attributeSet+= Math.pow(2, attribute.ordinal());
-            }
         }
         return new AttributeSet(attributeSet);
     }

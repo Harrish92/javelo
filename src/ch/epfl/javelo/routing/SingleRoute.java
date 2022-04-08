@@ -9,10 +9,9 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * @author Harrishan Raveendran (345291)
- *
- *
  * représente un itinéraire simple
+ *
+ * @author Harrishan Raveendran (345291)
  */
 
 public final class SingleRoute implements Route {
@@ -20,10 +19,9 @@ public final class SingleRoute implements Route {
     private final double[] tab;
 
     /**
-     *
      * @param edges liste d'edge
-     *  Constructeur public qui retourne l'itinéraire simple composé des arêtes données,
-     *  ou lève IllegalArgumentException si la liste d'arêtes est vide.
+     *              Constructeur public qui retourne l'itinéraire simple composé des arêtes données,
+     *              ou lève IllegalArgumentException si la liste d'arêtes est vide.
      */
     public SingleRoute(List<Edge> edges) {
         Preconditions.checkArgument(!edges.isEmpty());
@@ -40,8 +38,8 @@ public final class SingleRoute implements Route {
         }
 
     }
+
     /**
-     *
      * @param position position de l'itinéraire simple
      * @return l'index du segment de l'itinéraire contenant la position donnée,
      * qui vaut toujours 0 dans le cas d'un itinéraire simple
@@ -52,7 +50,6 @@ public final class SingleRoute implements Route {
     }
 
     /**
-     *
      * @return la longueur de l'itinéraire, en mètres
      */
     @Override
@@ -65,7 +62,6 @@ public final class SingleRoute implements Route {
     }
 
     /**
-     *
      * @return la totalité des arêtes de l'itinéraire
      */
     @Override
@@ -74,21 +70,19 @@ public final class SingleRoute implements Route {
     }
 
     /**
-     *
      * @return la totalité des points situés aux extrémités des arêtes de l'itinéraire
      */
     @Override
     public List<PointCh> points() {
-        List<PointCh> list  = new ArrayList<>();
+        List<PointCh> list = new ArrayList<>();
         for (Edge edge : edges) {
             list.add(edge.fromPoint());
         }
-        list.add(edges.get(edges.size()-1).toPoint());
+        list.add(edges.get(edges.size() - 1).toPoint());
         return list;
     }
 
     /**
-     *
      * @param position position sur l'itinéraire simple
      * @return le point se trouvant à la position donnée le long de l'itinéraire
      */
@@ -98,12 +92,12 @@ public final class SingleRoute implements Route {
 
         int index = Arrays.binarySearch(tab, position);
 
-        if(index > 0){
+        if (index > 0) {
             index -= 1;
             position -= tab[index];
             return edges.get(index).pointAt(position);
         }
-        if(index == 0){
+        if (index == 0) {
             return edges.get(index).pointAt(position);
         }
         index = -index - 2;
@@ -113,7 +107,6 @@ public final class SingleRoute implements Route {
     }
 
     /**
-     *
      * @param position où l'atitude se trouve
      * @return l'altitude à la position donnée le long de l'itinéraire,
      * qui peut valoir NaN si l'arête contenant cette position n'a pas de profil
@@ -124,24 +117,23 @@ public final class SingleRoute implements Route {
 
         int index = Arrays.binarySearch(tab, position);
 
-        if(index > 0){
+        if (index > 0) {
             index -= 1;
             position -= tab[index];
             return edges.get(index).elevationAt(position);
         }
-        if(index == 0){
+        if (index == 0) {
             return edges.get(index).elevationAt(position);
         }
         index = -index - 2;
-        position-= tab[index];
+        position -= tab[index];
         return edges.get(index).elevationAt(position);
 
     }
 
     /**
-     *
      * @param position sur l'itinéraire simple
-     * @return  l'identité du nœud appartenant à l'itinéraire et se trouvant le plus proche de la position donnée
+     * @return l'identité du nœud appartenant à l'itinéraire et se trouvant le plus proche de la position donnée
      */
     @Override
     public int nodeClosestTo(double position) {
@@ -149,20 +141,20 @@ public final class SingleRoute implements Route {
 
         int index = Arrays.binarySearch(tab, position);
 
-        if(index > 0){
+        if (index > 0) {
             index -= 1;
             position -= tab[index];
-            if((edges.get(index).length() / 2) > position){
+            if ((edges.get(index).length() / 2) > position) {
                 return edges.get(index).fromNodeId();
             }
             return edges.get(index).toNodeId();
         }
-        if(index == 0){
+        if (index == 0) {
             return edges.get(index).fromNodeId();
         }
         index = -index - 2;
         position -= tab[index];
-        if((edges.get(index).length() / 2) > position){
+        if ((edges.get(index).length() / 2) > position) {
             return edges.get(index).fromNodeId();
         }
         return edges.get(index).toNodeId();
@@ -171,7 +163,6 @@ public final class SingleRoute implements Route {
     }
 
     /**
-     *
      * @param point un point de coordonée
      * @return le point de l'itinéraire se trouvant le plus proche du point de référence donné
      */
@@ -180,11 +171,11 @@ public final class SingleRoute implements Route {
         int index = 0;
         double dtf_min = Double.POSITIVE_INFINITY;
 
-        for(int i=0; i < edges.size(); ++i){
+        for (int i = 0; i < edges.size(); ++i) {
             double dtf_max = point.distanceTo(edges.get(i).pointAt
                     (Math2.clamp(0, edges.get(i).positionClosestTo(point), edges.get(i).length())));
 
-            if(dtf_max < dtf_min) {
+            if (dtf_max < dtf_min) {
                 dtf_min = dtf_max;
                 index = i;
             }

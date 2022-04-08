@@ -7,15 +7,14 @@ import ch.epfl.javelo.Math2;
  * Un point sur la terre caractérisé par ses coordonnées
  * dans le système de coordonnées Mercator.
  *
- * @author Yoan Giovannini (303934)
- *
  * @param x La coordonnée x du point dans le système Mercator.
  * @param y La coordonnée y di point dans le système Mercator.
+ * @author Yoan Giovannini (303934)
  */
 public record PointWebMercator(double x, double y) {
 
     /**
-     *Constructeur compacte, vérifie que le point est
+     * Constructeur compacte, vérifie que le point est
      * dans le système Mercator (entre 0 et 1).
      *
      * @param x La coordonnée x du point.
@@ -23,9 +22,8 @@ public record PointWebMercator(double x, double y) {
      * @throws IllegalArgumentException si x ou y n'est pas dans [0,1]
      */
     public PointWebMercator {
-        if (x > 1 || x < 0 || y > 1 || y < 0) {
+        if (x > 1 || x < 0 || y > 1 || y < 0)
             throw new IllegalArgumentException("x ou y est hors de [0,1]");
-        }
     }
 
     /**
@@ -51,7 +49,7 @@ public record PointWebMercator(double x, double y) {
      */
     public static PointWebMercator ofPointCh(PointCh pointCh) {
         double x = (pointCh.lon() + Math.PI) / (2 * Math.PI);
-        double y = (Math.PI - Math2.asinh(Math.tan(pointCh.lat())))/ (2 * Math.PI);
+        double y = (Math.PI - Math2.asinh(Math.tan(pointCh.lat()))) / (2 * Math.PI);
         return new PointWebMercator(x, y);
     }
 
@@ -79,14 +77,16 @@ public record PointWebMercator(double x, double y) {
 
     /**
      * Calcule la longitude du point Mercator.
+     *
      * @return la longitude du point.
      */
     public double lon() {
-        return 2 * Math.PI * x -Math.PI;
+        return 2 * Math.PI * x - Math.PI;
     }
 
     /**
      * Calcule la latitude du point Mercator.
+     *
      * @return la latitude du point.
      */
     public double lat() {
@@ -95,18 +95,14 @@ public record PointWebMercator(double x, double y) {
 
     /**
      * Calcule les coordonnées du point Mercator dans le système suisse.
+     *
      * @return un point dans le système suisse.
      */
-    public PointCh toPointCh(){
+    public PointCh toPointCh() {
         double lon = this.lon();
         double lat = this.lat();
         double e = Ch1903.e(lon, lat);
         double n = Ch1903.n(lon, lat);
-        if(SwissBounds.containsEN(e, n)) {
-            return new PointCh(e, n);
-        }
-        else {
-            return null;
-        }
+        return SwissBounds.containsEN(e, n) ? new PointCh(e, n) : null;
     }
 }

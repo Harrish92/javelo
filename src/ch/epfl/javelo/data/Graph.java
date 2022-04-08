@@ -15,14 +15,17 @@ import java.util.function.DoubleUnaryOperator;
 
 /**
  * La classe Graph représente le graphe de javelo.
+ *
  * @author Yoan Giovannini (303934)
+ *
+ *
  */
 public final class Graph {
 
-    private GraphNodes nodes;
-    private GraphSectors sectors;
-    private GraphEdges edges;
-    private List<AttributeSet> attributeSets;
+    private final GraphNodes nodes;
+    private final GraphSectors sectors;
+    private final GraphEdges edges;
+    private final List<AttributeSet> attributeSets;
     /**
      * Constructeur de la classe Graph.
      * @param nodes les noeuds.
@@ -44,14 +47,7 @@ public final class Graph {
      * @return le graphe.
      */
     public static Graph loadFrom(Path basePath) throws IOException {
-        /*String paths[] = {"nodes.bin", "sectors.bin", "edges.bin", "profile_ids.bin",
-                "elevations.bin", "attributes.bin"};//nodesIds: pour les test
-        MappedByteBuffer[] buffers = new MappedByteBuffer[paths.length];
-        for(int i = 0; i < paths.length; i++){
-            try (FileChannel channel = FileChannel.open(basePath.resolve(paths[i]))) {
-                buffers[i] = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
-            }
-        }*/
+
         GraphNodes nodes = new GraphNodes(bufferFromPath(basePath, "nodes.bin").asIntBuffer());
         GraphSectors sectors = new GraphSectors(bufferFromPath(basePath, "sectors.bin"));
         GraphEdges edges = new GraphEdges(bufferFromPath(basePath, "edges.bin"),
@@ -126,7 +122,9 @@ public final class Graph {
         int nID = -1;
         Preconditions.checkArgument(searchDistance >= 0);
         double d = Math.pow(searchDistance, 2);
-        ArrayList<GraphSectors.Sector> sectorList = (ArrayList<GraphSectors.Sector>) sectors.sectorsInArea(point, searchDistance);
+        ArrayList<GraphSectors.Sector> sectorList = (ArrayList<GraphSectors.Sector>) sectors
+                .sectorsInArea(point, searchDistance);
+
         for(GraphSectors.Sector sector : sectorList){
             for(int i = sector.startNodeId(); i <= sector.endNodeId(); i++) {
                 PointCh pt = new PointCh(nodes.nodeE(i), nodes.nodeN(i));
@@ -192,9 +190,7 @@ public final class Graph {
      * @return une fonction.
      */
     public DoubleUnaryOperator edgeProfile(int edgeId) {
-        if(!edges.hasProfile(edgeId)){
-            return Functions.constant(Double.NaN);
-        }
-        return Functions.sampled(edges.profileSamples(edgeId), edgeLength(edgeId));
+        return (!edges.hasProfile(edgeId)) ?
+                Functions.constant(Double.NaN) : Functions.sampled(edges.profileSamples(edgeId), edgeLength(edgeId));
     }
 }
