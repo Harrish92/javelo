@@ -3,9 +3,10 @@ package ch.epfl.javelo.projection;
 import ch.epfl.javelo.Math2;
 
 /**
+ * permet la conversion entre les coordonnées WSG 84 et les coordonnées Web Mercator
+ *
  * @author Harrishan Raveendran (345291)
  *
- * permet la conversion entre les coordonnées WSG 84 et les coordonnées Web Mercator
  */
 public class WebMercator {
 

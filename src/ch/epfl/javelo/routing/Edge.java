@@ -9,9 +9,9 @@ import java.util.function.DoubleUnaryOperator;
 
 /**
  *
- * @author Harrishan Raveendran (345291)
- *
  * réprésente une arrête d'un itinéraire
+ *
+ * @author Harrishan Raveendran (345291)
  *
  * @param fromNodeId l'identité du noeud de départ de l'arête
  * @param toNodeId l'identité du noeud d'arrivée de l'arête

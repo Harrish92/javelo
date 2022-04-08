@@ -10,11 +10,11 @@ import java.nio.IntBuffer;
  *
  * @author Harrishan Raveendran (345291)
  *
- *
  * @param buffer mémoire tampon qui contient la valeur des attributs de tous les nœuds du graphe
  */
 public record GraphNodes(IntBuffer buffer) {
 
+    // décalages qui permet de retrouver l'attribut souhaité dans le buffer
     private static final int OFFSET_E = 0;
     private static final int OFFSET_N = OFFSET_E + 1;
     private static final int OFFSET_OUT_EDGES = OFFSET_N + 1;

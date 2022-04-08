@@ -8,8 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author Harrishan Raveendran (345291)
+ * Multiroute représente un itinéraire multiple
  *
+ * @author Harrishan Raveendran (345291)
  *
  */
 
@@ -167,7 +168,10 @@ public class MultiRoute implements Route{
         double longueur = 0;
         RoutePoint ShortestDist = RoutePoint.NONE;
         for (Route segment : segments) {
-            ShortestDist = ShortestDist.min(segment.pointClosestTo(point).withPositionShiftedBy(longueur));
+            ShortestDist = ShortestDist
+                    .min(segment.pointClosestTo(point)
+                    .withPositionShiftedBy(longueur));
+
             longueur += segment.length();
         }
         return ShortestDist;

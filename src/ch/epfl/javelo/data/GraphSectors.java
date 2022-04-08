@@ -12,10 +12,13 @@ import java.util.List;
 
 
 /**
+ *
+ * @author Yoan Giovannini (303934)
+ *
  * Représente la totalité des secteurs.
+ *
  * @param buffer la mémoire tampon contenant la valeur
  *              des attributs de la totalité des secteurs.
- * @author Yoan Giovannini (303934)
  */
 public record GraphSectors(ByteBuffer buffer) {
     //Longueur d'un secteur en octets.

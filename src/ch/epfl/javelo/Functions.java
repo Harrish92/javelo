@@ -54,8 +54,8 @@ public final class Functions {
      * Fonction d'interpolation linéaire
      */
     private static final class Sampled implements DoubleUnaryOperator {
-        private float[] samples;
-        private double xMax;
+        private final float[] samples;
+        private final double xMax;
 
         /**
          * Constructeur de la fonction d'interpolation linéaire.

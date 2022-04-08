@@ -8,13 +8,14 @@ import java.util.function.DoubleUnaryOperator;
 
 /**
  * Représente le profil d'une arête.
+ *
  * @author Yoan Giovannini (303934)
  */
 public final class ElevationProfile {
 
-    private double length;
-    private float[] elevationSamples;
-    private DoubleUnaryOperator profile;
+    private final double length;
+    private final float[] elevationSamples;
+    private final DoubleUnaryOperator profile;
 
     /**
      * Constructeur de la classe.

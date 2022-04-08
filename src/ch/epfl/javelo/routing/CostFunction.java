@@ -2,6 +2,7 @@ package ch.epfl.javelo.routing;
 
 /**
  * Interface représentant le coût d'une fonction.
+ *
  * @author Yoan Giovannini (303934)
  */
 public interface CostFunction {
@@ -13,5 +14,5 @@ public interface CostFunction {
      * @param edgeId identité de l'arête.
      * @return un facteur supérieur ou égal à 1.
      */
-    public abstract double costFactor(int nodeId, int edgeId);
+    double costFactor(int nodeId, int edgeId);
 }

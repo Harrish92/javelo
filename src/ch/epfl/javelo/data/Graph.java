@@ -15,14 +15,17 @@ import java.util.function.DoubleUnaryOperator;
 
 /**
  * La classe Graph représente le graphe de javelo.
+ *
  * @author Yoan Giovannini (303934)
+ *
+ *
  */
 public final class Graph {
 
-    private GraphNodes nodes;
-    private GraphSectors sectors;
-    private GraphEdges edges;
-    private List<AttributeSet> attributeSets;
+    private final GraphNodes nodes;
+    private final GraphSectors sectors;
+    private final GraphEdges edges;
+    private final List<AttributeSet> attributeSets;
     /**
      * Constructeur de la classe Graph.
      * @param nodes les noeuds.

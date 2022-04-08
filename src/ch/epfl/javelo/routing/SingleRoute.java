@@ -9,10 +9,10 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
+ * représente un itinéraire simple
+ *
  * @author Harrishan Raveendran (345291)
  *
- *
- * représente un itinéraire simple
  */
 
 public final class SingleRoute implements Route {

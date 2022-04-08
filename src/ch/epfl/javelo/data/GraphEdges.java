@@ -12,15 +12,15 @@ import java.nio.ShortBuffer;
  * GraphEdges représente le tableau de toutes les arêtes du graphe
  *
  * @author Harrishan Raveendran (345291)
- */
-
-/**
+ *
  * @param edgesBuffer mémoire tampon contenant les attributs des edges.
  * @param profileIds mémoire tampon contenant les attributs des profils.
  * @param elevations mémoire tampon contenant tous les échantillons des profils,
  *                   qu'ils soient compressés ou non.
  */
 public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuffer elevations) {
+
+    // décalages qui permet de retrouver l'attribut souhaité dans le buffer
     private static final int OFFSET_EDGESBUFFER_INVERTED = 0;
     private static final int OFFSET_EDGESBUFFER_LENGTH = OFFSET_EDGESBUFFER_INVERTED + 4;
     private static final int OFFSET_EDGESBUFFER_ELEVATIONGAIN = OFFSET_EDGESBUFFER_LENGTH + 2;

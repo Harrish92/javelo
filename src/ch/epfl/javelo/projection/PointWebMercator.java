@@ -23,9 +23,8 @@ public record PointWebMercator(double x, double y) {
      * @throws IllegalArgumentException si x ou y n'est pas dans [0,1]
      */
     public PointWebMercator {
-        if (x > 1 || x < 0 || y > 1 || y < 0) {
+        if (x > 1 || x < 0 || y > 1 || y < 0)
             throw new IllegalArgumentException("x ou y est hors de [0,1]");
-        }
     }
 
     /**
@@ -82,7 +81,7 @@ public record PointWebMercator(double x, double y) {
      * @return la longitude du point.
      */
     public double lon() {
-        return 2 * Math.PI * x -Math.PI;
+        return 2 * Math.PI * x - Math.PI;
     }
 
     /**
@@ -102,11 +101,6 @@ public record PointWebMercator(double x, double y) {
         double lat = this.lat();
         double e = Ch1903.e(lon, lat);
         double n = Ch1903.n(lon, lat);
-        if(SwissBounds.containsEN(e, n)) {
-            return new PointCh(e, n);
-        }
-        else {
-            return null;
-        }
+        return SwissBounds.containsEN(e, n) ? new PointCh(e, n) : null;
     }
 }

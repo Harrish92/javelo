@@ -4,9 +4,10 @@ import ch.epfl.javelo.projection.PointCh;
 
 
 /**
+ * RoutePoint représente le point d'un itinéraire le plus proche d'un point de référence donné
+ *
  * @author Harrishan Raveendran (345291)
  *
- * RoutePoint représente le point d'un itinéraire le plus proche d'un point de référence donné
  *
  * @param point sur l'itinéraire
  * @param position du point le long de l'itinéraire
@@ -33,10 +34,7 @@ public record RoutePoint(PointCh point, double position, double distanceToRefere
      * sinon retourn that
      */
     public RoutePoint min(RoutePoint that){
-        if(this.distanceToReference <= that.distanceToReference){
-            return this;
-        }
-        return that;
+        return this.distanceToReference <= that.distanceToReference ? this : that;
     }
 
     /**
@@ -49,10 +47,8 @@ public record RoutePoint(PointCh point, double position, double distanceToRefere
      * sinon retourne une nouvelle instance de RoutePoint dont les attributs sont les arguments passés à min .
      */
     public RoutePoint min(PointCh thatPoint, double thatPosition, double thatDistanceToReference){
-        if(this.distanceToReference <= thatDistanceToReference){
-            return this;
-        }
-        return new RoutePoint(thatPoint, thatPosition, thatDistanceToReference);
+        return this.distanceToReference <= thatDistanceToReference ?
+                this : new RoutePoint(thatPoint, thatPosition, thatDistanceToReference);
     }
 
 
