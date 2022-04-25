@@ -14,7 +14,7 @@ import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-
+import java.util.Locale;
 
 
 /**
@@ -63,12 +63,12 @@ public class GpxGenerator {
         for(int i=0; i < list.size(); i++){
             Element rtept = doc.createElement("rtept");
             rte.appendChild(rtept);
-            rtept.setAttribute("long", String.valueOf(list.get(i).lon()));
-            rtept.setAttribute("lat", String.valueOf(list.get(i).lat()));
+            rtept.setAttribute("lon", String.format(Locale.ROOT,"%.5f", Math.toDegrees(list.get(i).lon())));
+            rtept.setAttribute("lat", String.format(Locale.ROOT, "%.5f", Math.toDegrees(list.get(i).lat())));
 
             Element ele = doc.createElement("ele");
             rtept.appendChild(ele);
-            ele.setAttribute("alt", String.valueOf(profile.elevationAt(length)));
+            ele.setTextContent(String.format(Locale.ROOT, "%.2f", profile.elevationAt(length)));
             if(itineraire.edges().size() > i)
                 length += itineraire.edges().get(i).length();
 

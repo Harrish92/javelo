@@ -76,7 +76,7 @@ public final class TileManager {
             return lhm.get(tileid);
         }
 
-         Path filePath = Path.of(path.toString() + "/" + tileid.zoom() + "/"+ tileid.x() + "/" + tileid.y() + ".png");
+         Path filePath = Path.of(path.toString() + "/" + tileid.zoom + "/"+ tileid.x + "/" + tileid.y + ".png");
         if(Files.exists(filePath, LinkOption.NOFOLLOW_LINKS)){
             try(InputStream input = new FileInputStream(filePath.toString())){
                 Image img = new Image(input);
@@ -88,7 +88,8 @@ public final class TileManager {
             }
         }
 
-        Files.createDirectories(Path.of(path.toString() + "/" + tileid.zoom() + "/"+ tileid.x()));
+        Files.createDirectories(Path.of(path + "/" + tileid.zoom + "/"+ tileid.x));
+
         URL u = new URL(serverName);
         URLConnection c = u.openConnection();
         c.setRequestProperty("User-Agent", "JaVelo");
