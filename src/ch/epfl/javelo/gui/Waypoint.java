@@ -1,5 +1,7 @@
 package ch.epfl.javelo.gui;
 
+import ch.epfl.javelo.projection.PointCh;
+
 /**
  *
  * WayPoint représente un point de passage. Il possède deux attributs.
@@ -7,6 +9,6 @@ package ch.epfl.javelo.gui;
  * @author Harrishan Raveendran (345291)
  *
  */
-public record Waypoint(double PointCH, int NodeId) {
+public record Waypoint(PointCh PointCH, int NodeId) {
 
 }
