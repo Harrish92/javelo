@@ -46,6 +46,7 @@ public class BaseMapManagerTest extends Application{
                         errorConsumer);
         BaseMapManager baseMapManager =
                 new BaseMapManager(tileManager,
+                        waypointsManager,
                         mapViewParametersP);
 
         StackPane mainPane =

@@ -20,7 +20,7 @@ public final class BaseMapManager {
     private final static int MAP_LENGTH = 256;
 
 
-    public BaseMapManager(TileManager tm, ObjectProperty<MapViewParameters> property){
+    public BaseMapManager(TileManager tm, WaypointsManager waypointsManager, ObjectProperty<MapViewParameters> property){
         redrawNeeded = false;
         this.tm = tm;
         this.property = property;

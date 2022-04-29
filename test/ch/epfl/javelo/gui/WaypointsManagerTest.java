@@ -48,6 +48,7 @@ class WaypointsManagerTest extends Application {
                         errorConsumer);
         BaseMapManager baseMapManager =
                 new BaseMapManager(tileManager,
+                        waypointsManager,
                         mapViewParametersP);
 
         StackPane mainPane =
