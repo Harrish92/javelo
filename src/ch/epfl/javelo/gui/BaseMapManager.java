@@ -17,11 +17,13 @@ import java.util.Map;
 public final class BaseMapManager {
     private final TileManager tm;
     private final ObjectProperty<MapViewParameters> property;
+    private final WaypointsManager wpm;
     private boolean redrawNeeded;
     private final static int TILE_LENGTH= 256;
 
 
-    public BaseMapManager(TileManager tm, ObjectProperty<MapViewParameters> property) throws IOException {
+    public BaseMapManager(TileManager tm,WaypointsManager wpm , ObjectProperty<MapViewParameters> property) throws IOException {
+        this.wpm = wpm;
         redrawNeeded = false;
         this.tm = tm;
         this.property = property;
