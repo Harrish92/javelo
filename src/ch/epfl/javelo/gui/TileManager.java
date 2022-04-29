@@ -90,7 +90,7 @@ public final class TileManager {
 
         Files.createDirectories(Path.of(path + "/" + tileid.zoom + "/"+ tileid.x));
 
-        URL u = new URL(serverName + "/" + tileid.zoom + "/" + tileid.x + "/" + tileid.y + ".png");
+        URL u = new URL("https://" + serverName + "/" + tileid.zoom + "/" + tileid.x + "/" + tileid.y + ".png");
         URLConnection c = u.openConnection();
         c.setRequestProperty("User-Agent", "JaVelo");
         try(InputStream i = c.getInputStream()) {

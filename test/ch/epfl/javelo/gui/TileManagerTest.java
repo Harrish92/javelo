@@ -13,7 +13,7 @@ public class TileManagerTest {
     @Test
     public void FileIsCreated() throws IOException {
         TileManager m =  new TileManager(Path.of("cache") ,
-                "https://tile.openstreetmap.org");
+                "tile.openstreetmap.org");
         TileManager.TileId tId = new TileManager.TileId(19, 271725, 185422);
         m.imageForTileAt(tId);
     }

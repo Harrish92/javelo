@@ -10,6 +10,7 @@ import javafx.scene.input.ZoomEvent;
 import javafx.scene.layout.Pane;
 
 import java.awt.*;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -17,53 +18,42 @@ public final class BaseMapManager {
     private final TileManager tm;
     private final ObjectProperty<MapViewParameters> property;
     private boolean redrawNeeded;
-    private final static int MAP_LENGTH = 256;
+    private final static int TILE_LENGTH= 256;
 
 
-    public BaseMapManager(TileManager tm, ObjectProperty<MapViewParameters> property){
+    public BaseMapManager(TileManager tm, ObjectProperty<MapViewParameters> property) throws IOException {
         redrawNeeded = false;
         this.tm = tm;
         this.property = property;
-        int nbOfTiles;
-        Pane pane = pane();
 
+        Pane pane = pane();
         Canvas canvas = new Canvas();
         pane.getChildren().add(canvas);
         canvas.widthProperty().bind(pane.widthProperty());
         GraphicsContext graphicsContext =  canvas.getGraphicsContext2D();
 
+
         int zoom = property.get().zoomLevel();
-        int topLeftX = (int) Math.floor(0);property.get().topLeft().getX();
-        int topLeftY = (int) Math.floor(0);property.get().topLeft().getY();
-        int bottomRigthX = (int) Math.floor(topLeftX + canvas.getWidth() );
-        int bottomRigthY = (int) Math.floor(topLeftY  + canvas.getHeight());
+        double offSetX = property.get().topLeft().getX();
+        double offSetY = property.get().topLeft().getY();
+        int tuile0X = (int) Math.floor(property.get().coordX()/ TILE_LENGTH);
+        int tuile0Y = (int) Math.floor(property.get().coordY() / TILE_LENGTH);
+        TileManager.TileId tileId = new TileManager.TileId(zoom, tuile0X, tuile0Y);
+        graphicsContext.drawImage(tm.imageForTileAt(tileId), 50, 50);
 
 
-        nbOfTiles = (zoom != 0)
-                ? (int) Math.pow(2, zoom)
-                : 1;
+        /*
+        for(int y = 0; y <= canvas.getHeight(); y+= TILE_LENGTH){
+            for(int x = 0; x <= canvas.getWidth(); x+= TILE_LENGTH){
 
-        int xTile =(int) Math.floor(property.get().coordX() / MAP_LENGTH);
-        int yTile =(int) Math.floor(property.get().coordY() / MAP_LENGTH);
-        for(int y = topLeftY; y <= bottomRigthY; y+= MAP_LENGTH / nbOfTiles){ //remplace MAP_LENGTH par CanvasWidth
-            for(int x = topLeftX; x <= bottomRigthX; x += MAP_LENGTH / nbOfTiles){
-                TileManager.TileId tileId = new TileManager.TileId(zoom, xTile, yTile);
-                xTile += (MAP_LENGTH / nbOfTiles) / MAP_LENGTH;
             }
-            yTile +=  (MAP_LENGTH / nbOfTiles) / MAP_LENGTH;
-
         }
 
+         */
 
 
 
 
-
-
-        canvas.sceneProperty().addListener((p, oldS, newS) -> {
-            assert oldS == null;
-            newS.addPreLayoutPulseListener(this::redrawIfNeeded);
-        });
 
     }
 
