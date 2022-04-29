@@ -46,7 +46,7 @@ public final class TileManager {
      *
      * enregistement imbriqué qui représente l'identité d'une tuile
      */
-    public record TileId(double zoom, double x, double y){
+    public record TileId(int zoom, int x, int y){
 
         /**
          * constructeur qui vérifie si les paramètres données sont valides
@@ -58,7 +58,7 @@ public final class TileManager {
          *
          * @return vrai ssi les arguments zoom, x et y constituent une identité de tuile valide.
          */
-        public static boolean isValid(double zoom, double x, double y){
+        public static boolean isValid(int zoom, double x, double y){
 
             double max = Math.pow(2, zoom) - 1;
             return (zoom >= 0 && zoom <= 19 &&  x >= 0 && x <= max && y >= 0 && y <= max);
@@ -90,7 +90,7 @@ public final class TileManager {
 
         Files.createDirectories(Path.of(path + "/" + tileid.zoom + "/"+ tileid.x));
 
-        URL u = new URL(serverName);
+        URL u = new URL(serverName + "/" + tileid.zoom + "/" + tileid.x + "/" + tileid.y + ".png");
         URLConnection c = u.openConnection();
         c.setRequestProperty("User-Agent", "JaVelo");
         try(InputStream i = c.getInputStream()) {
