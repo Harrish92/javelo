@@ -44,7 +44,6 @@ public final class WaypointsManager {
         this.property = property;
         this.pointsListe = pointsListe;
         this.erreurs = erreurs;
-        Canvas canvas = new Canvas();
         pane = new Pane();
         drawAllPoint();
     }
@@ -96,8 +95,8 @@ public final class WaypointsManager {
         SVGPath svgCircle = new SVGPath();
         svgPoint.setContent("M-8-20C-5-14-2-7 0 0 2-7 5-14 8-20 20-40-20-40-8-20");
         svgCircle.setContent("M0-23A1 1 0 000-29 1 1 0 000-23");
-        svgPoint.getStyleClass().add("pin_inside");
-        svgCircle.getStyleClass().add("pin_outside");
+        svgPoint.getStyleClass().add("pin_outside");
+        svgCircle.getStyleClass().add("pin_inside");
         group.getChildren().addAll(svgPoint, svgCircle);
         group.setLayoutX(x);
         group.setLayoutY(y);
@@ -109,16 +108,19 @@ public final class WaypointsManager {
     private void pointEventListener(Group group, int pointIndex){
         ObjectProperty<Point2D> position = new SimpleObjectProperty<Point2D>();
         group.setOnMouseClicked(e -> {
-            pane.setPickOnBounds(false);
+            //pane.setPickOnBounds(false);
             pointsListe.remove(pointsListe.get(pointIndex));
             pane.getChildren().remove(group);
+            drawAllPoint();
         });
 
-        group.setOnMousePressed(e -> {
+        /*group.setOnMousePressed(e -> {
+            pane.setPickOnBounds(false);
             position.set(new Point2D(e.getX(), e.getY()));
         });
 
         group.setOnMouseDragged(e -> {
+            pane.setPickOnBounds(false);
             double x = e.getX();
             double y= e.getY();
             group.setLayoutX(x);
@@ -127,9 +129,10 @@ public final class WaypointsManager {
         });
 
         group.setOnMouseReleased(e -> {
+            pane.setPickOnBounds(false);
             changeWaypoint(position.get().getX(), position.get().getY(),pointIndex);
 
-        });
+        });*/
 
 
         /*group.setOnMouseDragEntered(e -> {
@@ -160,10 +163,10 @@ public final class WaypointsManager {
             Group group = createGraphicPoint(x,y);
             String s = "";
             if(k == 0) s = "first";
-            else if(k == pointsListe.size()) s = "last";
+            else if(k == pointsListe.size() - 1) s = "last";
             else s = "middle";
-            group.getStyleClass().add(s);
-            //pointEventListener(group, k);
+            group.getStyleClass().addAll("pin",s);
+            pointEventListener(group, k);
             pane.getChildren().add(group);
             System.out.println(k);
         }
