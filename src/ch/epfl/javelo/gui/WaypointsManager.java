@@ -9,8 +9,11 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.Node;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.Pane;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.SVGPath;
 
 import java.util.function.Consumer;
@@ -41,7 +44,9 @@ public final class WaypointsManager {
         this.property = property;
         this.pointsListe = pointsListe;
         this.erreurs = erreurs;
+        Canvas canvas = new Canvas();
         pane = new Pane();
+        drawAllPoint();
     }
 
     /**
@@ -96,6 +101,7 @@ public final class WaypointsManager {
         group.getChildren().addAll(svgPoint, svgCircle);
         group.setLayoutX(x);
         group.setLayoutY(y);
+        System.out.println(x+"JJJ"+y);
         return group;
     }
 
@@ -157,8 +163,9 @@ public final class WaypointsManager {
             else if(k == pointsListe.size()) s = "last";
             else s = "middle";
             group.getStyleClass().add(s);
-            pointEventListener(group, k);
+            //pointEventListener(group, k);
             pane.getChildren().add(group);
+            System.out.println(k);
         }
     }
 

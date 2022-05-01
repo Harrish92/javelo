@@ -6,6 +6,9 @@ import javafx.geometry.Point2D;
 /**
  * Cette classe représente les paramètres du fond de carte
  * présenté dans l'interface graphique.
+ * @param zoomLevel le niveau de zoom.
+ * @param coordX la coordonnée x du coin haut-gauche de la portion de carte affichée.
+ * @param coordY la coordonnée y du coin haut-gauche de la portion de carte affichée.
  * @author Yoan Giovannini (303934)
  */
 public final record MapViewParameters(int zoomLevel, double coordX, double coordY) {
@@ -50,7 +53,7 @@ public final record MapViewParameters(int zoomLevel, double coordX, double coord
      * @return la coordonnée x.
      */
     public double viewX(PointWebMercator p){
-        return p.x() - coordX;
+        return p.xAtZoomLevel(zoomLevel) - coordX;
     }
 
     /**
@@ -60,7 +63,7 @@ public final record MapViewParameters(int zoomLevel, double coordX, double coord
      * @return la coordonnée y.
      */
     public double viewY(PointWebMercator p){
-        return p.y() - coordY;
+        return p.yAtZoomLevel(zoomLevel) - coordY;
     }
 
 }
