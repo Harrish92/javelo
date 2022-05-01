@@ -100,7 +100,6 @@ public final class WaypointsManager {
         group.getChildren().addAll(svgPoint, svgCircle);
         group.setLayoutX(x);
         group.setLayoutY(y);
-        System.out.println(x+"JJJ"+y);
         return group;
     }
 
@@ -168,7 +167,6 @@ public final class WaypointsManager {
             group.getStyleClass().addAll("pin",s);
             pointEventListener(group, k);
             pane.getChildren().add(group);
-            System.out.println(k);
         }
     }
 
