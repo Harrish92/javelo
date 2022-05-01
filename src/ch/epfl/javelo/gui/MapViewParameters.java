@@ -16,10 +16,7 @@ public final record MapViewParameters(int zoomLevel, double coordX, double coord
      * @return un point sous la forme Point2D.
      */
     public Point2D topLeft() {
-        PointWebMercator p = PointWebMercator.of(zoomLevel, coordX, coordY);
-        double lon = Math.toDegrees(p.lon());
-        double lat = Math.toDegrees(p.lat());
-        return new Point2D(lon, lat);
+        return new Point2D(coordX, coordY);
     }
 
     /**

@@ -50,8 +50,7 @@ public class BaseMapManagerTest extends Application{
                         mapViewParametersP);
 
         StackPane mainPane =
-                new StackPane(baseMapManager.pane(),
-                        waypointsManager.pane());
+                new StackPane(baseMapManager.pane());
         mainPane.getStylesheets().add("map.css");
         primaryStage.setMinWidth(600);
         primaryStage.setMinHeight(300);
