@@ -34,7 +34,6 @@ public final class BaseMapManager {
 
         canvas = new Canvas();
         pane = new Pane(canvas);
-        pane.getChildren().add(wpm.pane());
         canvas.widthProperty().bind(pane.widthProperty());
         canvas.heightProperty().bind(pane.heightProperty());
 

@@ -1,10 +1,14 @@
 package ch.epfl.javelo.gui;
 
 import ch.epfl.javelo.data.Graph;
+import ch.epfl.javelo.data.GraphNodes;
+import ch.epfl.javelo.data.GraphSectors;
+import ch.epfl.javelo.projection.Ch1903;
 import ch.epfl.javelo.projection.PointCh;
 import ch.epfl.javelo.projection.PointWebMercator;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
@@ -29,6 +33,8 @@ public final class WaypointsManager {
     private ObservableList<Waypoint> pointsListe;
     private Consumer<String> erreurs;
     private Pane pane;
+    private Point2D mousePoint;
+    private Point2D mouse_difference;
 
 
     /**
@@ -46,42 +52,15 @@ public final class WaypointsManager {
         this.erreurs = erreurs;
         pane = new Pane();
         drawAllPoint();
+        paneEventListener();
     }
 
-    /**
-     * Gère les actions de l'utilisateur avec les points de passage.
-     */
-    /*private void canvasEventListener(){
-        canvas.setOnDragEntered(e -> {
-            double x = e.getX();
-            double y = e.getY();
-            boolean occupe = false;
-            for(Node n : canvas.getChildren()){//TODO: optimiser lambda
-                occupe = n.contains(x,y);
-            }
-            if(occupe){//TODO:calculer le point
-                Group group = createGraphicPoint(x,y);
-                canvas.getChildren().add(group);
-            }
-            else{
-                addWaypoint(x,y);
-            }
-        });
-        pane.setOnMouseClicked(e -> {
-            pane.setPickOnBounds(false);
-            double x = e.getX();
-            double y = e.getY();
-            boolean occupe = false;
-            for(Node n : pane.getChildren()){//TODO: optimiser lambda
-                occupe = n.contains(x,y);
-            }
-            //canvas.getChildren().forEach((n) -> occupe = n.contains(x,y));
-            if(!occupe){
-                addWaypoint(x,y);
-                pane.getChildren().add(createGraphicPoint(x,y));
-            }
-    });
-    }*/
+    private void paneEventListener(){
+        pane.setPickOnBounds(false);
+        property.addListener(e -> drawAllPoint());
+        pointsListe.addListener((ListChangeListener<? super Waypoint>) l -> drawAllPoint());
+
+    }
 
     /**
      * Créé un groupe javaFX avec le dessin d'un point et lui donne une position.
@@ -105,55 +84,62 @@ public final class WaypointsManager {
 
 
     private void pointEventListener(Group group, int pointIndex){
-        ObjectProperty<Point2D> position = new SimpleObjectProperty<Point2D>();
+        ObjectProperty<Point2D> initPosition = new SimpleObjectProperty<Point2D>();
         group.setOnMouseClicked(e -> {
-            //pane.setPickOnBounds(false);
-            pointsListe.remove(pointsListe.get(pointIndex));
-            pane.getChildren().remove(group);
-            drawAllPoint();
+            if(e.isStillSincePress()) {
+                System.out.println("EFFACE");
+                pane.getChildren().remove(pointIndex);
+                pointsListe.remove(pointsListe.get(pointIndex));
+            }
         });
 
-        /*group.setOnMousePressed(e -> {
-            pane.setPickOnBounds(false);
-            position.set(new Point2D(e.getX(), e.getY()));
+        group.setOnMousePressed(e -> {
+            mousePoint = new Point2D(e.getX(), e.getY());
+            initPosition.set(new Point2D(e.getX(), e.getY()));
         });
 
         group.setOnMouseDragged(e -> {
-            pane.setPickOnBounds(false);
-            double x = e.getX();
-            double y= e.getY();
-            group.setLayoutX(x);
-            group.setLayoutY(y);
-            position.set(new Point2D(x, y));//UTILE ?
+            mouse_difference = mousePoint.subtract(e.getX(), e.getY());
+            System.out.println(e.getX());
+            /*PointWebMercator pointM = new PointWebMercator(
+                    e.getX(),
+                    e.getY());
+            group.setLayoutX(property.get().viewX(pointM));
+            group.setLayoutY(property.get().viewY(pointM));*/
+            group.setLayoutX(e.getX());
+            group.setLayoutY(initPosition.get().getY() + e.getY());
+
+            //initPosition.set(new Point2D(x, y));//UTILE ?
         });
 
         group.setOnMouseReleased(e -> {
-            pane.setPickOnBounds(false);
-            changeWaypoint(position.get().getX(), position.get().getY(),pointIndex);
+            if(!e.isStillSincePress()){
+            double x = initPosition.get().getX();
+            double y = initPosition.get().getY();
+            PointCh point = property.get().pointAt(x,y).toPointCh();
+            int nodeId = graph.nodeClosestTo(point, SEARCHDISTANCE);
+            if(nodeId == -1){
+                erreurs.accept("Aucune route à proximité !");
+                group.setLayoutX(initPosition.get().getX());
+                group.setLayoutY(initPosition.get().getY());
+            }
 
-        });*/
+            else{
+                Waypoint waypoint = new Waypoint(graph.nodePoint(nodeId), nodeId);
+                pointsListe.remove(pointIndex);
+                pointsListe.add(pointIndex,waypoint);
+            }
+            //changeWaypoint(position.get().getX(), position.get().getY(),pointIndex);
 
-
-        /*group.setOnMouseDragEntered(e -> {
-            pane.setPickOnBounds(false);
-            System.out.println("DRAG ENTERED");
-
-        });
-        group.setOnMouseDragOver(e -> {
-            pane.setPickOnBounds(false);
-            group.setLayoutX(e.getX());
-            group.setLayoutY(e.getY());
-            //e.acceptTransferModes(TransferMode.MOVE);
-            e.consume();
-            System.out.println("DRAG OVER");
-        });*/
+        }});
     }
 
     /**
      * Recréé tous les points graphiques.
      */
     private void drawAllPoint(){
-        pane.getChildren().removeAll();
+        System.out.println("DRAW");
+        pane.getChildren().removeAll(pane.getChildren());
         for (int k = 0; k < pointsListe.size(); k++) {
             Waypoint point = pointsListe.get(k);
             PointWebMercator pm = PointWebMercator.ofPointCh(point.PointCH());
@@ -167,6 +153,7 @@ public final class WaypointsManager {
             group.getStyleClass().addAll("pin",s);
             pointEventListener(group, k);
             pane.getChildren().add(group);
+            //System.out.println(k);
         }
     }
 
@@ -191,9 +178,8 @@ public final class WaypointsManager {
             erreurs.accept("Aucune route à proximité !");
         }
         else{
-            Waypoint waypoint = new Waypoint(point, nodeId);
+            Waypoint waypoint = new Waypoint(graph.nodePoint(nodeId), nodeId);
             pointsListe.add(waypoint);
-            drawAllPoint();
         }
     }
 
@@ -204,10 +190,9 @@ public final class WaypointsManager {
             erreurs.accept("Aucune route à proximité !");
         }
         else{
-            Waypoint waypoint = new Waypoint(point, nodeId);
+            Waypoint waypoint = new Waypoint(graph.nodePoint(nodeId), nodeId);
             pointsListe.remove(index);
             pointsListe.add(index,waypoint);
-            drawAllPoint();
         }
     }
 }
