@@ -22,10 +22,10 @@ class MapViewParametersTest {
     void viewXYTest(){
         int x = 135735;
         int y = 92327;
-        PointWebMercator p = PointWebMercator.of(10, x, y);
+        PointWebMercator p = PointWebMercator.of(10, x+1, y+1);
         MapViewParameters m  = new MapViewParameters(10, x, y);
-        assertEquals(0, m.viewX(p));
-        assertEquals(0, m.viewY(p));
+        assertEquals(1, m.viewX(p));
+        assertEquals(1, m.viewY(p));
     }
 
     @Test

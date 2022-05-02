@@ -86,51 +86,44 @@ public final class WaypointsManager {
     private void pointEventListener(Group group, int pointIndex){
         ObjectProperty<Point2D> initPosition = new SimpleObjectProperty<Point2D>();
         group.setOnMouseClicked(e -> {
-            if(e.isStillSincePress()) {
-                System.out.println("EFFACE");
-                pane.getChildren().remove(pointIndex);
-                pointsListe.remove(pointsListe.get(pointIndex));
-            }
+
         });
 
         group.setOnMousePressed(e -> {
-            mousePoint = new Point2D(e.getX(), e.getY());
-            initPosition.set(new Point2D(e.getX(), e.getY()));
+            mousePoint = new Point2D(e.getSceneX(), e.getSceneY());
+            initPosition.set(new Point2D(group.getLayoutX(), group.getLayoutY()));
         });
 
         group.setOnMouseDragged(e -> {
-            mouse_difference = mousePoint.subtract(e.getX(), e.getY());
-            System.out.println(e.getX());
-            /*PointWebMercator pointM = new PointWebMercator(
-                    e.getX(),
-                    e.getY());
+            mouse_difference = mousePoint.subtract(e.getSceneX(), e.getSceneY());
+            PointWebMercator pointM = property.get().pointAt(
+                    initPosition.get().getX() - mouse_difference.getX(),
+                    initPosition.get().getY() - mouse_difference.getY());
             group.setLayoutX(property.get().viewX(pointM));
-            group.setLayoutY(property.get().viewY(pointM));*/
-            group.setLayoutX(e.getX());
-            group.setLayoutY(initPosition.get().getY() + e.getY());
-
-            //initPosition.set(new Point2D(x, y));//UTILE ?
+            group.setLayoutY(property.get().viewY(pointM));
         });
 
         group.setOnMouseReleased(e -> {
-            if(!e.isStillSincePress()){
-            double x = initPosition.get().getX();
-            double y = initPosition.get().getY();
-            PointCh point = property.get().pointAt(x,y).toPointCh();
-            int nodeId = graph.nodeClosestTo(point, SEARCHDISTANCE);
-            if(nodeId == -1){
-                erreurs.accept("Aucune route à proximité !");
-                group.setLayoutX(initPosition.get().getX());
-                group.setLayoutY(initPosition.get().getY());
+            if(e.isStillSincePress()) {
+                pane.getChildren().remove(pointIndex);
+                pointsListe.remove(pointsListe.get(pointIndex));
             }
-
             else{
-                Waypoint waypoint = new Waypoint(graph.nodePoint(nodeId), nodeId);
-                pointsListe.remove(pointIndex);
-                pointsListe.add(pointIndex,waypoint);
-            }
-            //changeWaypoint(position.get().getX(), position.get().getY(),pointIndex);
+                double x = initPosition.get().getX() - mouse_difference.getX();
+                double y = initPosition.get().getY() - mouse_difference.getY();
+                PointCh point = property.get().pointAt(x,y).toPointCh();
+                int nodeId = graph.nodeClosestTo(point, SEARCHDISTANCE);
+                if(nodeId == -1){
+                    erreurs.accept("Aucune route à proximité !");
+                    group.setLayoutX(initPosition.get().getX());
+                    group.setLayoutY(initPosition.get().getY());
+                }
 
+                else{
+                    Waypoint waypoint = new Waypoint(graph.nodePoint(nodeId), nodeId);
+                    pointsListe.remove(pointIndex);
+                    pointsListe.add(pointIndex,waypoint);
+                }
         }});
     }
 
@@ -138,7 +131,6 @@ public final class WaypointsManager {
      * Recréé tous les points graphiques.
      */
     private void drawAllPoint(){
-        System.out.println("DRAW");
         pane.getChildren().removeAll(pane.getChildren());
         for (int k = 0; k < pointsListe.size(); k++) {
             Waypoint point = pointsListe.get(k);
@@ -153,7 +145,6 @@ public final class WaypointsManager {
             group.getStyleClass().addAll("pin",s);
             pointEventListener(group, k);
             pane.getChildren().add(group);
-            //System.out.println(k);
         }
     }
 
