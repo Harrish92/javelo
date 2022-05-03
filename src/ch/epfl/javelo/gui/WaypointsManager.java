@@ -19,12 +19,12 @@ import java.util.function.Consumer;
  * @author Yoan Giovannini (303934)
  */
 public final class WaypointsManager {
-    private final int SEARCHDISTANCE = 1000;
-    private Graph graph;
-    private ObjectProperty<MapViewParameters> property;
-    private ObservableList<Waypoint> pointsListe;
-    private Consumer<String> erreurs;
-    private Pane pane;
+    private final int SEARCHDISTANCE = 500;
+    private final Graph graph;
+    private final ObjectProperty<MapViewParameters> property;
+    private final ObservableList<Waypoint> pointsListe;
+    private final Consumer<String> erreurs;
+    private final Pane pane;
 
 
     /**
@@ -50,18 +50,16 @@ public final class WaypointsManager {
      */
     private void paneEventListener(){
         pane.setPickOnBounds(false);
-        property.addListener(e -> drawAllPoint());
+        property.addListener(e -> positionAllPoint());
         pointsListe.addListener((ListChangeListener<? super Waypoint>) l -> drawAllPoint());
 
     }
 
     /**
-     * Créé un groupe javaFX avec le dessin d'un point et lui donne une position.
-     * @param x la coordonnée x de la position du point.
-     * @param y la coordonnée y de la position du point.
+     * Créé un groupe javaFX avec le dessin d'un point.
      * @return un groupe javaFX.
      */
-    private Group createGraphicPoint(double x, double y){
+    private Group createGraphicPoint(){
         Group group = new Group();
         SVGPath svgPoint = new SVGPath();
         SVGPath svgCircle = new SVGPath();
@@ -70,8 +68,6 @@ public final class WaypointsManager {
         svgPoint.getStyleClass().add("pin_outside");
         svgCircle.getStyleClass().add("pin_inside");
         group.getChildren().addAll(svgPoint, svgCircle);
-        group.setLayoutX(x);
-        group.setLayoutY(y);
         return group;
     }
 
@@ -126,18 +122,27 @@ public final class WaypointsManager {
     private void drawAllPoint(){
         pane.getChildren().removeAll(pane.getChildren());
         for (int k = 0; k < pointsListe.size(); k++) {
-            Waypoint point = pointsListe.get(k);
-            PointWebMercator pm = PointWebMercator.ofPointCh(point.PointCH());
-            double x = property.get().viewX(pm);
-            double y = property.get().viewY(pm);
-            Group group = createGraphicPoint(x,y);
-            String s = "";
+            Group group = createGraphicPoint();
+            String s = "middle";
             if(k == 0) s = "first";
             else if(k == pointsListe.size() - 1) s = "last";
-            else s = "middle";
             group.getStyleClass().addAll("pin",s);
             pointEventListener(group, k);
             pane.getChildren().add(group);
+        }
+        positionAllPoint();
+    }
+
+    /**
+     * Positionne tout les points sur la carte
+     */
+    private void positionAllPoint(){
+        for (int k = 0; k < pane.getChildren().size(); k++) {
+            Waypoint point = pointsListe.get(k);
+            PointWebMercator pm = PointWebMercator.ofPointCh(point.PointCH());
+            Group group = (Group) pane.getChildren().get(k);
+            group.setLayoutX(property.get().viewX(pm));
+            group.setLayoutY(property.get().viewY(pm));
         }
     }
 
