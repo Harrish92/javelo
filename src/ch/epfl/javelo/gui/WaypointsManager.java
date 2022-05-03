@@ -36,6 +36,7 @@ public final class WaypointsManager {
      */
     public WaypointsManager(Graph graph, ObjectProperty<MapViewParameters> property,
                             ObservableList<Waypoint> pointsListe, Consumer<String> erreurs){
+
         this.graph = graph;
         this.property = property;
         this.pointsListe = pointsListe;
@@ -43,6 +44,7 @@ public final class WaypointsManager {
         pane = new Pane();
         drawAllPoint();
         paneEventListener();
+        pane.setPickOnBounds(false);
     }
 
     /**

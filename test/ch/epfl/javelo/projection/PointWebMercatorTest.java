@@ -50,6 +50,7 @@ class PointWebMercatorTest {
             var maxXY = Math.scalb(1d, z + 8);
             var x = rng.nextDouble(maxXY);
             var y = rng.nextDouble(maxXY);
+            System.out.println(z);
             var p = PointWebMercator.of(z, x, y);
             assertEquals(x, p.xAtZoomLevel(z), 1e-8);
             assertEquals(y, p.yAtZoomLevel(z), 1e-8);
