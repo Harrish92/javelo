@@ -1,7 +1,10 @@
 package ch.epfl.javelo.gui;
 
+import ch.epfl.javelo.Math2;
+import ch.epfl.javelo.projection.PointWebMercator;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleLongProperty;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -21,10 +24,10 @@ public final class BaseMapManager {
     private final ObjectProperty<MapViewParameters> property;
     private final WaypointsManager wpm;
     private boolean redrawNeeded;
-    private Point2D mousePoint;
     private final static int TILE_LENGTH= 256;
     private final Pane pane;
     private final Canvas canvas;
+    private Point2D mousePoint;
 
 
     public BaseMapManager(TileManager tm,WaypointsManager wpm , ObjectProperty<MapViewParameters> property){
@@ -45,33 +48,49 @@ public final class BaseMapManager {
             mousePoint = new Point2D(e.getX(), e.getY());
         });
 
-        pane.setOnMouseDragged(e->{
-            Point2D mouse_difference = mousePoint.subtract(e.getX(), e.getY());
+        pane.setOnMouseDragged(f ->{
+            Point2D mouse_difference = mousePoint.subtract(f.getX(), f.getY());
             Point2D topLeft = mouse_difference.add(property.get().topLeft().getX(), property.get().topLeft().getY());
+
+
             property.set(new MapViewParameters(property.get().zoomLevel(), topLeft.getX(), topLeft.getY()));
             redrawOnNextPulse();
+
+            mousePoint = new Point2D(f.getX(), f.getY());
         });
 
         pane.setOnMouseReleased(e->{
+            mousePoint = null;
         });
 
         pane.setOnMouseClicked(e->{
-            if(e.isStillSincePress()){
+            if(e.isStillSincePress()) {
                 wpm.addWaypoint(e.getX(), e.getY());
             }
             redrawOnNextPulse();
         });
 
-
-        /*
+        SimpleLongProperty minScrollTime = new SimpleLongProperty();
         pane.setOnScroll(e ->{
-            int zooming =  (int) (e.getDeltaY() + 0.5);
-            int zoomLevel = property.get().zoomLevel() + zooming;
-            property.set(new MapViewParameters(zoomLevel, property.get().coordX(), property.get().coordY()));
+
+            long currentTime = System.currentTimeMillis();
+            if (currentTime < minScrollTime.get()) return;
+            minScrollTime.set(currentTime + 250);
+            double zoomDelta = Math.signum(e.getDeltaY());
+            int zoomLevel =  (int) Math.rint(zoomDelta + property.get().zoomLevel());
+
+            zoomLevel = Math2.clamp(8, zoomLevel, 19);
+
+            Point2D p2d = new Point2D(e.getX(), e.getY());
+
+            p2d = p2d.add(property.get().coordX(), property.get().coordY());
+            double scale = Math.scalb(1, zoomLevel - property.get().zoomLevel());
+            p2d = p2d.multiply(scale);
+            p2d = p2d.subtract(e.getX(), e.getY());
+            property.set(new MapViewParameters(zoomLevel, p2d.getX(), p2d.getY()));
             redrawOnNextPulse();
         });
 
-         */
 
         redrawOnNextPulse();
 
@@ -127,10 +146,10 @@ public final class BaseMapManager {
     private void redrawIfNeeded(){
         if (!redrawNeeded) return;
         redrawNeeded = false;
+
+        // dessin de la carte
         draw();
 
-
-        // … à faire : dessin de la carte
     }
 
     /**
