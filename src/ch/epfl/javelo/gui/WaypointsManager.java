@@ -44,7 +44,6 @@ public final class WaypointsManager {
         pane = new Pane();
         drawAllPoint();
         paneEventListener();
-        pane.setPickOnBounds(false);
     }
 
     /**
