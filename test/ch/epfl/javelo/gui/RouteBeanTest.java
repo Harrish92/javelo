@@ -2,23 +2,23 @@ package ch.epfl.javelo.gui;
 
 import ch.epfl.javelo.data.Graph;
 import ch.epfl.javelo.projection.PointCh;
+import ch.epfl.javelo.routing.CityBikeCF;
+import ch.epfl.javelo.routing.RouteComputer;
 import javafx.application.Application;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-import org.junit.jupiter.api.Test;
 
-import java.awt.geom.Point2D;
 import java.nio.file.Path;
 import java.util.function.Consumer;
 
-public class BaseMapManagerTest extends Application{
+import static org.junit.jupiter.api.Assertions.*;
 
+public class RouteBeanTest extends Application {
     public static void main(String[] args) { launch(args); }
 
 
@@ -39,11 +39,13 @@ public class BaseMapManagerTest extends Application{
                         new Waypoint(new PointCh(2532697, 1152350), 159049),
                         new Waypoint(new PointCh(2538659, 1154350), 117669));
         Consumer<String> errorConsumer = new ErrorConsumer();
-
+        RouteBean routeBean = new RouteBean(new RouteComputer(graph, new CityBikeCF(graph)));
+        routeBean.pointsList = waypoints;
+        routeBean.setHighlightedPosition(1000.0);
         WaypointsManager waypointsManager =
                 new WaypointsManager(graph,
                         mapViewParametersP,
-                        waypoints,
+                        routeBean.pointsList,
                         errorConsumer);
         BaseMapManager baseMapManager =
                 new BaseMapManager(tileManager,
@@ -65,4 +67,5 @@ public class BaseMapManagerTest extends Application{
         @Override
         public void accept(String s) { System.out.println(s); }
     }
+
 }

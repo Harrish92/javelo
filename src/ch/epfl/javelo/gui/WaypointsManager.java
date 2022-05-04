@@ -139,7 +139,7 @@ public final class WaypointsManager {
      * Positionne tout les points sur la carte
      */
     private void positionAllPoint(){
-        for (int k = 0; k < pane.getChildren().size(); k++) {
+        for (int k = 0; k < pointsListe.size(); k++) {
             Waypoint point = pointsListe.get(k);
             PointWebMercator pm = PointWebMercator.ofPointCh(point.PointCH());
             Group group = (Group) pane.getChildren().get(k);
