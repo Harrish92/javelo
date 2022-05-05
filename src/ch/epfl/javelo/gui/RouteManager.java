@@ -15,9 +15,14 @@ import java.util.stream.Collectors;
 
 public class RouteManager {
     private final Pane pane;
+    private final ObjectProperty<MapViewParameters> property;
+    private final Consumer<String> erreurs;
+    private final RouteBean rb;
 
     public RouteManager(RouteBean rb, ObjectProperty<MapViewParameters> property, Consumer<String> erreurs){
-
+        this.rb = rb;
+        this.erreurs = erreurs;
+        this.property = property;
         this.pane = new Pane();
         pane.setPickOnBounds(false);
 
@@ -38,15 +43,17 @@ public class RouteManager {
 
         List<Double> doubleArrayList = new ArrayList<>();
 
-        for(PointCh pch : rb.routeProperty.get().points()){
-            PointWebMercator pwm = PointWebMercator.ofPointCh(pch);
-            doubleArrayList.add(pwm.x());
-            doubleArrayList.add(pwm.y());
+        for(Waypoint wp : rb.pointsList){
+            doubleArrayList.add(wp.PointCH().e());
+            doubleArrayList.add(wp.PointCH().n());
         }
 
-
         p.getPoints().setAll(doubleArrayList);
+        System.out.println(p.getLayoutX());
 
+        property.addListener(e ->{
+            draw();
+        });
 
         pane.sceneProperty().addListener((pChanged, oldS, newS) -> {
             assert oldS == null;
@@ -54,6 +61,14 @@ public class RouteManager {
         });
 
 
+    }
+
+    private void draw(){
+        /*
+        PointWebMercator pwm = PointWebMercator.ofPointCh()
+        pane.getChildren().get(0).setLayoutX(property.get().viewX());
+
+         */
     }
 
     public Pane pane(){

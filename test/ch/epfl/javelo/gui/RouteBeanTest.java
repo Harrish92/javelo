@@ -55,6 +55,7 @@ public class RouteBeanTest extends Application {
                                             mapViewParametersP,
                                             errorConsumer);
 
+
         StackPane mainPane =
                 new StackPane(baseMapManager.pane(),
                         waypointsManager.pane(),
