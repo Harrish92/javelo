@@ -51,10 +51,14 @@ public class RouteBeanTest extends Application {
                 new BaseMapManager(tileManager,
                         waypointsManager,
                         mapViewParametersP);
+        RouteManager routeManager = new RouteManager(routeBean,
+                                            mapViewParametersP,
+                                            errorConsumer);
 
         StackPane mainPane =
                 new StackPane(baseMapManager.pane(),
-                        waypointsManager.pane());
+                        waypointsManager.pane(),
+                        routeManager.pane());
         mainPane.getStylesheets().add("map.css");
         primaryStage.setMinWidth(600);
         primaryStage.setMinHeight(300);
