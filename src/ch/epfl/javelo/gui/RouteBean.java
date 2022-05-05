@@ -1,9 +1,7 @@
 package ch.epfl.javelo.gui;
 
 import ch.epfl.javelo.routing.*;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.*;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
@@ -19,10 +17,10 @@ import java.util.LinkedHashMap;
  */
 public final class RouteBean {
     //TODO: propriétés publiques ?
-    public  ObservableList<Waypoint> pointsList;
-    public ObjectProperty<Route> routeProperty;
-    public DoubleProperty highlightedPosition;
-    public ObjectProperty<ElevationProfile> elevationProfile;
+    public  ObservableList<Waypoint> pointsList = new SimpleListProperty<>();
+    public ObjectProperty<Route> routeProperty = new SimpleObjectProperty<>();
+    public DoubleProperty highlightedPosition = new SimpleDoubleProperty();
+    public ObjectProperty<ElevationProfile> elevationProfile = new SimpleObjectProperty<>();
     private RouteComputer routeComputer;
     private final int DISTANCEMAX = 5;
     private final int MAXCACHESIZE = 50;
@@ -34,8 +32,10 @@ public final class RouteBean {
      */
     public RouteBean(RouteComputer routeComputer){
         this.routeComputer = routeComputer;
+
         //TODO: check propriétés + 1 seul listener ?
         pointsList.addListener((ListChangeListener<? super Waypoint>) e -> computeRoute());
+
     }
 
     /**
