@@ -124,10 +124,22 @@ public final class RouteBean {
         highlightedPosition.set(value);
     }
 
+    /**
+     * Setter pour pointList.
+     * @param l une liste de points.
+     */
     public void setPointsList(List<Waypoint> l){pointsList.addAll(l);}
 
+    /**
+     * Ajoute un point à pointList.
+     * @param point le point.
+     */
     public void setPoint(Waypoint point){pointsList.add(point);}
 
+    /**
+     * Getter pour la liste de points.
+     * @return la liste de points.
+     */
     public ObservableList<Waypoint> getPointsList(){return  pointsList;}
 
 
