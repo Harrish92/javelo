@@ -17,9 +17,6 @@ public final class SwissBounds {
     public final static double WIDTH = MAX_E - MIN_E;
     public final static double HEIGHT = MAX_N - MIN_N;
 
-    /**
-     * classe non instantiable
-     */
     private SwissBounds() {
     }
 
@@ -32,6 +29,6 @@ public final class SwissBounds {
      * sont en suisse et faux autrement.
      */
     public static boolean containsEN(double e, double n) {
-        return e <= MAX_E && e >= MIN_E && n <= MAX_N && n >= MIN_N;
+        return (e <= MAX_E) && (e >= MIN_E) && (n <= MAX_N) && (n >= MIN_N);
     }
 }
