@@ -2,6 +2,7 @@ package ch.epfl.javelo.gui;
 
 import ch.epfl.javelo.routing.*;
 import javafx.beans.property.*;
+import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
@@ -9,6 +10,7 @@ import javafx.geometry.Point2D;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
  * Représente un bean JavaFX regroupant les propriétés
@@ -17,23 +19,24 @@ import java.util.LinkedHashMap;
  */
 public final class RouteBean {
     //TODO: propriétés publiques ?
-    private  ObservableList<Waypoint> pointsList = new SimpleListProperty<>();
-    private ObjectProperty<Route> routeProperty = new SimpleObjectProperty<>();
-    private DoubleProperty highlightedPosition = new SimpleDoubleProperty();
-    private ObjectProperty<ElevationProfile> elevationProfile = new SimpleObjectProperty<>();
-    private RouteComputer routeComputer;
+    private final  ObservableList<Waypoint> pointsList;
+    private final ObjectProperty<Route> routeProperty = new SimpleObjectProperty<>();
+    private final DoubleProperty highlightedPosition = new SimpleDoubleProperty();
+    private final ObjectProperty<ElevationProfile> elevationProfile = new SimpleObjectProperty<>();
+    private final RouteComputer routeComputer;
     private final int DISTANCEMAX = 5;
     private final int MAXCACHESIZE = 50;
-    private LinkedHashMap<RouteSample, Route> cache;
+    private final LinkedHashMap<RouteSample, Route> cache = new LinkedHashMap<>();
 
     /**
      * Constructeur par défaut.
      * @param routeComputer un calculateur d'itinéraire.
      */
     public RouteBean(RouteComputer routeComputer){
+        pointsList = FXCollections.observableList(new ArrayList<>());
         this.routeComputer = routeComputer;
         //TODO: check propriétés + 1 seul listener ?
-        pointsList.addListener((ListChangeListener<? super Waypoint>) e -> computeRoute());
+        pointsList.addListener((ListChangeListener<? super Waypoint>) e ->{computeRoute();});
 
     }
 
@@ -70,9 +73,10 @@ public final class RouteBean {
             isRouteValid = !routesList.get(k).equals(null);
         }
         routeProperty.set( pointsList.size() >= 2 && isRouteValid ? new MultiRoute(routesList) : null);
-        elevationProfile.set(ElevationProfileComputer.elevationProfile(
+        if(routeProperty.get() == null) {highlightedPosition.set(Double.NaN);}
+        else{elevationProfile.set(ElevationProfileComputer.elevationProfile(
                 routeProperty.get(),
-                DISTANCEMAX));
+                DISTANCEMAX));}
     }
 
     //TODO: ajouter des getters setters si besoin
@@ -85,7 +89,7 @@ public final class RouteBean {
     }
 
     public void setRouteProperty(ObjectProperty<Route> routeP){
-        routeProperty = routeP;
+        routeProperty.set(routeP.get());
     }
 
     /**
@@ -118,7 +122,9 @@ public final class RouteBean {
         highlightedPosition.set(value);
     }
 
-    public void setPointsList(ObservableList<Waypoint> l){pointsList = l;}
+    public void setPointsList(List<Waypoint> l){pointsList.addAll(l);}
+
+    public void setPoint(Waypoint point){pointsList.add(point);}
 
     public ObservableList<Waypoint> getPointsList(){return  pointsList;}
 
