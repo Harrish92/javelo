@@ -18,15 +18,14 @@ import java.util.List;
  * @author Yoan Giovannini (303934)
  */
 public final class RouteBean {
-    //TODO: propriétés publiques ?
     private final  ObservableList<Waypoint> pointsList;
-    private final ObjectProperty<Route> routeProperty = new SimpleObjectProperty<>();
-    private final DoubleProperty highlightedPosition = new SimpleDoubleProperty();
-    private final ObjectProperty<ElevationProfile> elevationProfile = new SimpleObjectProperty<>();
+    private final ObjectProperty<Route> routeProperty;
+    private final DoubleProperty highlightedPosition;
+    private final ObjectProperty<ElevationProfile> elevationProfile;
     private final RouteComputer routeComputer;
     private final int DISTANCEMAX = 5;
     private final int MAXCACHESIZE = 50;
-    private final LinkedHashMap<RouteSample, Route> cache = new LinkedHashMap<>();
+    private final LinkedHashMap<RouteSample, Route> cache;
 
     /**
      * Constructeur par défaut.
@@ -34,9 +33,12 @@ public final class RouteBean {
      */
     public RouteBean(RouteComputer routeComputer){
         pointsList = FXCollections.observableList(new ArrayList<>());
+        routeProperty = new SimpleObjectProperty<>();
+        highlightedPosition = new SimpleDoubleProperty();
+        elevationProfile = new SimpleObjectProperty<>();
+        cache = new LinkedHashMap<>();
         this.routeComputer = routeComputer;
-        //TODO: check propriétés + 1 seul listener ?
-        pointsList.addListener((ListChangeListener<? super Waypoint>) e ->{computeRoute();});
+        pointsList.addListener((ListChangeListener<? super Waypoint>) e ->computeRoute());
 
     }
 
