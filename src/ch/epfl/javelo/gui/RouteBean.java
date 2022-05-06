@@ -17,10 +17,10 @@ import java.util.LinkedHashMap;
  */
 public final class RouteBean {
     //TODO: propriétés publiques ?
-    public  ObservableList<Waypoint> pointsList = new SimpleListProperty<>();
-    public ObjectProperty<Route> routeProperty = new SimpleObjectProperty<>();
-    public DoubleProperty highlightedPosition = new SimpleDoubleProperty();
-    public ObjectProperty<ElevationProfile> elevationProfile = new SimpleObjectProperty<>();
+    private  ObservableList<Waypoint> pointsList = new SimpleListProperty<>();
+    private ObjectProperty<Route> routeProperty = new SimpleObjectProperty<>();
+    private DoubleProperty highlightedPosition = new SimpleDoubleProperty();
+    private ObjectProperty<ElevationProfile> elevationProfile = new SimpleObjectProperty<>();
     private RouteComputer routeComputer;
     private final int DISTANCEMAX = 5;
     private final int MAXCACHESIZE = 50;
@@ -32,7 +32,6 @@ public final class RouteBean {
      */
     public RouteBean(RouteComputer routeComputer){
         this.routeComputer = routeComputer;
-
         //TODO: check propriétés + 1 seul listener ?
         pointsList.addListener((ListChangeListener<? super Waypoint>) e -> computeRoute());
 
@@ -52,6 +51,7 @@ public final class RouteBean {
      */
     private void computeRoute(){
         ArrayList<Route> routesList = new ArrayList<>();
+        boolean isRouteValid = true;
         for (int k = 0; k < pointsList.size() - 1; k++) {
             int n1 = pointsList.get(k).NodeId();
             int n2 = pointsList.get(k + 1).NodeId();
@@ -67,8 +67,9 @@ public final class RouteBean {
                     cache.remove(cache.entrySet().iterator().next().getKey());
                 }
             }
+            isRouteValid = !routesList.get(k).equals(null);
         }
-        routeProperty.set( pointsList.size() >= 2 ? new MultiRoute(routesList) : null);
+        routeProperty.set( pointsList.size() >= 2 && isRouteValid ? new MultiRoute(routesList) : null);
         elevationProfile.set(ElevationProfileComputer.elevationProfile(
                 routeProperty.get(),
                 DISTANCEMAX));
@@ -83,11 +84,15 @@ public final class RouteBean {
         return elevationProfile;
     }
 
+    public void setRouteProperty(ObjectProperty<Route> routeP){
+        routeProperty = routeP;
+    }
+
     /**
      * @return la propriété routeProperty sous la forme
      * d'une ReadOnlyObjectProperty.
      */
-    public ReadOnlyObjectProperty<Route> routeProperty(){
+    public ReadOnlyObjectProperty<Route> getRouteProperty(){
         return routeProperty;
     }
 
@@ -112,5 +117,10 @@ public final class RouteBean {
     public void setHighlightedPosition(Double value){
         highlightedPosition.set(value);
     }
+
+    public void setPointsList(ObservableList<Waypoint> l){pointsList = l;}
+
+    public ObservableList<Waypoint> getPointsList(){return  pointsList;}
+
 
 }

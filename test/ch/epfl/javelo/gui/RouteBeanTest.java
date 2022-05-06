@@ -40,12 +40,12 @@ public class RouteBeanTest extends Application {
                         new Waypoint(new PointCh(2538659, 1154350), 117669));
         Consumer<String> errorConsumer = new ErrorConsumer();
         RouteBean routeBean = new RouteBean(new RouteComputer(graph, new CityBikeCF(graph)));
-        routeBean.pointsList = waypoints;
+        routeBean.setPointsList(waypoints);
         routeBean.setHighlightedPosition(1000.0);
         WaypointsManager waypointsManager =
                 new WaypointsManager(graph,
                         mapViewParametersP,
-                        routeBean.pointsList,
+                        routeBean.getPointsList(),
                         errorConsumer);
         BaseMapManager baseMapManager =
                 new BaseMapManager(tileManager,
