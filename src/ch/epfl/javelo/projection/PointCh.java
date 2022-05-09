@@ -2,6 +2,8 @@ package ch.epfl.javelo.projection;
 
 import ch.epfl.javelo.Preconditions;
 
+import java.awt.geom.Point2D;
+
 /**
  * Un point en suisse caractérisé par ses coordonnées dans
  * le système suisse.
@@ -28,9 +30,7 @@ public record PointCh(double e, double n) {
      * @param that Un autre point.
      * @return La distance au carré.
      */
-    public double squaredDistanceTo(PointCh that) {
-        return Math.pow(this.distanceTo(that), 2);
-    }
+    public double squaredDistanceTo(PointCh that) {return Math.pow(this.distanceTo(that), 2);}
 
     /**
      * Calcule la distance entre ce point et un autre point.

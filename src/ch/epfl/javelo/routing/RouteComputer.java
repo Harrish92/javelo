@@ -9,9 +9,9 @@ import java.util.*;
  * Représente un planificateur d'itinéraire.
  * @author Yoan Giovannini (303934)
  */
-public class RouteComputer {
-    Graph graph;
-    CostFunction costFct;
+public final class RouteComputer {
+    private final Graph graph;
+    private final CostFunction costFct;
 
     record WeightedNode(int nodeId, float distance)
             implements Comparable<WeightedNode> {
@@ -50,7 +50,6 @@ public class RouteComputer {
         //Remplissage des tableaux
         for(int nID = 0; nID < nbN; nID++){
             distance[nID] = (int) Double.POSITIVE_INFINITY;
-            predecesseur[nID] = -1;
         }
         //Premier noeud
         distance[startNodeId] = 0;
@@ -59,10 +58,11 @@ public class RouteComputer {
         enExploration.add(new WeightedNode(startNodeId, 0));
         //Itère sur les noeuds en exploration
         while(!enExploration.isEmpty()) {
-            int N = enExploration.remove().nodeId;
-            while (distance[N] == Double.NEGATIVE_INFINITY){
+            int N;
+            do {
                 N = enExploration.remove().nodeId;
             }
+            while (distance[N] == Double.NEGATIVE_INFINITY);
             if(N == endNodeId) {
                 //Termine le programme, car le plus court chemin a été trouvé
                 ArrayList<Edge> edgesList = new ArrayList<>();

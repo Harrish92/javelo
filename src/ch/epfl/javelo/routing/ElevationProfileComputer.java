@@ -6,7 +6,7 @@ import ch.epfl.javelo.Preconditions;
 import java.util.Arrays;
 
 /**
- * ElevationProfileCompute génére un profil à partir d'une route.
+ * ElevationProfileCompute génère un profil à partir d'une route.
  *
  * @author Yoan Giovannini (303934)
  */

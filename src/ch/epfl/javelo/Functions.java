@@ -69,12 +69,9 @@ public final class Functions {
          * @param xMax    l'abscisse maximale de la fonction.
          */
         public Sampled(float[] samples, double xMax) {
-            if (samples.length < 2 || xMax <= 0) {
-                throw new IllegalArgumentException("pas assez d'échantillons ou maximum <= 0");
-            } else {
-                this.samples = samples;
-                this.xMax = xMax;
-            }
+            Preconditions.checkArgument(!(samples.length < 2 || xMax <= 0));
+            this.samples = samples.clone();
+            this.xMax = xMax;
         }
 
         @Override

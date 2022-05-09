@@ -27,8 +27,7 @@ public record AttributeSet(long bits) {
     public static AttributeSet of(Attribute... attributes) {
         long attributeSet = 0L;
         for(Attribute attribute : attributes) {
-            if((attributeSet >> attribute.ordinal()) % 2 == 0)
-                attributeSet += 1L << attribute.ordinal();
+            attributeSet |= 1L << attribute.ordinal();
         }
         return new AttributeSet(attributeSet);
     }
@@ -58,7 +57,10 @@ public record AttributeSet(long bits) {
         return false;
     }
 
-    //Renvoie la liste des attributs sous forme de chaine de caractères.
+    /**Renvoie la liste des attributs sous forme de chaine de caractères.
+     *
+     * @return une chaine de caractères.
+     */
     @Override
     public String toString() {
         StringJoiner str = new StringJoiner(",", "{", "}");

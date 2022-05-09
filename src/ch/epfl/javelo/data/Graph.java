@@ -126,11 +126,12 @@ public final class Graph {
                 .sectorsInArea(point, searchDistance);
 
         for(GraphSectors.Sector sector : sectorList){
-            for(int i = sector.startNodeId(); i <= sector.endNodeId(); i++) {
-                PointCh pt = new PointCh(nodes.nodeE(i), nodes.nodeN(i));
-                if(point.squaredDistanceTo(pt) <= d){
+            for(int i = sector.startNodeId(); i < sector.endNodeId(); i++) {
+                PointCh pt = nodePoint(i);
+                double sqD = point.squaredDistanceTo(pt);
+                if(sqD <= d){
                     nID = i;
-                    d = point.squaredDistanceTo(pt);
+                    d = sqD;
                 }
             }
         }

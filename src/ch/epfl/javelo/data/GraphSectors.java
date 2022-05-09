@@ -21,6 +21,7 @@ public record GraphSectors(ByteBuffer buffer) {
     private static final int SECTOR_LENGTH = Integer.BYTES + Short.BYTES;
     //Décalage pour obtenir le nombre de noeuds d'un secteur.
     private static final int OFFSET_NBN = Integer.BYTES;
+    private static final int SECTOR_NB = 128;
 
     /**
      * Représente un secteur
@@ -43,16 +44,16 @@ public record GraphSectors(ByteBuffer buffer) {
     public List<Sector> sectorsInArea(PointCh center, double distance) {
         Preconditions.checkArgument(distance >= 0);
         ArrayList<Sector> listeSecteurs = new ArrayList<>();
-        double deltaSE = SwissBounds.WIDTH / 128;
-        double deltaSN = SwissBounds.HEIGHT / 128;
+        double deltaSE = SwissBounds.WIDTH / SECTOR_NB;
+        double deltaSN = SwissBounds.HEIGHT / SECTOR_NB;
         int secteur0X = (int) Math.floor((center.e() - distance - SwissBounds.MIN_E) / deltaSE);
         int secteur0Y = (int) Math.floor((center.n() - distance - SwissBounds.MIN_N) / deltaSN);
         int secteur1X = (int) Math.floor((center.e() + distance - SwissBounds.MIN_E) / deltaSE);
         int secteur1Y = (int) Math.floor((center.n() + distance - SwissBounds.MIN_N) / deltaSN);
-        secteur0X = Math2.clamp(0, secteur0X, 127);
-        secteur0Y = Math2.clamp(0, secteur0Y, 127);
-        secteur1X = Math2.clamp(0, secteur1X, 127);
-        secteur1Y = Math2.clamp(0, secteur1Y, 127);
+        secteur0X = Math2.clamp(0, secteur0X, SECTOR_NB-1);
+        secteur0Y = Math2.clamp(0, secteur0Y, SECTOR_NB-1);
+        secteur1X = Math2.clamp(0, secteur1X, SECTOR_NB-1);
+        secteur1Y = Math2.clamp(0, secteur1Y, SECTOR_NB-1);
         for (int y = secteur0Y; y <= secteur1Y; y++) {
             for (int x = secteur0X; x <= secteur1X; x++) {
                 int secteur = y * 128 + x;

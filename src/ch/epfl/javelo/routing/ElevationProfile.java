@@ -3,6 +3,10 @@ package ch.epfl.javelo.routing;
 import ch.epfl.javelo.Functions;
 import ch.epfl.javelo.Preconditions;
 
+import java.awt.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.DoubleSummaryStatistics;
 import java.util.function.DoubleUnaryOperator;
 
@@ -16,18 +20,28 @@ public final class ElevationProfile {
     private final double length;
     private final float[] elevationSamples;
     private final DoubleUnaryOperator profile;
+    private final double minElevation;
+    private final double maxElevation;
+    private final double totalAscend;
+    private final double totalDescend;
 
     /**
      * Constructeur de la classe.
      *
      * @param length           la longueur du profil.
      * @param elevationSamples les points du profil.
+     * @throws IllegalArgumentException si la longueur est négative ou nulle
+     * ou qu'il n'y a pas assez d'elevationSamples.
      */
     public ElevationProfile(double length, float[] elevationSamples) {
         Preconditions.checkArgument(length > 0 && elevationSamples.length >= 2);
         this.length = length;
-        this.elevationSamples = elevationSamples;
+        this.elevationSamples = Arrays.copyOf(elevationSamples, elevationSamples.length);
         profile = Functions.sampled(elevationSamples, length);
+        minElevation = statistics().getMin();
+        maxElevation = statistics().getMax();
+        totalAscend = denivele(true);
+        totalDescend = denivele(false);
     }
 
     /**
@@ -45,7 +59,7 @@ public final class ElevationProfile {
      * @return une altitude.
      */
     public double minElevation() {
-        return statistics().getMin();
+        return minElevation;
     }
 
     /**
@@ -54,7 +68,7 @@ public final class ElevationProfile {
      * @return une altitude.
      */
     public double maxElevation() {
-        return statistics().getMax();
+        return maxElevation;
     }
 
     /**
@@ -94,9 +108,7 @@ public final class ElevationProfile {
      *
      * @return le dénivelé positif en mètres.
      */
-    public double totalAscent() {
-        return denivele(true);
-    }
+    public double totalAscent() {return totalAscend;}
 
     /**
      * Calcule le dénivelé négatif des points elevationSamples.
@@ -104,7 +116,7 @@ public final class ElevationProfile {
      * @return le dénivelé négatif en mètres.
      */
     public double totalDescent() {
-        return denivele(false);
+        return totalDescend;
     }
 
     /**
