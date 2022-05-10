@@ -72,7 +72,7 @@ public final class RouteBean {
                     cache.remove(cache.entrySet().iterator().next().getKey());
                 }
             }
-            isRouteValid = !routesList.get(k).equals(null);
+            isRouteValid = !(routesList.get(k) == null);
         }
         routeProperty.set( pointsList.size() >= 2 && isRouteValid ? new MultiRoute(routesList) : null);
         if(routeProperty.get() == null) {highlightedPosition.set(Double.NaN);}

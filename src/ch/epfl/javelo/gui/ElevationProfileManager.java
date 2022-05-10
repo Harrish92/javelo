@@ -34,6 +34,8 @@ public final class ElevationProfileManager {
      */
     public Pane pane(){return pane;}
 
+
+
     /**
      *
      * @return une propriété en lecture seule contenant la position
