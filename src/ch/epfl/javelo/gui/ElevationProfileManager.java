@@ -2,6 +2,8 @@ package ch.epfl.javelo.gui;
 
 import ch.epfl.javelo.routing.ElevationProfile;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
+import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.*;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
@@ -30,6 +32,7 @@ public final class ElevationProfileManager {
     private final int MIN_HORIZONTAL_DISTANCE = 25;
     private final int MIN_VERTICAL_DISTANCE = 50;
     private final double KILOMETER = 1000;
+    private final int NAN = (int) Double.NaN;
     private final ReadOnlyObjectProperty<ElevationProfile> elevationProfileProperty;
     private final ReadOnlyDoubleProperty highlightedPosition;
     private final BorderPane borderPane;
@@ -40,6 +43,7 @@ public final class ElevationProfileManager {
     private final ObjectProperty<Transform> screenToWorld;
     private final ObjectProperty<Transform> worldToScreen;
     private final IntegerProperty mousePositionOnProfile;
+    private final Line position;
 
 
 
@@ -55,6 +59,7 @@ public final class ElevationProfileManager {
         screenToWorld = new SimpleObjectProperty<>();
         worldToScreen = new SimpleObjectProperty<>();
         rectangle = new SimpleObjectProperty<Rectangle2D>();
+        position = new Line();
         initLayout();
         events();
     }
@@ -63,7 +68,6 @@ public final class ElevationProfileManager {
         VBox profileData = new VBox();
         Path grid = new Path();
         Group label = new Group();
-        Line position = new Line();
         Text stats = new Text();
         stats.setFont(Font.font("Avenir", 10));
         stats.setText(getStats());
@@ -75,6 +79,7 @@ public final class ElevationProfileManager {
         profileData.getChildren().add(stats);
         borderPane.setCenter(pane);
         borderPane.setBottom(profileData);
+
     }
 
     private void events(){
@@ -95,9 +100,20 @@ public final class ElevationProfileManager {
         //screenToWorld.addListener(e -> initProfile());
         worldToScreen.addListener(e -> initProfile());
         pane.setOnMouseMoved(e -> {
-            mousePositionOnProfile.set((int) Math.round(e.getSceneX()));
+            if(rectangle.get().contains(e.getSceneX(), e.getSceneY())){
+                mousePositionOnProfile.set((int) Math.round(e.getSceneX()));
+            }
+            else{
+                mousePositionOnProfile.set(NAN);
+            }
         });
-        pane.setOnMouseExited(e -> mousePositionOnProfile.set(0));//TODO: NaN ?
+        pane.setOnMouseExited(e -> mousePositionOnProfile.set(NAN));
+
+        position.layoutXProperty().bind(Bindings.createDoubleBinding(() ->
+                (double) mousePositionOnProfile.get(), mousePositionOnProfileProperty()));
+        position.startYProperty().bind(Bindings.select(rectangle, "minY"));
+        position.endYProperty().bind(Bindings.select(rectangle, "maxY"));
+        position.visibleProperty().bind(mousePositionOnProfile.greaterThanOrEqualTo(0));
     }
 
     private void initTransformation() throws NonInvertibleTransformException {
