@@ -4,6 +4,7 @@ import ch.epfl.javelo.routing.ElevationProfile;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.geometry.Insets;
+import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Group;
 import javafx.scene.layout.BorderPane;
@@ -39,6 +40,8 @@ public final class ElevationProfileManager {
     private final ObjectProperty<Transform> worldToScreen;
     private final IntegerProperty mousePositionOnProfile;
 
+
+
     public ElevationProfileManager(ReadOnlyObjectProperty<ElevationProfile> elevationProfileProperty,
                                    ReadOnlyDoubleProperty highlightedPosition){
         this.elevationProfileProperty = elevationProfileProperty;
@@ -59,7 +62,6 @@ public final class ElevationProfileManager {
         catch (NonInvertibleTransformException e){
             System.out.println(e.getStackTrace());
         }
-        initProfile();
     }
 
     private void initLayout(){
@@ -96,7 +98,6 @@ public final class ElevationProfileManager {
         //évènements
         pane.setOnMouseMoved(e -> {
             mousePositionOnProfile.set((int) Math.round(e.getSceneX()));
-            System.out.println(pane.getWidth());
             //System.out.println(e.getX()+" SSS: "+e.getSceneX());
         });
         pane.setOnMouseExited(e -> mousePositionOnProfile.set(0));//TODO: NaN ?
