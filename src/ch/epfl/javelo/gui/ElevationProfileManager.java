@@ -3,6 +3,7 @@ package ch.epfl.javelo.gui;
 import ch.epfl.javelo.routing.ElevationProfile;
 import javafx.beans.property.*;
 import javafx.geometry.Insets;
+import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Group;
 import javafx.scene.layout.BorderPane;
@@ -37,6 +38,8 @@ public final class ElevationProfileManager {
     private final ObjectProperty<Transform> worldToScreen;
     private final IntegerProperty mousePositionOnProfile;
 
+
+
     public ElevationProfileManager(ReadOnlyObjectProperty<ElevationProfile> elevationProfileProperty,
                                    ReadOnlyDoubleProperty highlightedPosition){
         this.elevationProfileProperty = elevationProfileProperty;
@@ -56,6 +59,7 @@ public final class ElevationProfileManager {
         catch (NonInvertibleTransformException e){
             System.out.println(e.getStackTrace());
         }
+        initGrille(); // Harrishan
     }
 
     private void initLayout(){
@@ -108,7 +112,7 @@ public final class ElevationProfileManager {
         Path grid = (Path) pane.getChildren().get(0);
         int nbV = (int) Math.floor(rectangle.get().getHeight()/MIN_VERTICAL_DISTANCE);
         int nbH = (int) Math.floor(rectangle.get().getWidth()/MIN_HORIZONTAL_DISTANCE);
-
+        System.out.println(pane.getWidth());
         grid.getElements().add(new MoveTo());
         grid.getElements().add(new LineTo());
     }
