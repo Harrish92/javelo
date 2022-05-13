@@ -2,7 +2,6 @@ package ch.epfl.javelo.gui;
 
 import ch.epfl.javelo.routing.ElevationProfile;
 import javafx.beans.property.*;
-import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Group;
@@ -34,7 +33,8 @@ public final class ElevationProfileManager {
     private final Pane pane;
     private final Insets insets;
     private final ObjectProperty<Rectangle2D> rectangle;
-    private final ObjectProperty<Transform> transformation;
+    private final ObjectProperty<Transform> screenToWorld;
+    private final ObjectProperty<Transform> worldToScreen;
     private final IntegerProperty mousePositionOnProfile;
 
     public ElevationProfileManager(ReadOnlyObjectProperty<ElevationProfile> elevationProfileProperty,
@@ -45,11 +45,17 @@ public final class ElevationProfileManager {
         pane = new Pane();
         mousePositionOnProfile = new SimpleIntegerProperty();
         insets = new Insets(10, 10, 20, 40);
-        transformation = new SimpleObjectProperty<>();
+        screenToWorld = new SimpleObjectProperty<>();
+        worldToScreen = new SimpleObjectProperty<>();
         rectangle = new SimpleObjectProperty<Rectangle2D>();
         //rectangle.set(new Rectangle2D(10,10,100,100));
         initLayout();
-        initTransformation();
+        try {
+            initTransformation();
+        }
+        catch (NonInvertibleTransformException e){
+            System.out.println(e.getStackTrace());
+        }
     }
 
     private void initLayout(){
@@ -78,14 +84,20 @@ public final class ElevationProfileManager {
         //évènements
         pane.setOnMouseMoved(e -> {
             mousePositionOnProfile.set((int) Math.round(e.getSceneX()));
-            System.out.println(e.getX()+"SSS: "+e.getSceneX());
+            //System.out.println(e.getX()+" SSS: "+e.getSceneX());
         });
         pane.setOnMouseExited(e -> mousePositionOnProfile.set(0));//TODO: NaN ?
     }
 
-    private void initTransformation(){
-        transformation.set(screenToWorld());
+    private void initTransformation() throws NonInvertibleTransformException {
+        Affine transMethods = new Affine();
+        transMethods.prependTranslation(-insets.getLeft(),-insets.getTop());
+        transMethods.prependScale(elevationProfileProperty.get().length()/rectangle.get().getWidth(),
+                -elevationProfileProperty.get().maxElevation()/rectangle.get().getHeight());
+        transMethods.prependTranslation(0,elevationProfileProperty.get().maxElevation());
 
+        screenToWorld.set(transMethods);
+        worldToScreen.set(screenToWorld.get().createInverse());
     }
 
     private void initProfile(){
@@ -101,19 +113,6 @@ public final class ElevationProfileManager {
         grid.getElements().add(new LineTo());
     }
 
-    private Transform screenToWorld(){
-        Affine transMethods = new Affine();
-        transMethods.prependTranslation(-insets.getLeft(),-insets.getTop());
-        transMethods.prependScale(elevationProfileProperty.get().length()/rectangle.get().getWidth(),
-                              -elevationProfileProperty.get().maxElevation()/rectangle.get().getHeight());
-        transMethods.prependTranslation(0,elevationProfileProperty.get().maxElevation());
-
-        return transMethods;
-    }
-
-    private void worldToScreen() throws NonInvertibleTransformException {
-        transformation.set(transformation.get().createInverse());
-    }
 
     private String stats(){
         ElevationProfile ep = elevationProfileProperty.get();
