@@ -29,6 +29,7 @@ public final class ElevationProfileManager {
             { 5, 10, 20, 25, 50, 100, 200, 250, 500, 1_000 };
     private final int MIN_HORIZONTAL_DISTANCE = 25;
     private final int MIN_VERTICAL_DISTANCE = 50;
+    private final double KILOMETER = 1000;
     private final ReadOnlyObjectProperty<ElevationProfile> elevationProfileProperty;
     private final ReadOnlyDoubleProperty highlightedPosition;
     private final BorderPane borderPane;
@@ -65,7 +66,7 @@ public final class ElevationProfileManager {
         Line position = new Line();
         Text stats = new Text();
         stats.setFont(Font.font("Avenir", 10));
-        stats.setText(stats());
+        stats.setText(getStats());
         borderPane.getStylesheets().add("elevation_profile.css");
         profileData.setId("profile_data");
         grid.setId("grid");
@@ -140,13 +141,13 @@ public final class ElevationProfileManager {
     }
 
 
-    private String stats(){
+    private String getStats(){
         ElevationProfile ep = elevationProfileProperty.get();
         return String.format("Longueur : %.1f km" +
                 "     Montée : %.0f m" +
                 "     Descente : %.0f m" +
                 "     Altitude : de %.0f m à %.0f m",
-                ep.length()/1000,
+                ep.length()/KILOMETER,
                     ep.totalAscent(),
                     ep.totalDescent(),
                     ep.minElevation(),
