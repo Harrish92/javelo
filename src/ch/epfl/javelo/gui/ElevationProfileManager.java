@@ -54,14 +54,8 @@ public final class ElevationProfileManager {
         screenToWorld = new SimpleObjectProperty<>();
         worldToScreen = new SimpleObjectProperty<>();
         rectangle = new SimpleObjectProperty<Rectangle2D>();
-        //rectangle.set(new Rectangle2D(10,10,100,100));
         initLayout();
-        try {
-            initTransformation();
-        }
-        catch (NonInvertibleTransformException e){
-            System.out.println(e.getStackTrace());
-        }
+        events();
     }
 
     private void initLayout(){
@@ -73,21 +67,6 @@ public final class ElevationProfileManager {
         stats.setFont(Font.font("Avenir", 10));
         stats.setText(stats());
         borderPane.getStylesheets().add("elevation_profile.css");
-        /*rectangle.set(new Rectangle2D(insets.getLeft(), insets.getBottom(), TODO: régler le problème de taille négative
-                borderPane.getWidth() - insets.getLeft() -insets.getRight(),
-                borderPane.getHeight() - insets.getBottom() - insets.getTop()));*/
-        /*rectangle.set(new Rectangle2D(insets.getLeft(), insets.getBottom(),
-                Math.max(pane.getWidth() - insets.getLeft() -insets.getRight(),
-                        0),
-                Math.max(pane.getHeight() - insets.getBottom() - insets.getTop(),
-                        0)));*/
-        rectangle.bind(Bindings.createObjectBinding(() -> {
-            System.out.println(pane.getWidth());
-            return new Rectangle2D(insets.getLeft(), insets.getBottom(),
-                Math.max(pane.getWidth() - insets.getLeft() -insets.getRight(), 0),
-                Math.max(pane.getHeight() - insets.getBottom() - insets.getTop(), 0));
-            }, pane.widthProperty(), pane.heightProperty()));
-
         profileData.setId("profile_data");
         grid.setId("grid");
         profile.setId("profile");
@@ -95,10 +74,27 @@ public final class ElevationProfileManager {
         profileData.getChildren().add(stats);
         borderPane.setCenter(pane);
         borderPane.setBottom(profileData);
-        //évènements
+    }
+
+    private void events(){
+        rectangle.bind(Bindings.createObjectBinding(() ->
+            new Rectangle2D(insets.getLeft(), insets.getBottom(),
+                    Math.max(pane.getWidth() - insets.getLeft() -insets.getRight(), 0),
+                    Math.max(pane.getHeight() - insets.getBottom() - insets.getTop(), 0))
+        , pane.widthProperty(), pane.heightProperty()));
+
+        rectangle.addListener(e ->{
+            try{
+                initTransformation();
+            }
+            catch (NonInvertibleTransformException ex){
+                System.out.println(ex.getStackTrace());
+            }
+        });
+        //screenToWorld.addListener(e -> initProfile());
+        worldToScreen.addListener(e -> initProfile());
         pane.setOnMouseMoved(e -> {
             mousePositionOnProfile.set((int) Math.round(e.getSceneX()));
-            //System.out.println(e.getX()+" SSS: "+e.getSceneX());
         });
         pane.setOnMouseExited(e -> mousePositionOnProfile.set(0));//TODO: NaN ?
     }
@@ -114,20 +110,17 @@ public final class ElevationProfileManager {
     }
 
     private void initProfile(){
+        profile.getPoints().clear();
         for (int j = 0; j < elevationProfileProperty.get().length(); j++) {
-            //System.out.println(screenToWorld.get().transform(j,j).getX());
-            //profile.getPoints().add(worldToScreen.get().transform(j,j).getX());
-            /*System.out.println(worldToScreen.get().transform(
-                    j, elevationProfileProperty.get().elevationAt(j)).getX());*/
-            //System.out.println(elevationProfileProperty.get().elevationAt(j));
-            profile.getPoints().add(
-                worldToScreen.get().transform(
-                        j, elevationProfileProperty.get().elevationAt(j)).getX());
-            profile.getPoints().add(
-                    worldToScreen.get().transform(
-                            j, elevationProfileProperty.get().elevationAt(j)).getY());
+            Point2D p = worldToScreen.get().transform(
+                    j, elevationProfileProperty.get().elevationAt(j));
+            profile.getPoints().addAll(p.getX(),p.getY());
         }
-
+        Point2D pbd = worldToScreen.get().transform(elevationProfileProperty.get().length(),
+                elevationProfileProperty.get().minElevation());
+        Point2D pbg = worldToScreen.get().transform(0,
+                elevationProfileProperty.get().minElevation());
+        profile.getPoints().addAll(pbd.getX(), pbd.getY(), pbg.getX(), pbg.getY());
     }
 
     private void initGrille(){
