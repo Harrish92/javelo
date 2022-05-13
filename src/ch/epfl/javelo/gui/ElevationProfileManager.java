@@ -1,6 +1,7 @@
 package ch.epfl.javelo.gui;
 
 import ch.epfl.javelo.routing.ElevationProfile;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.geometry.Insets;
 import javafx.geometry.Rectangle2D;
@@ -32,6 +33,7 @@ public final class ElevationProfileManager {
     private final BorderPane borderPane;
     private final Pane pane;
     private final Insets insets;
+    private final Polygon profile;
     private final ObjectProperty<Rectangle2D> rectangle;
     private final ObjectProperty<Transform> screenToWorld;
     private final ObjectProperty<Transform> worldToScreen;
@@ -43,6 +45,7 @@ public final class ElevationProfileManager {
         this.highlightedPosition = highlightedPosition;
         borderPane = new BorderPane();
         pane = new Pane();
+        profile = new Polygon();
         mousePositionOnProfile = new SimpleIntegerProperty();
         insets = new Insets(10, 10, 20, 40);
         screenToWorld = new SimpleObjectProperty<>();
@@ -56,13 +59,13 @@ public final class ElevationProfileManager {
         catch (NonInvertibleTransformException e){
             System.out.println(e.getStackTrace());
         }
+        initProfile();
     }
 
     private void initLayout(){
         VBox profileData = new VBox();
         Path grid = new Path();
         Group label = new Group();
-        Polygon profile = new Polygon();
         Line position = new Line();
         Text stats = new Text();
         stats.setFont(Font.font("Avenir", 10));
@@ -71,9 +74,18 @@ public final class ElevationProfileManager {
         /*rectangle.set(new Rectangle2D(insets.getLeft(), insets.getBottom(), TODO: régler le problème de taille négative
                 borderPane.getWidth() - insets.getLeft() -insets.getRight(),
                 borderPane.getHeight() - insets.getBottom() - insets.getTop()));*/
-        rectangle.set(new Rectangle2D(insets.getLeft(), insets.getBottom(),
-                borderPane.getWidth(),
-                borderPane.getHeight()));
+        /*rectangle.set(new Rectangle2D(insets.getLeft(), insets.getBottom(),
+                Math.max(pane.getWidth() - insets.getLeft() -insets.getRight(),
+                        0),
+                Math.max(pane.getHeight() - insets.getBottom() - insets.getTop(),
+                        0)));*/
+        rectangle.bind(Bindings.createObjectBinding(() -> {
+            System.out.println(pane.getWidth());
+            return new Rectangle2D(insets.getLeft(), insets.getBottom(),
+                Math.max(pane.getWidth() - insets.getLeft() -insets.getRight(), 0),
+                Math.max(pane.getHeight() - insets.getBottom() - insets.getTop(), 0));
+            }, pane.widthProperty(), pane.heightProperty()));
+
         profileData.setId("profile_data");
         grid.setId("grid");
         profile.setId("profile");
@@ -84,6 +96,7 @@ public final class ElevationProfileManager {
         //évènements
         pane.setOnMouseMoved(e -> {
             mousePositionOnProfile.set((int) Math.round(e.getSceneX()));
+            System.out.println(pane.getWidth());
             //System.out.println(e.getX()+" SSS: "+e.getSceneX());
         });
         pane.setOnMouseExited(e -> mousePositionOnProfile.set(0));//TODO: NaN ?
@@ -91,16 +104,28 @@ public final class ElevationProfileManager {
 
     private void initTransformation() throws NonInvertibleTransformException {
         Affine transMethods = new Affine();
-        transMethods.prependTranslation(-insets.getLeft(),-insets.getTop());
+        transMethods.prependTranslation(-insets.getLeft(),-insets.getBottom());
         transMethods.prependScale(elevationProfileProperty.get().length()/rectangle.get().getWidth(),
-                -elevationProfileProperty.get().maxElevation()/rectangle.get().getHeight());
+                -(elevationProfileProperty.get().maxElevation() - elevationProfileProperty.get().minElevation())/rectangle.get().getHeight());
         transMethods.prependTranslation(0,elevationProfileProperty.get().maxElevation());
-
         screenToWorld.set(transMethods);
         worldToScreen.set(screenToWorld.get().createInverse());
     }
 
     private void initProfile(){
+        for (int j = 0; j < elevationProfileProperty.get().length(); j++) {
+            //System.out.println(screenToWorld.get().transform(j,j).getX());
+            //profile.getPoints().add(worldToScreen.get().transform(j,j).getX());
+            /*System.out.println(worldToScreen.get().transform(
+                    j, elevationProfileProperty.get().elevationAt(j)).getX());*/
+            //System.out.println(elevationProfileProperty.get().elevationAt(j));
+            profile.getPoints().add(
+                worldToScreen.get().transform(
+                        j, elevationProfileProperty.get().elevationAt(j)).getX());
+            profile.getPoints().add(
+                    worldToScreen.get().transform(
+                            j, elevationProfileProperty.get().elevationAt(j)).getY());
+        }
 
     }
 
