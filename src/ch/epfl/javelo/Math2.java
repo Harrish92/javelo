@@ -29,9 +29,8 @@ public final class Math2 {
      * @return une interpolation sous la forme de y = a*x+y0
      */
     public static double interpolate(double y0, double y1, double x) {
-        double a = (x != 0) ? (y1 - y0) : 0;
 
-        return Math.fma(a, x, y0);
+        return Math.fma(y1 - y0, x, y0);
 
     }
 
@@ -83,7 +82,7 @@ public final class Math2 {
      * @return retourne le carré de la norme d'un vecteur.
      */
     public static double squaredNorm(double uX, double uY) {
-        return Math.pow(uX, 2) + Math.pow(uY, 2);
+        return dotProduct(uX, uY, uX, uY);
     }
 
     /**

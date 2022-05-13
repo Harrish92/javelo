@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.DoubleUnaryOperator;
 
 import static ch.epfl.test.TestRandomizer.RANDOM_ITERATIONS;
 import static ch.epfl.test.TestRandomizer.newRandom;
@@ -229,6 +230,10 @@ class SingleRouteTest {
                 assertEquals(Math.hypot(dE, dN), pct.distanceToReference());
             }
         }
+    }
+    @Test
+    void singleRouteWorksWithHighValue(){
+
     }
 
     private static List<Edge> verticalEdges(int edgesCount) {

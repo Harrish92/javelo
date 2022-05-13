@@ -58,8 +58,8 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
      */
     public double length(int edgeId) {
         short nb = edgesBuffer.getShort(edgeId * EDGESBUFFER_INTS + OFFSET_EDGESBUFFER_LENGTH);
-        int mon_integer = Short.toUnsignedInt(nb);
-        return Q28_4.asDouble(mon_integer);
+        int my_integer = Short.toUnsignedInt(nb);
+        return Q28_4.asDouble(my_integer);
     }
 
     /**
@@ -80,8 +80,8 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
      */
     public boolean hasProfile(int edgeId) {
         int profile = profileIds.get(edgeId * PROFILEIDS_INTS + OFFSET_PROFILESIDS_TYPE);
-        int profile_type = profile >>> 30;
-        return (profile_type != 0);
+        int profileType = profile >>> 30;
+        return (profileType != 0);
     }
 
     /**
@@ -109,15 +109,12 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
 
         // switch qui appelle une méthode selon le type du profil
 
-        switch (profile_type) {
-            case 2:
-                return profileType2(pts, tab, edgeId, index_element); // profil de type 2
-            case 3:
-                return profileType3(pts, tab, edgeId, index_element); // profil de type 3
-            default:
-                return profileType1(pts, tab, edgeId, index_element); // profil de type 1
+        return switch (profile_type) {
+            case 2 -> profileType(pts, tab, edgeId, index_element, 2); // profil de type 2
+            case 3 -> profileType(pts, tab, edgeId, index_element, 3); // profil de type 3
+            default -> profileType1(pts, tab, edgeId, index_element); // profil de type 1
 
-        }
+        };
 
     }
 
@@ -148,9 +145,9 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
      * @param tab tableau de type float
      * @param edgeId arrête identité
      * @param index_element identité du premier échantillon du profil
-     * @return le tableau avec les échantillons du profil de type 2 pour ProfileSamples.
+     * @return le tableau avec les échantillons du profil de type 2 et 3 pour ProfileSamples.
      */
-    private float[] profileType2(int pts, float[] tab, int edgeId, int index_element) {
+    private float[] profileType(int pts, float[] tab, int edgeId, int index_element, int profileType) {
         float echantillon = Q28_4.asFloat(Short.toUnsignedInt(elevations.get(index_element)));
 
         // vérifie si les échantillons du profil sont toujours ordonnés dans le sens de la voie OSM
@@ -160,53 +157,24 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
         } else {
             tab[0] = echantillon;
         }
-
-        int counting = 1, offset = 1;
-        for (int i = index_element + 1; i < pts + index_element; i += 2) {
-            for (int j = 1; j >= 0; j--) {
-                echantillon += Q28_4.asFloat(Bits.extractSigned(elevations.get(index_element + offset), j * 8,
-                        8));
-                if (counting < pts) {
-                    if (isInverted(edgeId)) {
-                        tab[pts - (counting + 1)] = echantillon;
-                    } else {
-                        tab[counting] = echantillon;
-                    }
-                }
-                ++counting;
+        int incrementation = 0;
+        int numberOfBits = 0;
+        switch (profileType) {
+            case 2 -> {
+                incrementation = 2;
+                numberOfBits = 8;
             }
-            ++offset;
-
-
-        }
-        return tab;
-
-    }
-
-
-    /**
-     * @param pts nombre d'échantillons
-     * @param tab tableau de type float
-     * @param edgeId arrête identité
-     * @param index_element identité du premier échantillon du profil
-     * @return le tableau avec les échantillons du profil de type 3 pour ProfileSamples.
-     */
-    private float[] profileType3(int pts, float[] tab, int edgeId, int index_element) {
-        float echantillon = Q28_4.asFloat(Short.toUnsignedInt(elevations.get(index_element)));
-
-        // vérifie si les échantillons du profil sont toujours ordonnés dans le sens de la voie OSM
-
-        if (isInverted(edgeId)) {
-            tab[pts - 1] = echantillon;
-        } else {
-            tab[0] = echantillon;
+            case 3 -> {
+                incrementation = 4;
+                numberOfBits = 4;
+            }
         }
 
         int counting = 1, offset = 1;
-        for (int i = index_element + 1; i < pts + index_element; i += 4) {
-            for (int j = 3; j >= 0; j--) {
-                echantillon += Q28_4.asFloat(Bits.extractSigned(elevations.get(index_element + offset), j * 4,
-                        4));
+        for (int i = index_element + 1; i < pts + index_element; i += incrementation) {
+            for (int j = incrementation-1; j >= 0; j--) {
+                echantillon += Q28_4.asFloat(Bits.extractSigned(elevations.get(index_element + offset),
+                        j * numberOfBits, numberOfBits));
 
                 if (counting < pts) {
 

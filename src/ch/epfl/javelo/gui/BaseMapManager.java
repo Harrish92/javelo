@@ -5,6 +5,7 @@ import ch.epfl.javelo.projection.PointWebMercator;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleLongProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -22,16 +23,17 @@ import java.io.IOException;
 public final class BaseMapManager {
     private final TileManager tm;
     private final ObjectProperty<MapViewParameters> property;
-    private final WaypointsManager wpm;
     private boolean redrawNeeded;
-    private final static int TILE_LENGTH= 256;
     private final Pane pane;
     private final Canvas canvas;
-    private Point2D mousePoint;
+    private ObjectProperty<Point2D> mousePoint;
+    private final static int TILE_LENGTH= 256;
+    private final static int MIN_ZOOM = 8;
+    private final static int MAX_ZOOM = 19;
+
 
 
     public BaseMapManager(TileManager tm,WaypointsManager wpm , ObjectProperty<MapViewParameters> property){
-        this.wpm = wpm;
         this.tm = tm;
         this.property = property;
 
@@ -45,18 +47,22 @@ public final class BaseMapManager {
         canvas.widthProperty().addListener(o -> redrawOnNextPulse());
 
         pane.setOnMousePressed(e->{
-            mousePoint = new Point2D(e.getX(), e.getY());
+            Point2D point2D = new Point2D(e.getX(), e.getY());
+            mousePoint = new SimpleObjectProperty<>(point2D);
         });
 
-        pane.setOnMouseDragged(f ->{
-            Point2D mouse_difference = mousePoint.subtract(f.getX(), f.getY());
-            Point2D topLeft = mouse_difference.add(property.get().topLeft().getX(), property.get().topLeft().getY());
+        pane.setOnMouseDragged(e ->{
+            ObjectProperty<Point2D> mouse_difference = new SimpleObjectProperty<>
+                    (mousePoint.get().subtract(e.getX(), e.getY()));
+            Point2D topLeft = mouse_difference
+                    .get()
+                    .add(property.get().topLeft().getX(), property.get().topLeft().getY());
 
 
             property.set(new MapViewParameters(property.get().zoomLevel(), topLeft.getX(), topLeft.getY()));
             redrawOnNextPulse();
 
-            mousePoint = new Point2D(f.getX(), f.getY());
+            mousePoint.set(new Point2D(e.getX(), e.getY()));
         });
 
         pane.setOnMouseReleased(e->{
@@ -79,15 +85,15 @@ public final class BaseMapManager {
             double zoomDelta = Math.signum(e.getDeltaY());
             int zoomLevel =  (int) Math.rint(zoomDelta + property.get().zoomLevel());
 
-            zoomLevel = Math2.clamp(8, zoomLevel, 19);
+            zoomLevel = Math2.clamp(MIN_ZOOM, zoomLevel, MAX_ZOOM);
 
-            Point2D p2d = new Point2D(e.getX(), e.getY());
+            ObjectProperty<Point2D> mouseOnScrollCoord = new SimpleObjectProperty<>(new Point2D(e.getX(), e.getY()));
 
-            p2d = p2d.add(property.get().coordX(), property.get().coordY());
+            mouseOnScrollCoord.set(mouseOnScrollCoord.get().add(property.get().coordX(), property.get().coordY()));
             double scale = Math.scalb(1, zoomLevel - property.get().zoomLevel());
-            p2d = p2d.multiply(scale);
-            p2d = p2d.subtract(e.getX(), e.getY());
-            property.set(new MapViewParameters(zoomLevel, p2d.getX(), p2d.getY()));
+            mouseOnScrollCoord.set(mouseOnScrollCoord.get().multiply(scale).subtract(e.getX(), e.getY()));
+            property.set(new MapViewParameters(zoomLevel, mouseOnScrollCoord.get().getX(),
+                    mouseOnScrollCoord.get().getY()));
             redrawOnNextPulse();
         });
 

@@ -22,8 +22,8 @@ public final class WaypointsManager {
     private final int SEARCHDISTANCE = 500;
     private final Graph graph;
     private final ObjectProperty<MapViewParameters> property;
-    private final ObservableList<Waypoint> pointsListe;
-    private final Consumer<String> erreurs;
+    private final ObservableList<Waypoint> pointsList;
+    private final Consumer<String> errors;
     private final Pane pane;
 
 
@@ -31,16 +31,16 @@ public final class WaypointsManager {
      * Constructeur de WaypointsManager.
      * @param graph le graphe su réseau routier.
      * @param property les paramètres de la carte affichée.
-     * @param pointsListe la liste observable de tous les points de passage.
-     * @param erreurs un objet permettant de signaler les erreurs.
+     * @param pointsList la liste observable de tous les points de passage.
+     * @param errors un objet permettant de signaler les erreurs.
      */
     public WaypointsManager(Graph graph, ObjectProperty<MapViewParameters> property,
-                            ObservableList<Waypoint> pointsListe, Consumer<String> erreurs){
+                            ObservableList<Waypoint> pointsList, Consumer<String> errors){
 
         this.graph = graph;
         this.property = property;
-        this.pointsListe = pointsListe;
-        this.erreurs = erreurs;
+        this.pointsList = pointsList;
+        this.errors = errors;
         pane = new Pane();
         drawAllPoint();
         paneEventListener();
@@ -52,7 +52,7 @@ public final class WaypointsManager {
     private void paneEventListener(){
         pane.setPickOnBounds(false);
         property.addListener(e -> positionAllPoint());
-        pointsListe.addListener((ListChangeListener<? super Waypoint>) l -> drawAllPoint());
+        pointsList.addListener((ListChangeListener<? super Waypoint>) l -> drawAllPoint());
 
     }
 
@@ -87,7 +87,7 @@ public final class WaypointsManager {
 
         group.setOnMouseDragged(e -> {
             mouse_difference.set(mousePoint.get().subtract(e.getSceneX(), e.getSceneY()));
-            PointWebMercator initPoint = PointWebMercator.ofPointCh(pointsListe.get(pointIndex).PointCH());
+            PointWebMercator initPoint = PointWebMercator.ofPointCh(pointsList.get(pointIndex).PointCH());
             group.setLayoutX(property.get().viewX(initPoint) - mouse_difference.get().getX());
             group.setLayoutY(property.get().viewY(initPoint) - mouse_difference.get().getY());
         });
@@ -95,24 +95,24 @@ public final class WaypointsManager {
         group.setOnMouseReleased(e -> {
             if(e.isStillSincePress()) {
                 pane.getChildren().remove(pointIndex);
-                pointsListe.remove(pointsListe.get(pointIndex));
+                pointsList.remove(pointsList.get(pointIndex));
             }
             else{
-                PointWebMercator initPoint = PointWebMercator.ofPointCh(pointsListe.get(pointIndex).PointCH());
+                PointWebMercator initPoint = PointWebMercator.ofPointCh(pointsList.get(pointIndex).PointCH());
                 double x = property.get().viewX(initPoint) - mouse_difference.get().getX();
                 double y = property.get().viewY(initPoint) - mouse_difference.get().getY();
                 PointCh point = property.get().pointAt(x,y).toPointCh();
                 int nodeId = graph.nodeClosestTo(point, SEARCHDISTANCE);
                 if(nodeId == -1){
-                    erreurs.accept("Aucune route à proximité !");
+                    errors.accept("Aucune route à proximité !");
                     group.setLayoutX(property.get().viewX(initPoint));
                     group.setLayoutY(property.get().viewY(initPoint));
                 }
 
                 else{
                     Waypoint waypoint = new Waypoint(graph.nodePoint(nodeId), nodeId);
-                    pointsListe.remove(pointIndex);
-                    pointsListe.add(pointIndex,waypoint);
+                    pointsList.remove(pointIndex);
+                    pointsList.add(pointIndex,waypoint);
                 }
         }});
     }
@@ -122,11 +122,11 @@ public final class WaypointsManager {
      */
     private void drawAllPoint(){
         pane.getChildren().removeAll(pane.getChildren());
-        for (int k = 0; k < pointsListe.size(); k++) {
+        for (int k = 0; k < pointsList.size(); k++) {
             Group group = createGraphicPoint();
             String s = "middle";
             if(k == 0) s = "first";
-            else if(k == pointsListe.size() - 1) s = "last";
+            else if(k == pointsList.size() - 1) s = "last";
             group.getStyleClass().addAll("pin",s);
             pointEventListener(group, k);
             pane.getChildren().add(group);
@@ -138,8 +138,8 @@ public final class WaypointsManager {
      * Positionne tout les points sur la carte
      */
     private void positionAllPoint(){
-        for (int k = 0; k < pointsListe.size(); k++) {
-            Waypoint point = pointsListe.get(k);
+        for (int k = 0; k < pointsList.size(); k++) {
+            Waypoint point = pointsList.get(k);
             PointWebMercator pm = PointWebMercator.ofPointCh(point.PointCH());
             Group group = (Group) pane.getChildren().get(k);
             group.setLayoutX(property.get().viewX(pm));
@@ -165,11 +165,11 @@ public final class WaypointsManager {
         PointCh point = property.get().pointAt(x,y).toPointCh();
         int nodeId = graph.nodeClosestTo(point, SEARCHDISTANCE);
         if(nodeId == -1){
-            erreurs.accept("Aucune route à proximité !");
+            errors.accept("Aucune route à proximité !");
         }
         else{
             Waypoint waypoint = new Waypoint(graph.nodePoint(nodeId), nodeId);
-            pointsListe.add(waypoint);
+            pointsList.add(waypoint);
         }
     }
 }

@@ -128,13 +128,15 @@ public final class RouteBean {
      * Setter pour pointList.
      * @param l une liste de points.
      */
-    public void setPointsList(List<Waypoint> l){pointsList.addAll(l);}
+    public void setPointsList(List<Waypoint> l){
+        pointsList.addAll(l);}
 
     /**
      * Ajoute un point à pointList.
      * @param point le point.
      */
-    public void setPoint(Waypoint point){pointsList.add(point);}
+    public void setPoint(int index, Waypoint point){
+        pointsList.add(index, point);}
 
     /**
      * Getter pour la liste de points.
