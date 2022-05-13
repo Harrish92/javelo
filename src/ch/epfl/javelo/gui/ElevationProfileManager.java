@@ -111,9 +111,16 @@ public final class ElevationProfileManager {
 
     private void initProfile(){
         profile.getPoints().clear();
-        for (int j = 0; j < elevationProfileProperty.get().length(); j++) {
+        //ancienne boucle
+        /*for (int j = 0; j < elevationProfileProperty.get().length(); j++) {
             Point2D p = worldToScreen.get().transform(
                     j, elevationProfileProperty.get().elevationAt(j));
+            profile.getPoints().addAll(p.getX(),p.getY());
+        }*/
+        for (int j = (int) rectangle.get().getMinX(); j < rectangle.get().getMaxX(); j++) {
+            Point2D p = worldToScreen.get().transform(
+                    screenToWorld.get().transform(j,rectangle.get().getMinY()).getX(),
+                    elevationProfileProperty.get().elevationAt( screenToWorld.get().transform(j,rectangle.get().getMinY()).getX() ));
             profile.getPoints().addAll(p.getX(),p.getY());
         }
         Point2D pbd = worldToScreen.get().transform(elevationProfileProperty.get().length(),
