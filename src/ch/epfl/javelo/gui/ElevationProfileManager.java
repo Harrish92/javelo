@@ -1,14 +1,12 @@
 package ch.epfl.javelo.gui;
 
 import ch.epfl.javelo.routing.ElevationProfile;
-import com.sun.scenario.effect.impl.sw.java.JSWBlend_SOFT_LIGHTPeer;
 import javafx.beans.binding.Bindings;
-import javafx.beans.binding.BooleanBinding;
-import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.*;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
+import javafx.geometry.VPos;
 import javafx.scene.Group;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
@@ -19,8 +17,6 @@ import javafx.scene.text.Text;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.NonInvertibleTransformException;
 import javafx.scene.transform.Transform;
-
-import javax.print.DocFlavor;
 
 /**
  * Gère l'affichage et l'interaction avec le profil en long d'un itinéraire.
@@ -47,6 +43,9 @@ public final class ElevationProfileManager {
     private final ObjectProperty<Transform> worldToScreen;
     private final IntegerProperty mousePositionOnProfile;
     private final Line position;
+    private final Group groupForTextInRectangle;
+
+
 
 
 
@@ -63,7 +62,9 @@ public final class ElevationProfileManager {
         worldToScreen = new SimpleObjectProperty<>();
         rectangle = new SimpleObjectProperty<Rectangle2D>();
         position = new Line();
+        groupForTextInRectangle = new Group();
         initLayout();
+        pane.getChildren().add(groupForTextInRectangle);
         events();
     }
 
@@ -95,7 +96,7 @@ public final class ElevationProfileManager {
         rectangle.addListener(e ->{
             try{
                 initTransformation();
-                initGrille();
+                initGrid();
             }
             catch (NonInvertibleTransformException ex){
                 System.out.println(ex.getStackTrace());
@@ -119,6 +120,7 @@ public final class ElevationProfileManager {
         position.endYProperty().bind(Bindings.select(rectangle, "maxY"));
         position.visibleProperty().bind(mousePositionOnProfile.greaterThanOrEqualTo(0));
     }
+
 
 
     private void initTransformation() throws NonInvertibleTransformException {
@@ -152,13 +154,11 @@ public final class ElevationProfileManager {
         profile.getPoints().addAll(pbd.getX(), pbd.getY(), pbg.getX(), pbg.getY());
     }
 
-    private void initGrille(){
+    private void initGrid(){
         int xStepOnWorld = POS_STEPS[POS_STEPS.length-1];
         int yStepOnWorld = ELE_STEPS[ELE_STEPS.length-1];
+        groupForTextInRectangle.getChildren().removeAll(groupForTextInRectangle.getChildren());
         Path grid = (Path) pane.getChildren().get(0);
-        MoveTo moveTo;
-        LineTo lineTo;
-
         grid.getElements().removeAll(grid.getElements());
         ElevationProfile ep = elevationProfileProperty.get();
 
@@ -183,8 +183,9 @@ public final class ElevationProfileManager {
                 ? ep.minElevation() : ep.minElevation() + yStepOnWorld - (ep.minElevation() % yStepOnWorld);
         int firstHorizontalLine = (int) worldToScreen.get().transform(0, firstElevationOnTheGrid).getY();
 
-        moveTo = new MoveTo();
-        lineTo = new LineTo();
+
+        MoveTo moveTo = new MoveTo();
+        LineTo lineTo = new LineTo();
         moveTo.setX(rectangle.get().getMinX());
         moveTo.setY(firstHorizontalLine);
         grid.getElements().add(moveTo);
@@ -192,7 +193,22 @@ public final class ElevationProfileManager {
         lineTo.setY(firstHorizontalLine);
         grid.getElements().add(lineTo);
 
+
+
+
+        int textValueForElevation = (int) firstElevationOnTheGrid;
         for(int y = firstHorizontalLine; y > rectangle.get().getMinY(); y += yStepOnScreen){
+
+            Text textForElevation = new Text();
+            textForElevation.setFont(Font.font("Avenir", 10));
+            textForElevation.getStyleClass().addAll("grid_label", "vertical");
+            textForElevation.setText(String.format("%d", textValueForElevation));
+            textForElevation.textOriginProperty().set(VPos.CENTER);
+            textForElevation.setLayoutX(rectangle.get().getMinX() - textForElevation.prefWidth(0) - 2);
+
+            textForElevation.setLayoutY(y);
+            groupForTextInRectangle.getChildren().add(textForElevation);
+
             moveTo = new MoveTo();
             lineTo = new LineTo();
             moveTo.setX(rectangle.get().getMinX());
@@ -200,10 +216,23 @@ public final class ElevationProfileManager {
             grid.getElements().add(moveTo);
             lineTo.setX(rectangle.get().getMaxX());
             lineTo.setY(y);
+
+            textValueForElevation += yStepOnWorld;
             grid.getElements().add(lineTo);
+
         }
 
+        int textValueForPosition = 0;
         for(int x= (int) rectangle.get().getMinX(); x < rectangle.get().getMaxX(); x += xStepOnScreen){
+
+            Text textForPosition = new Text();
+            textForPosition.setText(String.format("%d", textValueForPosition));
+            textForPosition.setFont(Font.font("Avenir", 10));
+            textForPosition.textOriginProperty().set(VPos.TOP);
+            textForPosition.getStyleClass().addAll("grid_label", "horizontal");
+            textForPosition.setLayoutX(x - textForPosition.prefWidth(0) / 2);
+            textForPosition.setLayoutY(rectangle.get().getMaxY());
+
             moveTo = new MoveTo();
             lineTo = new LineTo();
             moveTo.setX(x);
@@ -211,8 +240,12 @@ public final class ElevationProfileManager {
             grid.getElements().add(moveTo);
             lineTo.setX(x);
             lineTo.setY(rectangle.get().getMaxY());
+
+            textValueForPosition += xStepOnWorld / (int) KILOMETER;
+            groupForTextInRectangle.getChildren().add(textForPosition);
             grid.getElements().add(lineTo);
         }
+
 
 
 
