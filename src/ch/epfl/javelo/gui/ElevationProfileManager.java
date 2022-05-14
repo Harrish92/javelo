@@ -1,6 +1,7 @@
 package ch.epfl.javelo.gui;
 
 import ch.epfl.javelo.routing.ElevationProfile;
+import com.sun.scenario.effect.impl.sw.java.JSWBlend_SOFT_LIGHTPeer;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.DoubleBinding;
@@ -18,6 +19,8 @@ import javafx.scene.text.Text;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.NonInvertibleTransformException;
 import javafx.scene.transform.Transform;
+
+import javax.print.DocFlavor;
 
 /**
  * Gère l'affichage et l'interaction avec le profil en long d'un itinéraire.
@@ -92,6 +95,7 @@ public final class ElevationProfileManager {
         rectangle.addListener(e ->{
             try{
                 initTransformation();
+                initGrille();
             }
             catch (NonInvertibleTransformException ex){
                 System.out.println(ex.getStackTrace());
@@ -115,6 +119,7 @@ public final class ElevationProfileManager {
         position.endYProperty().bind(Bindings.select(rectangle, "maxY"));
         position.visibleProperty().bind(mousePositionOnProfile.greaterThanOrEqualTo(0));
     }
+
 
     private void initTransformation() throws NonInvertibleTransformException {
         Affine transMethods = new Affine();
@@ -148,12 +153,69 @@ public final class ElevationProfileManager {
     }
 
     private void initGrille(){
+        int xStepOnWorld = POS_STEPS[POS_STEPS.length-1];
+        int yStepOnWorld = ELE_STEPS[ELE_STEPS.length-1];
         Path grid = (Path) pane.getChildren().get(0);
-        int nbV = (int) Math.floor(rectangle.get().getHeight()/MIN_VERTICAL_DISTANCE);
-        int nbH = (int) Math.floor(rectangle.get().getWidth()/MIN_HORIZONTAL_DISTANCE);
+        MoveTo moveTo;
+        LineTo lineTo;
 
-        grid.getElements().add(new MoveTo());
-        grid.getElements().add(new LineTo());
+        grid.getElements().removeAll(grid.getElements());
+        ElevationProfile ep = elevationProfileProperty.get();
+
+        for (int pos_step : POS_STEPS) {
+            if (worldToScreen.get().deltaTransform(pos_step, 0).getX() >= MIN_VERTICAL_DISTANCE){
+                xStepOnWorld = pos_step;
+                break;
+            }
+        }
+
+        for(int ele_step : ELE_STEPS){
+            if (worldToScreen.get().deltaTransform(0, -ele_step).getY() >= MIN_HORIZONTAL_DISTANCE) {
+                yStepOnWorld = ele_step;
+                break;
+            }
+        }
+
+        int xStepOnScreen = (int) worldToScreen.get().deltaTransform(xStepOnWorld, 0).getX();
+        int yStepOnScreen = (int) worldToScreen.get().deltaTransform(0, yStepOnWorld).getY();
+
+        double firstElevationOnTheGrid = (ep.minElevation() % yStepOnWorld == 0)
+                ? ep.minElevation() : ep.minElevation() + yStepOnWorld - (ep.minElevation() % yStepOnWorld);
+        int firstHorizontalLine = (int) worldToScreen.get().transform(0, firstElevationOnTheGrid).getY();
+
+        moveTo = new MoveTo();
+        lineTo = new LineTo();
+        moveTo.setX(rectangle.get().getMinX());
+        moveTo.setY(firstHorizontalLine);
+        grid.getElements().add(moveTo);
+        lineTo.setX(rectangle.get().getMaxX());
+        lineTo.setY(firstHorizontalLine);
+        grid.getElements().add(lineTo);
+
+        for(int y = firstHorizontalLine; y > rectangle.get().getMinY(); y += yStepOnScreen){
+            moveTo = new MoveTo();
+            lineTo = new LineTo();
+            moveTo.setX(rectangle.get().getMinX());
+            moveTo.setY(y);
+            grid.getElements().add(moveTo);
+            lineTo.setX(rectangle.get().getMaxX());
+            lineTo.setY(y);
+            grid.getElements().add(lineTo);
+        }
+
+        for(int x= (int) rectangle.get().getMinX(); x < rectangle.get().getMaxX(); x += xStepOnScreen){
+            moveTo = new MoveTo();
+            lineTo = new LineTo();
+            moveTo.setX(x);
+            moveTo.setY(rectangle.get().getMinY());
+            grid.getElements().add(moveTo);
+            lineTo.setX(x);
+            lineTo.setY(rectangle.get().getMaxY());
+            grid.getElements().add(lineTo);
+        }
+
+
+
     }
 
 

@@ -33,6 +33,7 @@ public final class BaseMapManager {
 
 
 
+    //TODO faire les commentaires
     public BaseMapManager(TileManager tm,WaypointsManager wpm , ObjectProperty<MapViewParameters> property){
         this.tm = tm;
         this.property = property;
