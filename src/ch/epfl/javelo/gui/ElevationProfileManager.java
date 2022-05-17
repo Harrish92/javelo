@@ -68,6 +68,9 @@ public final class ElevationProfileManager {
         events();
     }
 
+    /**
+     * Créé les éléments javaFX de base pour l'affichage du profil.
+     */
     private void initLayout(){
         VBox profileData = new VBox();
         Path grid = new Path();
@@ -86,6 +89,9 @@ public final class ElevationProfileManager {
 
     }
 
+    /**
+     * Gère les évènements //TODO:améliorer commentaire
+     */
     private void events(){
         rectangle.bind(Bindings.createObjectBinding(() ->
             new Rectangle2D(insets.getLeft(), insets.getBottom(),
@@ -122,7 +128,10 @@ public final class ElevationProfileManager {
     }
 
 
-
+    /**
+     * Transformation du profil su l'écran au profil réel et inversement.
+     * @throws NonInvertibleTransformException si la transformation n'est pas inversible.
+     */
     private void initTransformation() throws NonInvertibleTransformException {
         Affine transMethods = new Affine();
         transMethods.prependTranslation(-insets.getLeft(),-insets.getBottom());
@@ -133,14 +142,11 @@ public final class ElevationProfileManager {
         worldToScreen.set(screenToWorld.get().createInverse());
     }
 
+    /**
+     * Créé le profile affiché à l'écran.
+     */
     private void initProfile(){
         profile.getPoints().clear();
-        //ancienne boucle
-        /*for (int j = 0; j < elevationProfileProperty.get().length(); j++) {
-            Point2D p = worldToScreen.get().transform(
-                    j, elevationProfileProperty.get().elevationAt(j));
-            profile.getPoints().addAll(p.getX(),p.getY());
-        }*/
         for (int j = (int) rectangle.get().getMinX(); j < rectangle.get().getMaxX(); j++) {
             Point2D p = worldToScreen.get().transform(
                     screenToWorld.get().transform(j,rectangle.get().getMinY()).getX(),
@@ -154,6 +160,9 @@ public final class ElevationProfileManager {
         profile.getPoints().addAll(pbd.getX(), pbd.getY(), pbg.getX(), pbg.getY());
     }
 
+    /**
+     * Créé la grille du profil adaptée à la taille de la fenêtre.
+     */
     private void initGrid(){
         int xStepOnWorld = POS_STEPS[POS_STEPS.length-1];
         int yStepOnWorld = ELE_STEPS[ELE_STEPS.length-1];
@@ -252,6 +261,10 @@ public final class ElevationProfileManager {
     }
 
 
+    /**
+     * Créé une chaine de caractères contenant des informations sur le profile.
+     * @return une chaine de caractères.
+     */
     private String getStats(){
         ElevationProfile ep = elevationProfileProperty.get();
         return String.format("Longueur : %.1f km" +
@@ -276,11 +289,11 @@ public final class ElevationProfileManager {
 
 
     /**
-     *
-     * @return une propriété en lecture seule contenant la position
+     * Retourne une propriété en lecture seule contenant la position
      * du pointeur de la souris le long du profil (en mètres, arrondie
      * à l'entier le plus proche), ou NaN si le pointeur de la souris ne
      * se trouve pas au-dessus du profil.
+     * @return  une propriété contenant un entier en lecture seule.
      */
     public ReadOnlyIntegerProperty mousePositionOnProfileProperty(){
         return mousePositionOnProfile;
