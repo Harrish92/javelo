@@ -106,7 +106,7 @@ public final class ElevationProfileManager {
         worldToScreen.addListener(e -> initProfile());
         pane.setOnMouseMoved(e -> {
             if(rectangle.get().contains(e.getSceneX(), e.getSceneY())){
-                mousePositionOnProfile.set((int) Math.round(e.getSceneX()));
+                mousePositionOnProfile.set((int) Math.round(screenToWorld.get().transform(e.getSceneX(),0).getX()));
             }
             else{
                 mousePositionOnProfile.set(NAN);
@@ -115,10 +115,10 @@ public final class ElevationProfileManager {
         pane.setOnMouseExited(e -> mousePositionOnProfile.set(NAN));
 
         position.layoutXProperty().bind(Bindings.createDoubleBinding(() ->
-                (double) mousePositionOnProfile.get(), mousePositionOnProfileProperty()));
+                worldToScreen.get().transform(highlightedPosition.get(),0).getX(), highlightedPosition));
         position.startYProperty().bind(Bindings.select(rectangle, "minY"));
         position.endYProperty().bind(Bindings.select(rectangle, "maxY"));
-        position.visibleProperty().bind(mousePositionOnProfile.greaterThanOrEqualTo(0));
+        position.visibleProperty().bind(highlightedPosition.greaterThanOrEqualTo(0));
     }
 
 
