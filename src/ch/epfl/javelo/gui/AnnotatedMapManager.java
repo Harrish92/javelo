@@ -41,8 +41,7 @@ public final class AnnotatedMapManager {
                                                             waypointsManager,
                                                             mapViewParametersProperty);
         RouteManager routeManager = new RouteManager(routeBean,
-                                                    mapViewParametersProperty,
-                                                    errorConsumer);
+                                                    mapViewParametersProperty);
         this.routeBean = routeBean;
         pane = new StackPane(
                 baseMapManager.pane(),

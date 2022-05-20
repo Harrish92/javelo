@@ -52,8 +52,7 @@ public class RouteBeanTest extends Application {
                         waypointsManager,
                         mapViewParametersP);
         RouteManager routeManager = new RouteManager(routeBean,
-                                            mapViewParametersP,
-                                            errorConsumer);
+                                            mapViewParametersP);
 
 
         StackPane mainPane =

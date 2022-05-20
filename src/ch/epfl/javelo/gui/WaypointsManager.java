@@ -87,7 +87,7 @@ public final class WaypointsManager {
 
         group.setOnMouseDragged(e -> {
             mouse_difference.set(mousePoint.get().subtract(e.getSceneX(), e.getSceneY()));
-            PointWebMercator initPoint = PointWebMercator.ofPointCh(pointsList.get(pointIndex).PointCH());
+            PointWebMercator initPoint = PointWebMercator.ofPointCh(pointsList.get(pointIndex).pointCh());
             group.setLayoutX(property.get().viewX(initPoint) - mouse_difference.get().getX());
             group.setLayoutY(property.get().viewY(initPoint) - mouse_difference.get().getY());
         });
@@ -98,7 +98,7 @@ public final class WaypointsManager {
                 pointsList.remove(pointsList.get(pointIndex));
             }
             else{
-                PointWebMercator initPoint = PointWebMercator.ofPointCh(pointsList.get(pointIndex).PointCH());
+                PointWebMercator initPoint = PointWebMercator.ofPointCh(pointsList.get(pointIndex).pointCh());
                 double x = property.get().viewX(initPoint) - mouse_difference.get().getX();
                 double y = property.get().viewY(initPoint) - mouse_difference.get().getY();
                 PointCh point = property.get().pointAt(x,y).toPointCh();
@@ -140,7 +140,7 @@ public final class WaypointsManager {
     private void positionAllPoint(){
         for (int k = 0; k < pointsList.size(); k++) {
             Waypoint point = pointsList.get(k);
-            PointWebMercator pm = PointWebMercator.ofPointCh(point.PointCH());
+            PointWebMercator pm = PointWebMercator.ofPointCh(point.pointCh());
             Group group = (Group) pane.getChildren().get(k);
             group.setLayoutX(property.get().viewX(pm));
             group.setLayoutY(property.get().viewY(pm));

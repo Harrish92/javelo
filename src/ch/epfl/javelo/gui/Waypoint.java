@@ -9,6 +9,6 @@ import ch.epfl.javelo.projection.PointCh;
  * @author Harrishan Raveendran (345291)
  *
  */
-public record Waypoint(PointCh PointCH, int NodeId) {
+public record Waypoint(PointCh pointCh, int nodeId) {
 
 }

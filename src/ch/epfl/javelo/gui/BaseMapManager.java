@@ -80,10 +80,12 @@ public final class BaseMapManager {
         SimpleLongProperty minScrollTime = new SimpleLongProperty();
         pane.setOnScroll(e ->{
 
+
+            if (e.getDeltaY() == 0d) return;
             long currentTime = System.currentTimeMillis();
             if (currentTime < minScrollTime.get()) return;
-            minScrollTime.set(currentTime + 250);
-            double zoomDelta = Math.signum(e.getDeltaY());
+            minScrollTime.set(currentTime + 200);
+            int zoomDelta = (int) Math.signum(e.getDeltaY());
             int zoomLevel =  (int) Math.rint(zoomDelta + property.get().zoomLevel());
 
             zoomLevel = Math2.clamp(MIN_ZOOM, zoomLevel, MAX_ZOOM);

@@ -6,9 +6,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
-import javafx.geometry.Point2D;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -58,28 +56,38 @@ public final class RouteBean {
         ArrayList<Route> routesList = new ArrayList<>();
         boolean isRouteValid = true;
         for (int k = 0; k < pointsList.size() - 1; k++) {
-            int n1 = pointsList.get(k).NodeId();
-            int n2 = pointsList.get(k + 1).NodeId();
-            RouteSample key = new RouteSample(n1, n2);
-            if(cache.containsKey(key)) {
-                routesList.add(cache.get(key));
-            }
-            else{
-                Route route = routeComputer.bestRouteBetween(n1 ,n2);
-                routesList.add(route);
-                cache.put(key, route);
-                if(cache.size() > MAXCACHESIZE){
-                    cache.remove(cache.entrySet().iterator().next().getKey());
+            int n1 = pointsList.get(k).nodeId();
+            int n2 = pointsList.get(k + 1).nodeId();
+            if(n1 != n2){
+                RouteSample key = new RouteSample(n1, n2);
+                if (cache.containsKey(key)) {
+                    routesList.add(cache.get(key));
+                } else {
+                    Route route = routeComputer.bestRouteBetween(n1, n2);
+                    routesList.add(route);
+                    cache.put(key, route);
+                    if (cache.size() > MAXCACHESIZE) {
+                        cache.remove(cache.entrySet().iterator().next().getKey());
+                    }
                 }
+                if (isRouteValid) isRouteValid = !(pointsList.get(k) == null);
             }
-            isRouteValid = !(routesList.get(k) == null);
+
+
         }
-        routeProperty.set( pointsList.size() >= 2 && isRouteValid ? new MultiRoute(routesList) : null);
-        if(routeProperty.get() == null) {highlightedPosition.set(Double.NaN);}
-        else{elevationProfile.set(ElevationProfileComputer.elevationProfile(
-                routeProperty.get(),
-                DISTANCEMAX));}
+
+        routeProperty.set((pointsList.size() >= 2 && isRouteValid) ? new MultiRoute(routesList) : null);
+        if (routeProperty.get() == null) {
+            highlightedPosition.set(Double.NaN);
+        } else {
+            elevationProfile.set(ElevationProfileComputer.elevationProfile(
+                    routeProperty.get(),
+                    DISTANCEMAX));
+        }
+
     }
+
+
 
     //TODO: ajouter des getters setters si besoin
     /**
@@ -143,6 +151,16 @@ public final class RouteBean {
      * @return la liste de points.
      */
     public ObservableList<Waypoint> getPointsList(){return  pointsList;}
+
+    public int indexOfNonEmptySegmentAt(double position) {
+        int index = routeProperty.get().indexOfSegmentAt(position);
+        for (int i = 0; i <= index; i += 1) {
+            int n1 = pointsList.get(i).nodeId();
+            int n2 = pointsList.get(i + 1).nodeId();
+            if (n1 == n2) index += 1;
+        }
+        return index;
+    }
 
 
 }

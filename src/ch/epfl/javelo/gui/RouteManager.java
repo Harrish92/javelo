@@ -11,22 +11,19 @@ import javafx.scene.shape.Polyline;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
 public class RouteManager {
     private final Pane pane;
     private final ObjectProperty<MapViewParameters> mapViewParametersProperty;
-    private final Consumer<String> error;
     private final RouteBean rb;
     private final Polyline polyline;
     private final Circle circle;
-    private double HighlightedPos;
+    private final double HighlightedPos;
 
 
-    public RouteManager(RouteBean rb, ObjectProperty<MapViewParameters> mapViewParametersProperty, Consumer<String> error){
+    public RouteManager(RouteBean rb, ObjectProperty<MapViewParameters> mapViewParametersProperty){
         HighlightedPos = rb.highlightedPosition();
         this.rb = rb;
-        this.error = error;
         this.mapViewParametersProperty = mapViewParametersProperty;
         this.pane = new Pane();
         this.circle = new Circle(5);
@@ -51,7 +48,6 @@ public class RouteManager {
                 slideOnTheMap();
             }
 
-
         });
 
 
@@ -61,7 +57,7 @@ public class RouteManager {
 
 
         circle.setOnMouseClicked(e->{
-                addWaypoint(e.getX(), e.getY());
+            addWaypointInTheWhiteCircle(e.getX(), e.getY());
         });
 
 
@@ -70,7 +66,7 @@ public class RouteManager {
 
     }
 
-    private void addWaypoint(double x, double y) {
+    private void addWaypointInTheWhiteCircle(double x, double y) {
         if(rb.getRouteProperty().getValue() == null)
             return;
         Point2D p2d = new Point2D(x, y).add(mapViewParametersProperty.get().topLeft());
@@ -78,19 +74,10 @@ public class RouteManager {
         PointWebMercator pwm = PointWebMercator.of(mapViewParametersProperty.get().zoomLevel(),
                 p2dLocalToParent.getX(), p2dLocalToParent.getY()) ;
 
-
-
-        int WpHighligthedPosNodeId = rb.getRouteProperty().get().nodeClosestTo(rb.highlightedPosition());
-        for(Waypoint wpFromTheList : rb.getPointsList()){
-            if(wpFromTheList.NodeId() == WpHighligthedPosNodeId) {
-                error.accept("Un point de passage est déjà présent à cet endroit !");
-                return;
-            }
-        }
         Waypoint wp = new Waypoint(pwm.toPointCh(),
                 rb.getRouteProperty().get().nodeClosestTo(rb.highlightedPosition()));
 
-        int index = rb.getRouteProperty().get().indexOfSegmentAt(rb.highlightedPosition()) + 1;
+        int index = rb.indexOfNonEmptySegmentAt(rb.highlightedPosition()) + 1;
         rb.setPoint(index, wp);
 
 
@@ -100,53 +87,63 @@ public class RouteManager {
     private void slideOnTheMap() {
         if(rb.getRouteProperty().getValue() == null)
             return;
-        polyline.setLayoutX(-mapViewParametersProperty.get().coordX());
-        polyline.setLayoutY(-mapViewParametersProperty.get().coordY());
+        setLayoutOfPolyline();
 
-
-        circle.setLayoutX(-mapViewParametersProperty.get().coordX());
-        circle.setLayoutY(-mapViewParametersProperty.get().coordY());
-
-
+        setLayoutOfCircle();
 
     }
 
     private void draw(){
         if(rb.getRouteProperty().getValue() == null){
-            polyline.setVisible(false);
-            circle.setVisible(false);
+            setVisibility(false);
             return;
         }
-        polyline.setVisible(true);
-        circle.setVisible(true);
+        setVisibility(true);
 
         List<Double> doubleArrayList = new ArrayList<>();
 
-        for(PointCh r : rb.getRouteProperty().get().points()){
-            PointWebMercator pwm = PointWebMercator.ofPointCh(r);
-            doubleArrayList.add(pwm.xAtZoomLevel(mapViewParametersProperty.get().zoomLevel()));
-            doubleArrayList.add(pwm.yAtZoomLevel(mapViewParametersProperty.get().zoomLevel()));
+        if(rb.getRouteProperty().get().points() != null) {
+            for (PointCh r : rb.getRouteProperty().get().points()) {
+
+                PointWebMercator pwm = PointWebMercator.ofPointCh(r);
+                doubleArrayList.add(pwm.xAtZoomLevel(mapViewParametersProperty.get().zoomLevel()));
+                doubleArrayList.add(pwm.yAtZoomLevel(mapViewParametersProperty.get().zoomLevel()));
+
+            }
         }
-
-        rb.setHighlightedPosition(HighlightedPos);
-        PointCh positionOfCircleInCh = rb.getRouteProperty().get().pointAt(rb.highlightedPosition());
-
-        PointWebMercator pwm = PointWebMercator.ofPointCh(positionOfCircleInCh);
 
         polyline.getPoints().setAll(doubleArrayList);
 
+        setLayoutOfPolyline();
+
+        setCenterOfCircle();
+
+        setLayoutOfCircle();
+
+
+    }
+
+    private void setLayoutOfPolyline(){
         polyline.setLayoutX(-mapViewParametersProperty.get().coordX());
         polyline.setLayoutY(-mapViewParametersProperty.get().coordY());
+    }
 
-        circle.setCenterX(pwm.xAtZoomLevel(mapViewParametersProperty.get().zoomLevel()));
-        circle.setCenterY(pwm.yAtZoomLevel(mapViewParametersProperty.get().zoomLevel()));
-
+    private void setLayoutOfCircle(){
         circle.setLayoutX(-mapViewParametersProperty.get().coordX());
         circle.setLayoutY(-mapViewParametersProperty.get().coordY());
+    }
 
+    private void setCenterOfCircle(){
+        rb.setHighlightedPosition(HighlightedPos);
+        PointCh positionOfCircleInCh = rb.getRouteProperty().get().pointAt(rb.highlightedPosition());
+        PointWebMercator pwm = PointWebMercator.ofPointCh(positionOfCircleInCh);
+        circle.setCenterX(pwm.xAtZoomLevel(mapViewParametersProperty.get().zoomLevel()));
+        circle.setCenterY(pwm.yAtZoomLevel(mapViewParametersProperty.get().zoomLevel()));
+    }
 
-
-
+    private void setVisibility(boolean bool){
+        polyline.setVisible(bool);
+        circle.setVisible(bool);
     }
 
 

@@ -41,7 +41,7 @@ public final class RouteComputer {
      * @return un itinéraire ou null s'il en existe aucun.
      */
     public Route bestRouteBetween(int startNodeId, int endNodeId) {
-        Preconditions.checkArgument(startNodeId != endNodeId);
+        if(startNodeId == endNodeId) return null;
         //Initialisation des tableaux
         int nbN = graph.nodeCount();
         double[] distance = new double[nbN];
