@@ -33,7 +33,7 @@ public final class JaVelo extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Graph graph = Graph.loadFrom(Path.of("javelo-data/ch_west"));
+        Graph graph = Graph.loadFrom(Path.of("javelo-data"));
         Path cacheBasePath = Path.of("osm-cache");
         String tileServerHost = "tile.openstreetmap.org";
         TileManager tileManager =
@@ -47,7 +47,8 @@ public final class JaVelo extends Application {
         AnnotatedMapManager annotatedMapManager = new AnnotatedMapManager(graph,tileManager, routeBean, errorManager :: displayError);
         SplitPane splitPane = new SplitPane();
         splitPane.setOrientation(Orientation.VERTICAL);
-        splitPane.getItems().add(annotatedMapManager.pane());
+        //splitPane.getItems().add(annotatedMapManager.pane());
+        splitPane.getItems().addAll(annotatedMapManager.pane(), errorManager.pane());
         mainPane.setCenter(splitPane);
 
         ElevationProfileManager elevationProfileManager = new ElevationProfileManager(
@@ -78,7 +79,11 @@ public final class JaVelo extends Application {
                             elevationProfileManager.mousePositionOnProfileProperty().doubleValue(),
                             elevationProfileManager.mousePositionOnProfileProperty()
                     ));*/
-                    //routeBean.highlightedPositionProperty().bindBidirectional((Property<Number>) elevationProfileManager.mousePositionOnProfileProperty());
+                    routeBean.highlightedPositionProperty().bind(Bindings.createIntegerBinding(() ->{
+                        return annotatedMapManager.mousePositionOnRouteProperty().get() >= 0 ?
+                                annotatedMapManager.mousePositionOnRouteProperty().get():
+                                elevationProfileManager.mousePositionOnProfileProperty().get();
+                    }, annotatedMapManager.mousePositionOnRouteProperty()));
                 }
                 else{
                     splitPane.getItems().removeAll(splitPane.getItems());
