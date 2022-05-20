@@ -91,6 +91,19 @@ public final class ElevationProfileManager {
     }
 
     /**
+     * Dessine le profile.
+     */
+    private void draw(){
+        try{
+            initTransformation();
+            initGrid();
+        }
+        catch (NonInvertibleTransformException ex){
+            System.out.println(ex.getStackTrace());
+        }
+    }
+
+    /**
      * Gère les évènements //TODO:améliorer commentaire
      */
     private void events(){
@@ -100,17 +113,13 @@ public final class ElevationProfileManager {
                     Math.max(pane.getHeight() - insets.getBottom() - insets.getTop(), 0))
         , pane.widthProperty(), pane.heightProperty()));
 
-        rectangle.addListener(e ->{
-            try{
-                initTransformation();
-                initGrid();
-            }
-            catch (NonInvertibleTransformException ex){
-                System.out.println(ex.getStackTrace());
-            }
+        rectangle.addListener((p, oldS, newS) ->{
+            draw();
         });
-        //screenToWorld.addListener(e -> initProfile());
-        worldToScreen.addListener(e -> initProfile());
+        elevationProfileProperty.addListener((p, oldS, newS) ->{
+            draw();
+        });
+        worldToScreen.addListener((p, oldS, newS) -> initProfile());
         pane.setOnMouseMoved(e -> {
             if(rectangle.get().contains(e.getSceneX(), e.getSceneY())){
                 mousePositionOnProfile.set((int) Math.round(screenToWorld.get().transform(e.getSceneX(),0).getX()));
@@ -268,6 +277,7 @@ public final class ElevationProfileManager {
      */
     private String getStats(){
         ElevationProfile ep = elevationProfileProperty.get();
+        if(ep == null) return "";
         return String.format("Longueur : %.1f km" +
                 "     Montée : %.0f m" +
                 "     Descente : %.0f m" +

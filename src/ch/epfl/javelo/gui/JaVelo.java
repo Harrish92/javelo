@@ -50,6 +50,8 @@ public final class JaVelo extends Application {
         splitPane.getItems().add(annotatedMapManager.pane());
         mainPane.setCenter(splitPane);
 
+        ElevationProfileManager elevationProfileManager = new ElevationProfileManager(
+                routeBean.elevationProfile(),routeBean.highlightedPositionProperty());
 
 
         //barre de menu
@@ -69,8 +71,6 @@ public final class JaVelo extends Application {
         routeBean.getRouteProperty().addListener( l ->{
                 menuItem.setVisible(routeBean.getRouteProperty().getValue() != null);
                 if(routeBean.getRouteProperty().get() != null){
-                    ElevationProfileManager elevationProfileManager = new ElevationProfileManager(
-                            routeBean.elevationProfile(),routeBean.highlightedPositionProperty());
                     if(splitPane.getItems().size() < 2) {
                         splitPane.getItems().add(elevationProfileManager.pane());
                     }
