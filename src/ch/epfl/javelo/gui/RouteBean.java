@@ -52,13 +52,13 @@ public final class RouteBean {
      * Calcule l'itinéraire sous forme d'une MultiRoute attribuée
      * à propriété routeProperty. Calcule aussi le profile de l'itinéraire.
      */
-    private void computeRoute(){
+    private void computeRoute() {
         ArrayList<Route> routesList = new ArrayList<>();
         boolean isRouteValid = true;
         for (int k = 0; k < pointsList.size() - 1; k++) {
             int n1 = pointsList.get(k).nodeId();
             int n2 = pointsList.get(k + 1).nodeId();
-            if(n1 != n2){
+            if (n1 != n2) {
                 RouteSample key = new RouteSample(n1, n2);
                 if (cache.containsKey(key)) {
                     routesList.add(cache.get(key));
@@ -73,17 +73,17 @@ public final class RouteBean {
             }
         }
 
-        for(Route route : routesList){
+        for (Route route : routesList) {
             if (isRouteValid) isRouteValid = !(route == null);
         }
 
         routeProperty.set((pointsList.size() >= 2 && isRouteValid) ? new MultiRoute(routesList) : null);
         if (routeProperty.get() == null) {
-            highlightedPosition.set(Double.NaN);
+           // highlightedPosition.set(Double.NaN);
         } else {
-            elevationProfile.set(ElevationProfileComputer.elevationProfile(
-                    routeProperty.get(),
-                    DISTANCEMAX));
+        elevationProfile.set(ElevationProfileComputer.elevationProfile(
+                routeProperty.get(),
+                DISTANCEMAX));
         }
 
     }
@@ -102,6 +102,7 @@ public final class RouteBean {
     public void setRouteProperty(ObjectProperty<Route> routeP){
         routeProperty.set(routeP.get());
     }
+
 
     /**
      * @return la propriété routeProperty sous la forme

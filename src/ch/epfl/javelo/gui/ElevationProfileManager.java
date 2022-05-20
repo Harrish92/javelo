@@ -59,8 +59,8 @@ public final class ElevationProfileManager {
         profile = new Polygon();
         mousePositionOnProfile = new SimpleIntegerProperty();
         insets = new Insets(10, 10, 20, 40);
-        screenToWorld = new SimpleObjectProperty<>();
-        worldToScreen = new SimpleObjectProperty<>();
+        screenToWorld = new SimpleObjectProperty<>(new Affine());
+        worldToScreen = new SimpleObjectProperty<>(new Affine());
         rectangle = new SimpleObjectProperty<Rectangle2D>();
         position = new Line();
         groupForTextInRectangle = new Group();
@@ -131,7 +131,7 @@ public final class ElevationProfileManager {
         pane.setOnMouseExited(e -> mousePositionOnProfile.set(NAN));
 
         position.layoutXProperty().bind(Bindings.createDoubleBinding(() ->
-                worldToScreen.get().transform(highlightedPosition.get(),0).getX(), highlightedPosition));
+                worldToScreen.get().transform(highlightedPosition.get(),0).getX(), highlightedPosition, worldToScreen));
         position.startYProperty().bind(Bindings.select(rectangle, "minY"));
         position.endYProperty().bind(Bindings.select(rectangle, "maxY"));
         position.visibleProperty().bind(highlightedPosition.greaterThanOrEqualTo(0));

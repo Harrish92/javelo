@@ -47,8 +47,8 @@ public final class JaVelo extends Application {
         AnnotatedMapManager annotatedMapManager = new AnnotatedMapManager(graph,tileManager, routeBean, errorManager :: displayError);
         SplitPane splitPane = new SplitPane();
         splitPane.setOrientation(Orientation.VERTICAL);
-        //splitPane.getItems().add(annotatedMapManager.pane());
-        splitPane.getItems().addAll(annotatedMapManager.pane(), errorManager.pane());
+        splitPane.getItems().add(annotatedMapManager.pane());
+        //splitPane.getItems().addAll(annotatedMapManager.pane(), errorManager.pane());
         mainPane.setCenter(splitPane);
 
         ElevationProfileManager elevationProfileManager = new ElevationProfileManager(
@@ -69,16 +69,38 @@ public final class JaVelo extends Application {
         primaryStage.setTitle("JaVelo");
         primaryStage.show();
 
-        routeBean.getRouteProperty().addListener( l ->{
+        routeBean.elevationProfile().addListener((p, prevS, newS) ->{
+            if(newS != null){
+                System.out.println("PROFILE");
+                menuItem.setDisable(false);
+                if(splitPane.getItems().size() < 2) {
+                    splitPane.getItems().add(elevationProfileManager.pane());
+                }
+            }
+            else{
+                menuItem.setDisable(true);
+            }
+            /*if((prevS == null && newS != null) || (prevS != null && newS == null)){
+                splitPane.getItems().remove(1);
+                System.out.println("CLEAR");
+            }*/
+        });
+
+        /*routeBean.highlightedPositionProperty().bind(Bindings.createIntegerBinding(() ->{
+                System.out.println(annotatedMapManager.mousePositionOnRouteProperty().get());
+                return annotatedMapManager.mousePositionOnRouteProperty().get() >= 0 ?
+                        annotatedMapManager.mousePositionOnRouteProperty().get() :
+                        elevationProfileManager.mousePositionOnProfileProperty().get();
+
+        }, annotatedMapManager.mousePositionOnRouteProperty(),elevationProfileManager.mousePositionOnProfileProperty()));*/
+
+
+        /*routeBean.getRouteProperty().addListener( l ->{
                 menuItem.setVisible(routeBean.getRouteProperty().getValue() != null);
                 if(routeBean.getRouteProperty().get() != null){
                     if(splitPane.getItems().size() < 2) {
                         splitPane.getItems().add(elevationProfileManager.pane());
                     }
-                    /*routeBean.highlightedPositionProperty().bindBidirectional((Property<Number>) Bindings.createDoubleBinding(() ->
-                            elevationProfileManager.mousePositionOnProfileProperty().doubleValue(),
-                            elevationProfileManager.mousePositionOnProfileProperty()
-                    ));*/
                     routeBean.highlightedPositionProperty().bind(Bindings.createIntegerBinding(() ->{
                         return annotatedMapManager.mousePositionOnRouteProperty().get() >= 0 ?
                                 annotatedMapManager.mousePositionOnRouteProperty().get():
@@ -89,7 +111,7 @@ public final class JaVelo extends Application {
                     splitPane.getItems().removeAll(splitPane.getItems());
                     splitPane.getItems().add(annotatedMapManager.pane());
                 }
-        });
+        });*/
 
     }
 }
