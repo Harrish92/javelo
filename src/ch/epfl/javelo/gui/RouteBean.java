@@ -70,10 +70,11 @@ public final class RouteBean {
                         cache.remove(cache.entrySet().iterator().next().getKey());
                     }
                 }
-                if (isRouteValid) isRouteValid = !(pointsList.get(k) == null);
             }
+        }
 
-
+        for(Route route : routesList){
+            if (isRouteValid) isRouteValid = !(route == null);
         }
 
         routeProperty.set((pointsList.size() >= 2 && isRouteValid) ? new MultiRoute(routesList) : null);

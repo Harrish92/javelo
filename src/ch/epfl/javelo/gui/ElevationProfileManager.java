@@ -22,6 +22,7 @@ import javafx.scene.transform.Transform;
  * Gère l'affichage et l'interaction avec le profil en long d'un itinéraire.
  *
  * @author Yoan Giovannini (303934)
+ * @author Harrishan Raveendran (345291)
  */
 public final class ElevationProfileManager {
     private final int[] POS_STEPS =
