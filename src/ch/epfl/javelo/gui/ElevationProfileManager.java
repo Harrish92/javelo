@@ -95,8 +95,10 @@ public final class ElevationProfileManager {
      */
     private void draw(){
         try{
-            initTransformation();
-            initGrid();
+            if(elevationProfileProperty.get() != null) {
+                initTransformation();
+                initGrid();
+            }
         }
         catch (NonInvertibleTransformException ex){
             System.out.println(ex.getStackTrace());
@@ -113,13 +115,10 @@ public final class ElevationProfileManager {
                     Math.max(pane.getHeight() - insets.getBottom() - insets.getTop(), 0))
         , pane.widthProperty(), pane.heightProperty()));
 
-        rectangle.addListener((p, oldS, newS) ->{
-            draw();
-        });
-        elevationProfileProperty.addListener((p, oldS, newS) ->{
-            draw();
-        });
-        worldToScreen.addListener((p, oldS, newS) -> initProfile());
+        rectangle.addListener((p, oldS, newS) -> draw());
+        elevationProfileProperty.addListener((p, oldS, newS) -> draw());
+        worldToScreen.addListener((p, oldS, newS) ->{
+                if(elevationProfileProperty.get() != null) initProfile();});
         pane.setOnMouseMoved(e -> {
             if(rectangle.get().contains(e.getSceneX(), e.getSceneY())){
                 mousePositionOnProfile.set((int) Math.round(screenToWorld.get().transform(e.getSceneX(),0).getX()));
@@ -144,10 +143,10 @@ public final class ElevationProfileManager {
      */
     private void initTransformation() throws NonInvertibleTransformException {
         Affine transMethods = new Affine();
-        transMethods.prependTranslation(-insets.getLeft(),-insets.getBottom());
-        transMethods.prependScale(elevationProfileProperty.get().length()/rectangle.get().getWidth(),
-                -(elevationProfileProperty.get().maxElevation() - elevationProfileProperty.get().minElevation())/rectangle.get().getHeight());
-        transMethods.prependTranslation(0,elevationProfileProperty.get().maxElevation());
+        transMethods.prependTranslation(-insets.getLeft(), -insets.getBottom());
+        transMethods.prependScale(elevationProfileProperty.get().length() / rectangle.get().getWidth(),
+                    -(elevationProfileProperty.get().maxElevation() - elevationProfileProperty.get().minElevation()) / rectangle.get().getHeight());
+        transMethods.prependTranslation(0, elevationProfileProperty.get().maxElevation());
         screenToWorld.set(transMethods);
         worldToScreen.set(screenToWorld.get().createInverse());
     }

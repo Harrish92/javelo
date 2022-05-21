@@ -69,9 +69,9 @@ public final class JaVelo extends Application {
         primaryStage.setTitle("JaVelo");
         primaryStage.show();
 
+
         routeBean.elevationProfile().addListener((p, prevS, newS) ->{
             if(newS != null){
-                System.out.println("PROFILE");
                 menuItem.setDisable(false);
                 if(splitPane.getItems().size() < 2) {
                     splitPane.getItems().add(elevationProfileManager.pane());
@@ -80,10 +80,9 @@ public final class JaVelo extends Application {
             else{
                 menuItem.setDisable(true);
             }
-            /*if((prevS == null && newS != null) || (prevS != null && newS == null)){
+            if(/*(prevS == null && newS != null) ||*/ (prevS != null && newS == null)){
                 splitPane.getItems().remove(1);
-                System.out.println("CLEAR");
-            }*/
+            }
         });
 
         /*routeBean.highlightedPositionProperty().bind(Bindings.createIntegerBinding(() ->{

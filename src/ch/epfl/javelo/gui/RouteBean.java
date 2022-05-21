@@ -80,6 +80,7 @@ public final class RouteBean {
         routeProperty.set((pointsList.size() >= 2 && isRouteValid) ? new MultiRoute(routesList) : null);
         if (routeProperty.get() == null) {
            // highlightedPosition.set(Double.NaN);
+            elevationProfile.set(null);
         } else {
         elevationProfile.set(ElevationProfileComputer.elevationProfile(
                 routeProperty.get(),
