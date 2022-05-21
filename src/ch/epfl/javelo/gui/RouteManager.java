@@ -12,6 +12,14 @@ import javafx.scene.shape.Polyline;
 import java.util.ArrayList;
 import java.util.List;
 
+
+/**
+ *
+ * RouteManager représente une gestionnaire de route
+ *
+ * @author Harrishan Raveendran (345291)
+ *
+ */
 public class RouteManager {
     private final Pane pane;
     private final ObjectProperty<MapViewParameters> mapViewParametersProperty;
@@ -21,6 +29,13 @@ public class RouteManager {
     private final double HighlightedPos;
 
 
+    /**
+     *constructeur construit une polyligne qui représente une route et
+     *un cercle qui permet l'ajout de points de passage intermédiaires
+     *
+     * @param rb un bean JavaFX regroupant les propriétés
+     * @param mapViewParametersProperty une propriété JavaFX contenant les paramètres de la carte affichée
+     */
     public RouteManager(RouteBean rb, ObjectProperty<MapViewParameters> mapViewParametersProperty){
         HighlightedPos = rb.highlightedPosition();
         this.rb = rb;
@@ -38,21 +53,21 @@ public class RouteManager {
         pane.setPickOnBounds(false);
 
         if(rb.getRouteProperty() != null)
-            draw();
+            drawRouteAndCircle();
 
 
         mapViewParametersProperty.addListener((p, oldS, newS) -> {
             if (oldS.zoomLevel() != newS.zoomLevel()){
-                draw();
+                drawRouteAndCircle();
             }else{
-                slideOnTheMap();
+                RouteAndCircleAdaptToSliding();
             }
 
         });
 
 
         rb.getRouteProperty().addListener((p, oldS, newS) -> {
-            draw();
+            drawRouteAndCircle();
         });
 
 
@@ -66,6 +81,12 @@ public class RouteManager {
 
     }
 
+    /**
+     * ajout d'un point de passage dans le cercle blanc
+     *
+     * @param x coordonnée x de la souris
+     * @param y coordonnée y de la souris
+     */
     private void addWaypointInTheWhiteCircle(double x, double y) {
         if(rb.getRouteProperty().getValue() == null)
             return;
@@ -84,7 +105,11 @@ public class RouteManager {
 
     }
 
-    private void slideOnTheMap() {
+
+    /**
+     * la route s'adapte au glissement de la carte
+     */
+    private void RouteAndCircleAdaptToSliding() {
         if(rb.getRouteProperty().getValue() == null)
             return;
         setLayoutOfPolyline();
@@ -93,7 +118,10 @@ public class RouteManager {
 
     }
 
-    private void draw(){
+    /**
+     * dessin de la route et du cercle sur la carte
+     */
+    private void drawRouteAndCircle(){
         if(rb.getRouteProperty().getValue() == null){
             setVisibility(false);
             return;
@@ -123,16 +151,25 @@ public class RouteManager {
 
     }
 
+    /**
+     * translate la position de la polyligne sur le panneau
+     */
     private void setLayoutOfPolyline(){
         polyline.setLayoutX(-mapViewParametersProperty.get().coordX());
         polyline.setLayoutY(-mapViewParametersProperty.get().coordY());
     }
 
+    /**
+     * translate la position du cercle sur le panneau
+     */
     private void setLayoutOfCircle(){
         circle.setLayoutX(-mapViewParametersProperty.get().coordX());
         circle.setLayoutY(-mapViewParametersProperty.get().coordY());
     }
 
+    /**
+     * définit le centre du cercle
+     */
     private void setCenterOfCircle(){
         rb.setHighlightedPosition(HighlightedPos);
         PointCh positionOfCircleInCh = rb.getRouteProperty().get().pointAt(rb.highlightedPosition());
@@ -141,12 +178,21 @@ public class RouteManager {
         circle.setCenterY(pwm.yAtZoomLevel(mapViewParametersProperty.get().zoomLevel()));
     }
 
+    /**
+     * définit la visibilité du cercle et de la polyligne sur la carte
+     *
+     * @param bool valeur booléenne
+     */
     private void setVisibility(boolean bool){
         polyline.setVisible(bool);
         circle.setVisible(bool);
     }
 
 
+    /**
+     *
+     * @return un panneau
+     */
     public Pane pane(){
         return this.pane;
     }

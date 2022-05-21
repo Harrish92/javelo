@@ -214,6 +214,7 @@ public final class ElevationProfileManager {
 
 
 
+
         int textValueForElevation = (int) firstElevationOnTheGrid;
         for(int y = firstHorizontalLine; y > rectangle.get().getMinY(); y += yStepOnScreen){
 
