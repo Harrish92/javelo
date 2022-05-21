@@ -4,6 +4,7 @@ package ch.epfl.javelo.gui;
 import ch.epfl.javelo.data.Graph;
 import ch.epfl.javelo.routing.CityBikeCF;
 import ch.epfl.javelo.routing.ElevationProfile;
+import ch.epfl.javelo.routing.GpxGenerator;
 import ch.epfl.javelo.routing.RouteComputer;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
@@ -20,6 +21,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Path;
 
 /**
@@ -62,6 +65,17 @@ public final class JaVelo extends Application {
         menu.getItems().add(menuItem);
         menuBar.getMenus().add(menu);
         mainPane.setTop(menuBar);
+        menuItem.setDisable(true);
+        menuItem.setOnAction(a -> {
+            try {
+                GpxGenerator.writeGpx("javelo.gpx",
+                                        routeBean.getRouteProperty().get(),
+                                        routeBean.elevationProfile().get());
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+        });
+
 
         primaryStage.setMinWidth(800);
         primaryStage.setMinHeight(600);
@@ -70,6 +84,7 @@ public final class JaVelo extends Application {
         primaryStage.show();
 
 
+        //gère l'affichage du profile
         routeBean.elevationProfile().addListener((p, prevS, newS) ->{
             if(newS != null){
                 menuItem.setDisable(false);
@@ -85,32 +100,16 @@ public final class JaVelo extends Application {
             }
         });
 
-        /*routeBean.highlightedPositionProperty().bind(Bindings.createIntegerBinding(() ->{
+        //gère l'affiche de la highlighted position (marche pas)
+        //TODO: résoudre l'erreur créé par ce bind: A bound value cannot be set
+        routeBean.highlightedPositionProperty().bind(Bindings.createIntegerBinding(() ->{
                 System.out.println(annotatedMapManager.mousePositionOnRouteProperty().get());
                 return annotatedMapManager.mousePositionOnRouteProperty().get() >= 0 ?
                         annotatedMapManager.mousePositionOnRouteProperty().get() :
                         elevationProfileManager.mousePositionOnProfileProperty().get();
 
-        }, annotatedMapManager.mousePositionOnRouteProperty(),elevationProfileManager.mousePositionOnProfileProperty()));*/
+        }, annotatedMapManager.mousePositionOnRouteProperty(),elevationProfileManager.mousePositionOnProfileProperty()));
 
-
-        /*routeBean.getRouteProperty().addListener( l ->{
-                menuItem.setVisible(routeBean.getRouteProperty().getValue() != null);
-                if(routeBean.getRouteProperty().get() != null){
-                    if(splitPane.getItems().size() < 2) {
-                        splitPane.getItems().add(elevationProfileManager.pane());
-                    }
-                    routeBean.highlightedPositionProperty().bind(Bindings.createIntegerBinding(() ->{
-                        return annotatedMapManager.mousePositionOnRouteProperty().get() >= 0 ?
-                                annotatedMapManager.mousePositionOnRouteProperty().get():
-                                elevationProfileManager.mousePositionOnProfileProperty().get();
-                    }, annotatedMapManager.mousePositionOnRouteProperty()));
-                }
-                else{
-                    splitPane.getItems().removeAll(splitPane.getItems());
-                    splitPane.getItems().add(annotatedMapManager.pane());
-                }
-        });*/
 
     }
 }

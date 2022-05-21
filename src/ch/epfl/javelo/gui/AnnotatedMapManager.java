@@ -69,14 +69,13 @@ public final class AnnotatedMapManager {
      * @return la position de la souris.
      */
     public ReadOnlyIntegerProperty mousePositionOnRouteProperty(){
-        IntegerProperty mousePositionOnRouteProperty = new SimpleIntegerProperty();
-        PointCh mousePosCh = mapViewParametersProperty.get().pointAt(mousePosition.getX(),mousePosition.getY()).toPointCh();
-        RoutePoint routePos = routeBean.getRouteProperty().get().pointClosestTo(mousePosCh);
-        if(mousePosCh.distanceTo(routePos.point()) <= MAXDISTANCEROUTE){
-            mousePositionOnRouteProperty.set((int) routePos.position());
-        }
-        else{
-            mousePositionOnRouteProperty.set(NAN);
+        IntegerProperty mousePositionOnRouteProperty = new SimpleIntegerProperty(NAN);
+        if(routeBean.getRouteProperty().get() != null) {
+            PointCh mousePosCh = mapViewParametersProperty.get().pointAt(mousePosition.getX(), mousePosition.getY()).toPointCh();
+            RoutePoint routePos = routeBean.getRouteProperty().get().pointClosestTo(mousePosCh);
+            if (mousePosCh.distanceTo(routePos.point()) <= MAXDISTANCEROUTE) {
+                mousePositionOnRouteProperty.set((int) routePos.position());
+            }
         }
         return mousePositionOnRouteProperty;
     }
