@@ -29,7 +29,7 @@ public final class ErrorManager {
         this.errorMessage = new Text();
         this.vBox = new VBox();
         vBox.getStyleClass().add("error.css");
-
+        vBox.setDisable(true);
         addAnimation();
 
     }

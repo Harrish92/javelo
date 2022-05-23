@@ -19,6 +19,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -52,10 +53,12 @@ public final class JaVelo extends Application {
         splitPane.setOrientation(Orientation.VERTICAL);
         splitPane.getItems().add(annotatedMapManager.pane());
         //splitPane.getItems().addAll(annotatedMapManager.pane(), errorManager.pane());
-        mainPane.setCenter(splitPane);
+        StackPane stackPane = new StackPane(splitPane, errorManager.pane());
+        mainPane.setCenter(stackPane);
 
         ElevationProfileManager elevationProfileManager = new ElevationProfileManager(
                 routeBean.elevationProfile(),routeBean.highlightedPositionProperty());
+        SplitPane.setResizableWithParent(elevationProfileManager.pane(), false);
 
 
         //barre de menu
