@@ -106,7 +106,7 @@ public final class JaVelo extends Application {
         //gère l'affiche de la highlighted position (marche pas)
         //TODO: résoudre l'erreur créé par ce bind: A bound value cannot be set
         routeBean.highlightedPositionProperty().bind(Bindings.createIntegerBinding(() ->{
-                System.out.println(annotatedMapManager.mousePositionOnRouteProperty().get());
+                //System.out.println(annotatedMapManager.mousePositionOnRouteProperty().get());
                 return annotatedMapManager.mousePositionOnRouteProperty().get() >= 0 ?
                         annotatedMapManager.mousePositionOnRouteProperty().get() :
                         elevationProfileManager.mousePositionOnProfileProperty().get();

@@ -171,7 +171,7 @@ public class RouteManager {
      * définit le centre du cercle
      */
     private void setCenterOfCircle(){
-        rb.setHighlightedPosition(HighlightedPos);
+        //rb.setHighlightedPosition(HighlightedPos);
         PointCh positionOfCircleInCh = rb.getRouteProperty().get().pointAt(rb.highlightedPosition());
         PointWebMercator pwm = PointWebMercator.ofPointCh(positionOfCircleInCh);
         circle.setCenterX(pwm.xAtZoomLevel(mapViewParametersProperty.get().zoomLevel()));
