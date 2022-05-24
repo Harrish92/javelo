@@ -45,6 +45,7 @@ public final class ElevationProfileManager {
     private final IntegerProperty mousePositionOnProfile;
     private final Line position;
     private final Group groupForTextInRectangle;
+    private final Text stats;
 
 
 
@@ -64,6 +65,7 @@ public final class ElevationProfileManager {
         rectangle = new SimpleObjectProperty<Rectangle2D>();
         position = new Line();
         groupForTextInRectangle = new Group();
+        stats = new Text();
         initLayout();
         pane.getChildren().add(groupForTextInRectangle);
         events();
@@ -76,7 +78,6 @@ public final class ElevationProfileManager {
         VBox profileData = new VBox();
         Path grid = new Path();
         Group label = new Group();
-        Text stats = new Text();
         stats.setFont(Font.font("Avenir", 10));
         stats.setText(getStats());
         borderPane.getStylesheets().add("elevation_profile.css");
@@ -98,6 +99,7 @@ public final class ElevationProfileManager {
             if(elevationProfileProperty.get() != null) {
                 initTransformation();
                 initGrid();
+                stats.setText(getStats());
             }
         }
         catch (NonInvertibleTransformException ex){
