@@ -3,6 +3,7 @@ package ch.epfl.javelo.gui;
 
 import ch.epfl.javelo.data.Graph;
 import ch.epfl.javelo.projection.PointCh;
+import ch.epfl.javelo.projection.PointWebMercator;
 import ch.epfl.javelo.routing.RoutePoint;
 import javafx.beans.property.*;
 import javafx.geometry.Point2D;
@@ -26,6 +27,7 @@ public final class AnnotatedMapManager {
     private final Pane pane;
     private final ObjectProperty<MapViewParameters> mapViewParametersProperty;
     private final RouteBean routeBean;
+    private final DoubleProperty mousePositionOnRouteProperty;
 
     public AnnotatedMapManager(Graph graph, TileManager tileManager,
                                RouteBean routeBean, Consumer<String> errorConsumer){
@@ -50,9 +52,13 @@ public final class AnnotatedMapManager {
         pane.getStylesheets().add("map.css");
 
         mousePosition = new Point2D(NAN,NAN);
-        baseMapManager.pane().setOnMouseMoved(e ->
-                mousePosition = new Point2D(e.getSceneX(),e.getSceneY()));
-        baseMapManager.pane().setOnMouseExited(e ->
+        mousePositionOnRouteProperty = new SimpleDoubleProperty(Double.NaN);
+        pane.setOnMouseMoved(e ->{
+                mousePosition = new Point2D(e.getX(),e.getY());
+                updateMousePositionOnRouteProperty();
+        });
+
+        pane.setOnMouseExited(e ->
                 mousePosition = new Point2D(NAN,NAN));
 
 
@@ -64,20 +70,31 @@ public final class AnnotatedMapManager {
      */
     public Pane pane(){return pane;}
 
+    private void updateMousePositionOnRouteProperty() {
+        if (routeBean.getRouteProperty().get() != null) {
+            double mX = mousePosition.getX();
+            double mY = mousePosition.getY();
+            PointCh mousePosCh = mapViewParametersProperty.get().pointAt(mX, mY).toPointCh();
+            RoutePoint routePos = routeBean.getRouteProperty().get().pointClosestTo(mousePosCh);
+            double rX = mapViewParametersProperty.get().viewX(PointWebMercator.ofPointCh(routePos.point()));
+            double rY = mapViewParametersProperty.get().viewY(PointWebMercator.ofPointCh(routePos.point()));
+            if (Math.hypot(rX - mX, rY - mY) <= MAXDISTANCEROUTE) {
+                mousePositionOnRouteProperty.set((int) routePos.position());
+            }
+            else {
+                mousePositionOnRouteProperty.set(Double.NaN);
+            }
+        }
+        else {
+            mousePositionOnRouteProperty.set(Double.NaN);
+        }
+    }
+
     /**
      * Retourne la position de la souris dans une propriété en lecture seule.
      * @return la position de la souris.
      */
-    public ReadOnlyIntegerProperty mousePositionOnRouteProperty(){
-        IntegerProperty mousePositionOnRouteProperty = new SimpleIntegerProperty(NAN);
-        if(routeBean.getRouteProperty().get() != null) {
-            PointCh mousePosCh = mapViewParametersProperty.get().pointAt(mousePosition.getX(), mousePosition.getY()).toPointCh();
-            RoutePoint routePos = routeBean.getRouteProperty().get().pointClosestTo(mousePosCh);
-            mapViewParametersProperty.get().zoomLevel();
-            if (mousePosCh.distanceTo(routePos.point()) <= MAXDISTANCEROUTE) {
-                mousePositionOnRouteProperty.set((int) routePos.position());
-            }
-        }
+    public ReadOnlyDoubleProperty mousePositionOnRouteProperty(){
         return mousePositionOnRouteProperty;
     }
 

@@ -120,7 +120,7 @@ public final class ElevationProfileManager {
         worldToScreen.addListener((p, oldS, newS) ->{
                 if(elevationProfileProperty.get() != null) initProfile();});
         pane.setOnMouseMoved(e -> {
-            if(rectangle.get().contains(e.getSceneX(), e.getSceneY())){
+            if(rectangle.get().contains(e.getX(), e.getY())){
                 mousePositionOnProfile.set((int) Math.round(screenToWorld.get().transform(e.getSceneX(),0).getX()));
             }
             else{

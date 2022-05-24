@@ -26,7 +26,6 @@ public class RouteManager {
     private final RouteBean rb;
     private final Polyline polyline;
     private final Circle circle;
-    private final double HighlightedPos;
 
 
     /**
@@ -37,7 +36,6 @@ public class RouteManager {
      * @param mapViewParametersProperty une propriété JavaFX contenant les paramètres de la carte affichée
      */
     public RouteManager(RouteBean rb, ObjectProperty<MapViewParameters> mapViewParametersProperty){
-        HighlightedPos = rb.highlightedPosition();
         this.rb = rb;
         this.mapViewParametersProperty = mapViewParametersProperty;
         this.pane = new Pane();
@@ -171,7 +169,6 @@ public class RouteManager {
      * définit le centre du cercle
      */
     private void setCenterOfCircle(){
-        //rb.setHighlightedPosition(HighlightedPos);
         PointCh positionOfCircleInCh = rb.getRouteProperty().get().pointAt(rb.highlightedPosition());
         PointWebMercator pwm = PointWebMercator.ofPointCh(positionOfCircleInCh);
         circle.setCenterX(pwm.xAtZoomLevel(mapViewParametersProperty.get().zoomLevel()));
