@@ -81,12 +81,9 @@ public final class AnnotatedMapManager {
             RoutePoint routePos = routeBean.getRouteProperty().get().pointClosestTo(mousePosCh);
             double rX = mapViewParametersProperty.get().viewX(PointWebMercator.ofPointCh(routePos.point()));
             double rY = mapViewParametersProperty.get().viewY(PointWebMercator.ofPointCh(routePos.point()));
-            if (Math.hypot(rX - mX, rY - mY) <= MAXDISTANCEROUTE) {
-                mousePositionOnRouteProperty.set((int) routePos.position());
-            }
-            else {
-                mousePositionOnRouteProperty.set(Double.NaN);
-            }
+            mousePositionOnRouteProperty.set(
+                    (Math.hypot(rX - mX, rY - mY) <= MAXDISTANCEROUTE) ? (int) routePos.position() : Double.NaN
+            );
         }
         else {
             mousePositionOnRouteProperty.set(Double.NaN);

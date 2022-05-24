@@ -18,6 +18,8 @@ import javafx.scene.transform.Affine;
 import javafx.scene.transform.NonInvertibleTransformException;
 import javafx.scene.transform.Transform;
 
+import java.util.Arrays;
+
 /**
  * Gère l'affichage et l'interaction avec le profil en long d'un itinéraire.
  *
@@ -132,7 +134,11 @@ public final class ElevationProfileManager {
         pane.setOnMouseExited(e -> mousePositionOnProfile.set(NAN));
 
         position.layoutXProperty().bind(Bindings.createDoubleBinding(() ->
-                worldToScreen.get().transform(highlightedPosition.get(),0).getX(), highlightedPosition, worldToScreen));
+                worldToScreen.get().transform(highlightedPosition.get(),0).getX(),
+                highlightedPosition,
+                worldToScreen
+        ));
+
         position.startYProperty().bind(Bindings.select(rectangle, "minY"));
         position.endYProperty().bind(Bindings.select(rectangle, "maxY"));
         position.visibleProperty().bind(highlightedPosition.greaterThanOrEqualTo(0));
@@ -175,26 +181,20 @@ public final class ElevationProfileManager {
      * Créé la grille du profil adaptée à la taille de la fenêtre.
      */
     private void initGrid(){
-        int xStepOnWorld = POS_STEPS[POS_STEPS.length-1];
-        int yStepOnWorld = ELE_STEPS[ELE_STEPS.length-1];
         groupForTextInRectangle.getChildren().removeAll(groupForTextInRectangle.getChildren());
         Path grid = (Path) pane.getChildren().get(0);
         grid.getElements().removeAll(grid.getElements());
         ElevationProfile ep = elevationProfileProperty.get();
 
-        for (int pos_step : POS_STEPS) {
-            if (worldToScreen.get().deltaTransform(pos_step, 0).getX() >= MIN_VERTICAL_DISTANCE){
-                xStepOnWorld = pos_step;
-                break;
-            }
-        }
+        int xStepOnWorld = Arrays.stream(POS_STEPS)
+                .filter(e -> (worldToScreen.get().deltaTransform(e, 0).getX() >= MIN_VERTICAL_DISTANCE))
+                .min()
+                .orElse(POS_STEPS[POS_STEPS.length-1]);
 
-        for(int ele_step : ELE_STEPS){
-            if (worldToScreen.get().deltaTransform(0, -ele_step).getY() >= MIN_HORIZONTAL_DISTANCE) {
-                yStepOnWorld = ele_step;
-                break;
-            }
-        }
+        int yStepOnWorld = Arrays.stream(ELE_STEPS)
+                .filter(e->(worldToScreen.get().deltaTransform(0, -e).getY() >= MIN_HORIZONTAL_DISTANCE))
+                .min()
+                .orElse(ELE_STEPS[ELE_STEPS.length-1]);
 
         int xStepOnScreen = (int) worldToScreen.get().deltaTransform(xStepOnWorld, 0).getX();
         int yStepOnScreen = (int) worldToScreen.get().deltaTransform(0, yStepOnWorld).getY();
@@ -202,19 +202,6 @@ public final class ElevationProfileManager {
         double firstElevationOnTheGrid = (ep.minElevation() % yStepOnWorld == 0)
                 ? ep.minElevation() : ep.minElevation() + yStepOnWorld - (ep.minElevation() % yStepOnWorld);
         int firstHorizontalLine = (int) worldToScreen.get().transform(0, firstElevationOnTheGrid).getY();
-
-
-        MoveTo moveTo = new MoveTo();
-        LineTo lineTo = new LineTo();
-        moveTo.setX(rectangle.get().getMinX());
-        moveTo.setY(firstHorizontalLine);
-        grid.getElements().add(moveTo);
-        lineTo.setX(rectangle.get().getMaxX());
-        lineTo.setY(firstHorizontalLine);
-        grid.getElements().add(lineTo);
-
-
-
 
 
         int textValueForElevation = (int) firstElevationOnTheGrid;
@@ -230,8 +217,10 @@ public final class ElevationProfileManager {
             textForElevation.setLayoutY(y);
             groupForTextInRectangle.getChildren().add(textForElevation);
 
-            moveTo = new MoveTo();
-            lineTo = new LineTo();
+
+            MoveTo moveTo = new MoveTo();
+            LineTo lineTo = new LineTo();
+
             moveTo.setX(rectangle.get().getMinX());
             moveTo.setY(y);
             grid.getElements().add(moveTo);
@@ -254,8 +243,8 @@ public final class ElevationProfileManager {
             textForPosition.setLayoutX(x - textForPosition.prefWidth(0) / 2);
             textForPosition.setLayoutY(rectangle.get().getMaxY());
 
-            moveTo = new MoveTo();
-            lineTo = new LineTo();
+            MoveTo moveTo = new MoveTo();
+            LineTo lineTo = new LineTo();
             moveTo.setX(x);
             moveTo.setY(rectangle.get().getMinY());
             grid.getElements().add(moveTo);
