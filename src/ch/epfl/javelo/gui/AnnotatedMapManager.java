@@ -70,6 +70,9 @@ public final class AnnotatedMapManager {
      */
     public Pane pane(){return pane;}
 
+    /**
+     * Rafraichit la position de la souris.
+     */
     private void updateMousePositionOnRouteProperty() {
         if (routeBean.getRouteProperty().get() != null) {
             double mX = mousePosition.getX();
