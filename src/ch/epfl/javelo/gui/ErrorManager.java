@@ -28,9 +28,10 @@ public final class ErrorManager {
     public ErrorManager(){
         this.errorMessage = new Text();
         this.vBox = new VBox();
-        vBox.getStyleClass().add("error.css");
-        vBox.setDisable(true);
+        vBox.getStylesheets().add("error.css");
+        vBox.setMouseTransparent(true);
         addAnimation();
+
 
     }
 
@@ -65,6 +66,7 @@ public final class ErrorManager {
         sequentialTransition.stop();
         errorMessage.setText(message);
         vBox.getChildren().add(errorMessage);
+
 
         java.awt.Toolkit.getDefaultToolkit().beep();
         sequentialTransition.play();
