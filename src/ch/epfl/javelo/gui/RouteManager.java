@@ -67,7 +67,9 @@ public class RouteManager {
         rb.getRouteProperty().addListener((p, oldS, newS) -> {
             drawRouteAndCircle();
         });
-
+        rb.highlightedPositionProperty().addListener((p, oldS, newS) -> {
+            drawRouteAndCircle();
+        });
 
         circle.setOnMouseClicked(e->{
             addWaypointInTheWhiteCircle(e.getX(), e.getY());
