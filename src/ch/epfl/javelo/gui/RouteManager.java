@@ -11,6 +11,7 @@ import javafx.scene.shape.Polyline;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 
 /**
@@ -23,7 +24,7 @@ import java.util.List;
 public class RouteManager {
     private final Pane pane;
     private final ObjectProperty<MapViewParameters> mapViewParametersProperty;
-    private final RouteBean rb;
+    private final RouteBean routeBean;
     private final Polyline polyline;
     private final Circle circle;
 
@@ -32,11 +33,11 @@ public class RouteManager {
      *constructeur construit une polyligne qui représente une route et
      *un cercle qui permet l'ajout de points de passage intermédiaires
      *
-     * @param rb un bean JavaFX regroupant les propriétés
+     * @param routeBean un bean JavaFX regroupant les propriétés
      * @param mapViewParametersProperty une propriété JavaFX contenant les paramètres de la carte affichée
      */
-    public RouteManager(RouteBean rb, ObjectProperty<MapViewParameters> mapViewParametersProperty){
-        this.rb = rb;
+    public RouteManager(RouteBean routeBean, ObjectProperty<MapViewParameters> mapViewParametersProperty){
+        this.routeBean = routeBean;
         this.mapViewParametersProperty = mapViewParametersProperty;
         this.pane = new Pane();
         this.circle = new Circle(5);
@@ -50,7 +51,7 @@ public class RouteManager {
 
         pane.setPickOnBounds(false);
 
-        if(rb.getRouteProperty() != null)
+        if(routeBean.getRouteProperty() != null)
             drawRouteAndCircle();
 
 
@@ -64,12 +65,12 @@ public class RouteManager {
         });
 
 
-        rb.getRouteProperty().addListener((p, oldS, newS) -> {
+        routeBean.getRouteProperty().addListener((p, oldS, newS) -> {
             if (newS != null){
                 drawRouteAndCircle();
             }
         });
-        rb.highlightedPositionProperty().addListener((p, oldS, newS) -> {
+        routeBean.highlightedPositionProperty().addListener((p, oldS, newS) -> {
             if(Double.isNaN(newS.doubleValue())){
                 circle.setVisible(false);
             }
@@ -96,7 +97,7 @@ public class RouteManager {
      * @param y coordonnée y de la souris
      */
     private void addWaypointInTheWhiteCircle(double x, double y) {
-        if(rb.getRouteProperty().getValue() == null)
+        if(routeBean.getRouteProperty().getValue() == null)
             return;
         Point2D p2d = new Point2D(x, y).add(mapViewParametersProperty.get().topLeft());
         Point2D p2dLocalToParent = circle.localToParent(p2d);
@@ -104,10 +105,10 @@ public class RouteManager {
                 p2dLocalToParent.getX(), p2dLocalToParent.getY()) ;
 
         Waypoint wp = new Waypoint(pwm.toPointCh(),
-                rb.getRouteProperty().get().nodeClosestTo(rb.highlightedPosition()));
+                routeBean.getRouteProperty().get().nodeClosestTo(routeBean.highlightedPosition()));
 
-        int index = rb.indexOfNonEmptySegmentAt(rb.highlightedPosition()) + 1;
-        rb.setPoint(index, wp);
+        int index = routeBean.indexOfNonEmptySegmentAt(routeBean.highlightedPosition()) + 1;
+        routeBean.setPoint(index, wp);
 
 
 
@@ -118,7 +119,7 @@ public class RouteManager {
      * la route s'adapte au glissement de la carte
      */
     private void RouteAndCircleAdaptToSliding() {
-        if(rb.getRouteProperty().getValue() == null)
+        if(routeBean.getRouteProperty().getValue() == null)
             return;
         setLayoutOfPolyline();
 
@@ -130,7 +131,7 @@ public class RouteManager {
      * dessin de la route et du cercle sur la carte
      */
     private void drawRouteAndCircle(){
-        if(rb.getRouteProperty().getValue() == null){
+        if(routeBean.getRouteProperty().getValue() == null){
             setVisibility(false);
             return;
         }
@@ -138,24 +139,24 @@ public class RouteManager {
 
         List<Double> doubleArrayList = new ArrayList<>();
 
-        if(rb.getRouteProperty().get().points() != null) {
-            for (PointCh r : rb.getRouteProperty().get().points()) {
+        routeBean.getRouteProperty().get().points()
+                .stream()
+                .filter(Objects::nonNull)
+                .map(PointWebMercator::ofPointCh)
+                .forEachOrdered(e->{
+                    doubleArrayList.add(e.xAtZoomLevel(mapViewParametersProperty.get().zoomLevel()));
+                    doubleArrayList.add(e.yAtZoomLevel(mapViewParametersProperty.get().zoomLevel()));
 
-                PointWebMercator pwm = PointWebMercator.ofPointCh(r);
-                doubleArrayList.add(pwm.xAtZoomLevel(mapViewParametersProperty.get().zoomLevel()));
-                doubleArrayList.add(pwm.yAtZoomLevel(mapViewParametersProperty.get().zoomLevel()));
-
-            }
-        }
+                });
 
         polyline.getPoints().setAll(doubleArrayList);
 
         setLayoutOfPolyline();
 
-        setCenterOfCircle();
-
-        setLayoutOfCircle();
-
+        if(!Double.isNaN(routeBean.highlightedPosition())){
+            setCenterOfCircle();
+            setLayoutOfCircle();
+        }
 
     }
 
@@ -179,7 +180,7 @@ public class RouteManager {
      * définit le centre du cercle
      */
     private void setCenterOfCircle(){
-        PointCh positionOfCircleInCh = rb.getRouteProperty().get().pointAt(rb.highlightedPosition());
+        PointCh positionOfCircleInCh = routeBean.getRouteProperty().get().pointAt(routeBean.highlightedPosition());
         PointWebMercator pwm = PointWebMercator.ofPointCh(positionOfCircleInCh);
         circle.setCenterX(pwm.xAtZoomLevel(mapViewParametersProperty.get().zoomLevel()));
         circle.setCenterY(pwm.yAtZoomLevel(mapViewParametersProperty.get().zoomLevel()));
