@@ -42,7 +42,7 @@ public final class ElevationProfileManager {
     private final ObjectProperty<Rectangle2D> rectangle;
     private final ObjectProperty<Transform> screenToWorld;
     private final ObjectProperty<Transform> worldToScreen;
-    private final IntegerProperty mousePositionOnProfile;
+    private final DoubleProperty mousePositionOnProfile;
     private final Line position;
     private final Group groupForTextInRectangle;
     private final Text stats;
@@ -58,7 +58,7 @@ public final class ElevationProfileManager {
         borderPane = new BorderPane();
         pane = new Pane();
         profile = new Polygon();
-        mousePositionOnProfile = new SimpleIntegerProperty();
+        mousePositionOnProfile = new SimpleDoubleProperty(Double.NaN);
         insets = new Insets(10, 10, 20, 40);
         screenToWorld = new SimpleObjectProperty<>(new Affine());
         worldToScreen = new SimpleObjectProperty<>(new Affine());
@@ -123,13 +123,13 @@ public final class ElevationProfileManager {
                 if(elevationProfileProperty.get() != null) initProfile();});
         pane.setOnMouseMoved(e -> {
             if(rectangle.get().contains(e.getX(), e.getY())){
-                mousePositionOnProfile.set((int) Math.round(screenToWorld.get().transform(e.getSceneX(),0).getX()));
+                mousePositionOnProfile.set(Math.round(screenToWorld.get().transform(e.getSceneX(),0).getX()));
             }
             else{
-                mousePositionOnProfile.set(NAN);
+                mousePositionOnProfile.set(Double.NaN);
             }
         });
-        pane.setOnMouseExited(e -> mousePositionOnProfile.set(NAN));
+        pane.setOnMouseExited(e -> mousePositionOnProfile.set(Double.NaN));
 
         position.layoutXProperty().bind(Bindings.createDoubleBinding(() ->
                 worldToScreen.get().transform(highlightedPosition.get(),0).getX(), highlightedPosition, worldToScreen));
@@ -308,7 +308,7 @@ public final class ElevationProfileManager {
      * se trouve pas au-dessus du profil.
      * @return  une propriété contenant un entier en lecture seule.
      */
-    public ReadOnlyIntegerProperty mousePositionOnProfileProperty(){
+    public ReadOnlyDoubleProperty mousePositionOnProfileProperty(){
         return mousePositionOnProfile;
     }
 }

@@ -100,8 +100,9 @@ public final class JaVelo extends Application {
             }
         });
 
-        //gère l'affiche de la highlighted position
+        //gère l'affiche de la highlighted position TODO: il faut faire disparaitre le point ?!
         routeBean.highlightedPositionProperty().bind(Bindings.createDoubleBinding(() ->{
+                    System.out.println(elevationProfileManager.mousePositionOnProfileProperty().get());
                 return annotatedMapManager.mousePositionOnRouteProperty().get() >= 0 ?
                         annotatedMapManager.mousePositionOnRouteProperty().get() :
                         elevationProfileManager.mousePositionOnProfileProperty().get();

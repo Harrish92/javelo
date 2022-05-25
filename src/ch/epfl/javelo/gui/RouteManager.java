@@ -65,10 +65,18 @@ public class RouteManager {
 
 
         rb.getRouteProperty().addListener((p, oldS, newS) -> {
-            drawRouteAndCircle();
+            if (newS != null){
+                drawRouteAndCircle();
+            }
         });
         rb.highlightedPositionProperty().addListener((p, oldS, newS) -> {
-            drawRouteAndCircle();
+            if(Double.isNaN(newS.doubleValue())){
+                circle.setVisible(false);
+            }
+            else{
+                drawRouteAndCircle();
+            }
+
         });
 
         circle.setOnMouseClicked(e->{
