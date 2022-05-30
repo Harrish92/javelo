@@ -79,7 +79,6 @@ public final class RouteBean {
 
         routeProperty.set((pointsList.size() >= 2 && isRouteValid) ? new MultiRoute(routesList) : null);
         if (routeProperty.get() == null) {
-            //highlightedPosition.set(Double.NaN);
             elevationProfile.set(null);
         } else {
         elevationProfile.set(ElevationProfileComputer.elevationProfile(
@@ -91,7 +90,6 @@ public final class RouteBean {
 
 
 
-    //TODO: ajouter des getters setters si besoin
     /**
      * @return la propriété elevationProfile sous la forme
      * d'une ReadOnlyObjectProperty.
@@ -100,9 +98,9 @@ public final class RouteBean {
         return elevationProfile;
     }
 
-    public void setRouteProperty(ObjectProperty<Route> routeP){
+    /*public void setRouteProperty(ObjectProperty<Route> routeP){
         routeProperty.set(routeP.get());
-    }
+    }*/ //probablement inutile
 
 
     /**

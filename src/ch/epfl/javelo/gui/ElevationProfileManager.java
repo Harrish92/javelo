@@ -34,7 +34,6 @@ public final class ElevationProfileManager {
     private final int MIN_HORIZONTAL_DISTANCE = 25;
     private final int MIN_VERTICAL_DISTANCE = 50;
     private final double KILOMETER = 1000;
-    private final int NAN = (int) Double.NaN;
     private final ReadOnlyObjectProperty<ElevationProfile> elevationProfileProperty;
     private final ReadOnlyDoubleProperty highlightedPosition;
     private final BorderPane borderPane;
@@ -110,7 +109,7 @@ public final class ElevationProfileManager {
     }
 
     /**
-     * Gère les évènements //TODO:améliorer commentaire
+     * Gère les évènements liés au profil : redimension et déplacement de la souris
      */
     private void events(){
         rectangle.bind(Bindings.createObjectBinding(() ->
@@ -283,7 +282,7 @@ public final class ElevationProfileManager {
 
 
 
-    /**
+    /** Retourne le panneau contenant le dessin du profil.
      * @return le panneau contenant le dessin du profil.
      */
     public Pane pane(){return borderPane;}

@@ -21,7 +21,6 @@ public final class AnnotatedMapManager {
     private final int ZOOMLEVEL = 12;
     private final double STARTX = 543200;
     private final double STARTY = 370650;
-    private final int NAN = (int) Double.NaN;
     private final int MAXDISTANCEROUTE = 15;
     private Point2D mousePosition;
     private final Pane pane;
@@ -51,7 +50,7 @@ public final class AnnotatedMapManager {
                 waypointsManager.pane());
         pane.getStylesheets().add("map.css");
 
-        mousePosition = new Point2D(NAN,NAN);
+        mousePosition = new Point2D(Double.NaN,Double.NaN);
         mousePositionOnRouteProperty = new SimpleDoubleProperty(Double.NaN);
         pane.setOnMouseMoved(e ->{
                 mousePosition = new Point2D(e.getX(),e.getY());
@@ -59,7 +58,7 @@ public final class AnnotatedMapManager {
         });
 
         pane.setOnMouseExited(e ->
-                mousePosition = new Point2D(NAN,NAN));
+                mousePosition = new Point2D(Double.NaN,Double.NaN));
 
 
     }

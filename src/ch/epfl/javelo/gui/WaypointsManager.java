@@ -135,7 +135,7 @@ public final class WaypointsManager {
     }
 
     /**
-     * Positionne tout les points sur la carte
+     * Positionne tous les points sur la carte
      */
     private void positionAllPoint(){
         for (int k = 0; k < pointsList.size(); k++) {
