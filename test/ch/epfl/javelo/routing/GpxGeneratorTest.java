@@ -51,8 +51,11 @@ public class GpxGeneratorTest {
 
     private static List<Edge> createEpflSauvabelin(){
         var edges = new ArrayList<Edge>();
-        var p1 = new PointCh( Ch1903.e(46.5190582, 6.5615820), Ch1903.n(6.5615820, 46.5190582)); // EPFL
-        var p2 = new PointCh( Ch1903.e( 7.0168378, 47.4925267), Ch1903.n(7.0168378, 47.4925267)); // Sauvabelin
+
+        var p1 = new PointCh( Ch1903.e(Math.toRadians(6.5615820), Math.toRadians(46.5190582)),
+                Ch1903.n(Math.toRadians(6.5615820), Math.toRadians(46.5190582))); // EPFL
+        var p2 = new PointCh( Ch1903.e(Math.toRadians(7.0168378), Math.toRadians(47.4925267)),
+                Ch1903.n(Math.toRadians(7.0168378), Math.toRadians(47.4925267))); // Sauvabelin
         edges.add(new Edge(159049, 117669, p1, p2, p1.distanceTo(p2), x -> Double.NaN));
         return Collections.unmodifiableList(edges);
 
