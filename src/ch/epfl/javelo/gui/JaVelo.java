@@ -1,6 +1,7 @@
 package ch.epfl.javelo.gui;
 
 
+import ch.epfl.javelo.Functions;
 import ch.epfl.javelo.data.Graph;
 import ch.epfl.javelo.routing.CityBikeCF;
 import ch.epfl.javelo.routing.GpxGenerator;
@@ -22,6 +23,7 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
+import java.util.function.BiFunction;
 
 /**
  * Programme principale de l'application javelo.
@@ -76,13 +78,11 @@ public final class JaVelo extends Application {
             }
         });
 
-
         primaryStage.setMinWidth(MIN_WIDTH);
         primaryStage.setMinHeight(MIN_HEIGHT);
         primaryStage.setScene(new Scene(mainPane));
         primaryStage.setTitle("JaVelo");
         primaryStage.show();
-
 
         //gère l'affichage du profile
         routeBean.elevationProfile().addListener((p, prevS, newS) ->{
@@ -101,13 +101,12 @@ public final class JaVelo extends Application {
         });
 
         //gère l'affiche de la highlighted position
-        routeBean.highlightedPositionProperty().bind(Bindings.createDoubleBinding(() ->{
-                return annotatedMapManager.mousePositionOnRouteProperty().get() >= 0 ?
-                        annotatedMapManager.mousePositionOnRouteProperty().get() :
-                        elevationProfileManager.mousePositionOnProfileProperty().get();
 
-        }, annotatedMapManager.mousePositionOnRouteProperty(),
-                elevationProfileManager.mousePositionOnProfileProperty()));
+        routeBean.highlightedPositionProperty().bind(
+                Bindings.when(annotatedMapManager.mousePositionOnRouteProperty().greaterThanOrEqualTo(0))
+                        .then(annotatedMapManager.mousePositionOnRouteProperty())
+                        .otherwise(elevationProfileManager.mousePositionOnProfileProperty())
+        );
 
 
     }

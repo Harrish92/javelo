@@ -53,8 +53,8 @@ public final class AnnotatedMapManager {
         mousePosition = new Point2D(Double.NaN,Double.NaN);
         mousePositionOnRouteProperty = new SimpleDoubleProperty(Double.NaN);
         pane.setOnMouseMoved(e ->{
-                mousePosition = new Point2D(e.getX(),e.getY());
-                updateMousePositionOnRouteProperty();
+            mousePosition = new Point2D(e.getX(),e.getY());
+            updateMousePositionOnRouteProperty();
         });
 
         pane.setOnMouseExited(e ->
@@ -73,10 +73,10 @@ public final class AnnotatedMapManager {
      * Rafraichit la position de la souris.
      */
     private void updateMousePositionOnRouteProperty() {
-        if (routeBean.getRouteProperty().get() != null) {
-            double mX = mousePosition.getX();
-            double mY = mousePosition.getY();
-            PointCh mousePosCh = mapViewParametersProperty.get().pointAt(mX, mY).toPointCh();
+        double mX = mousePosition.getX();
+        double mY = mousePosition.getY();
+        PointCh mousePosCh = mapViewParametersProperty.get().pointAt(mX, mY).toPointCh();
+        if (routeBean.getRouteProperty().get() != null && mousePosCh != null) {
             RoutePoint routePos = routeBean.getRouteProperty().get().pointClosestTo(mousePosCh);
             double rX = mapViewParametersProperty.get().viewX(PointWebMercator.ofPointCh(routePos.point()));
             double rY = mapViewParametersProperty.get().viewY(PointWebMercator.ofPointCh(routePos.point()));

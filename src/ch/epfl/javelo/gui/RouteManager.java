@@ -3,6 +3,7 @@ package ch.epfl.javelo.gui;
 
 import ch.epfl.javelo.projection.PointCh;
 import ch.epfl.javelo.projection.PointWebMercator;
+import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
 import javafx.geometry.Point2D;
 import javafx.scene.layout.Pane;
@@ -51,42 +52,27 @@ public class RouteManager {
 
         pane.setPickOnBounds(false);
 
-        if(routeBean.getRouteProperty() != null)
-            drawRouteAndCircle();
-
 
         mapViewParametersProperty.addListener((p, oldS, newS) -> {
             if (oldS.zoomLevel() != newS.zoomLevel()){
-                drawRouteAndCircle();
+                drawRoute();
+                drawCircle();
             }else{
                 RouteAndCircleAdaptToSliding();
             }
 
         });
 
-
         routeBean.getRouteProperty().addListener((p, oldS, newS) -> {
-            if (newS != null){
-                drawRouteAndCircle();
-            }
-        });
-        routeBean.highlightedPositionProperty().addListener((p, oldS, newS) -> {
-            if(Double.isNaN(newS.doubleValue())){
-                circle.setVisible(false);
-            }
-            else{
-                drawRouteAndCircle();
-            }
-
-        });
-
-        circle.setOnMouseClicked(e->{
-            addWaypointInTheWhiteCircle(e.getX(), e.getY());
+            drawRoute();
+            drawCircle();
         });
 
 
+        routeBean.highlightedPositionProperty().addListener((p, oldS, newS) -> drawCircle());
 
 
+        circle.setOnMouseClicked(e-> addWaypointInTheWhiteCircle(e.getX(), e.getY()));
 
     }
 
@@ -99,6 +85,7 @@ public class RouteManager {
     private void addWaypointInTheWhiteCircle(double x, double y) {
         if(routeBean.getRouteProperty().getValue() == null)
             return;
+
         Point2D p2d = new Point2D(x, y).add(mapViewParametersProperty.get().topLeft());
         Point2D p2dLocalToParent = circle.localToParent(p2d);
         PointWebMercator pwm = PointWebMercator.of(mapViewParametersProperty.get().zoomLevel(),
@@ -121,8 +108,8 @@ public class RouteManager {
     private void RouteAndCircleAdaptToSliding() {
         if(routeBean.getRouteProperty().getValue() == null)
             return;
-        setLayoutOfPolyline();
 
+        setLayoutOfPolyline();
         setLayoutOfCircle();
 
     }
@@ -130,12 +117,12 @@ public class RouteManager {
     /**
      * dessin de la route et du cercle sur la carte
      */
-    private void drawRouteAndCircle(){
+    private void drawRoute(){
         if(routeBean.getRouteProperty().getValue() == null){
-            setVisibility(false);
+            polyline.setVisible(false);
             return;
         }
-        setVisibility(true);
+        polyline.setVisible(true);
 
         List<Double> doubleArrayList = new ArrayList<>();
 
@@ -153,10 +140,17 @@ public class RouteManager {
 
         setLayoutOfPolyline();
 
-        if(!Double.isNaN(routeBean.highlightedPosition())){
-            setCenterOfCircle();
-            setLayoutOfCircle();
+    }
+
+    private void drawCircle(){
+        if(Double.isNaN(routeBean.highlightedPosition()) || routeBean.getRouteProperty().getValue() == null){
+            circle.setVisible(false);
+            return;
         }
+        circle.setVisible(true);
+
+        setCenterOfCircle();
+        setLayoutOfCircle();
 
     }
 
@@ -184,16 +178,6 @@ public class RouteManager {
         PointWebMercator pwm = PointWebMercator.ofPointCh(positionOfCircleInCh);
         circle.setCenterX(pwm.xAtZoomLevel(mapViewParametersProperty.get().zoomLevel()));
         circle.setCenterY(pwm.yAtZoomLevel(mapViewParametersProperty.get().zoomLevel()));
-    }
-
-    /**
-     * définit la visibilité du cercle et de la polyligne sur la carte
-     *
-     * @param bool valeur booléenne
-     */
-    private void setVisibility(boolean bool){
-        polyline.setVisible(bool);
-        circle.setVisible(bool);
     }
 
 

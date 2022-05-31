@@ -102,7 +102,7 @@ public final class WaypointsManager {
                 double x = property.get().viewX(initPoint) - mouse_difference.get().getX();
                 double y = property.get().viewY(initPoint) - mouse_difference.get().getY();
                 PointCh point = property.get().pointAt(x,y).toPointCh();
-                int nodeId = graph.nodeClosestTo(point, SEARCHDISTANCE);
+                int nodeId = (point == null) ? -1 : graph.nodeClosestTo(point, SEARCHDISTANCE);
                 if(nodeId == -1){
                     errors.accept("Aucune route à proximité !");
                     group.setLayoutX(property.get().viewX(initPoint));
@@ -163,7 +163,8 @@ public final class WaypointsManager {
      */
     public void addWaypoint(double x, double y){
         PointCh point = property.get().pointAt(x,y).toPointCh();
-        int nodeId = graph.nodeClosestTo(point, SEARCHDISTANCE);
+
+        int nodeId = (point == null) ? -1 : graph.nodeClosestTo(point, SEARCHDISTANCE);
         if(nodeId == -1){
             errors.accept("Aucune route à proximité !");
         }
@@ -171,5 +172,8 @@ public final class WaypointsManager {
             Waypoint waypoint = new Waypoint(graph.nodePoint(nodeId), nodeId);
             pointsList.add(waypoint);
         }
+
+
+
     }
 }

@@ -140,12 +140,16 @@ public final class BaseMapManager {
         pane.setOnMouseDragged(e ->{
             ObjectProperty<Point2D> mouse_difference = new SimpleObjectProperty<>
                     (mousePoint.get().subtract(e.getX(), e.getY()));
+
             Point2D topLeft = mouse_difference
                     .get()
-                    .add(mapViewParametersProperty.get().topLeft().getX(), mapViewParametersProperty.get().topLeft().getY());
+                    .add(mapViewParametersProperty.get().topLeft().getX(),
+                            mapViewParametersProperty.get().topLeft().getY());
 
+            mapViewParametersProperty.set(new MapViewParameters(mapViewParametersProperty.get().zoomLevel(),
+                    topLeft.getX(),
+                    topLeft.getY()));
 
-            mapViewParametersProperty.set(new MapViewParameters(mapViewParametersProperty.get().zoomLevel(), topLeft.getX(), topLeft.getY()));
             redrawOnNextPulse();
 
             mousePoint.set(new Point2D(e.getX(), e.getY()));
@@ -154,15 +158,14 @@ public final class BaseMapManager {
         pane.setOnMouseReleased(e-> mousePoint = null);
 
         pane.setOnMouseClicked(e->{
-            if(e.isStillSincePress()) {
+            if(e.isStillSincePress())
                 wpm.addWaypoint(e.getX(), e.getY());
-            }
+
             redrawOnNextPulse();
         });
 
         SimpleLongProperty minScrollTime = new SimpleLongProperty();
         pane.setOnScroll(e ->{
-
 
             if (e.getDeltaY() == 0d) return;
             long currentTime = System.currentTimeMillis();
@@ -175,11 +178,16 @@ public final class BaseMapManager {
 
             ObjectProperty<Point2D> mouseOnScrollCoord = new SimpleObjectProperty<>(new Point2D(e.getX(), e.getY()));
 
-            mouseOnScrollCoord.set(mouseOnScrollCoord.get().add(mapViewParametersProperty.get().coordX(), mapViewParametersProperty.get().coordY()));
+            mouseOnScrollCoord.set(mouseOnScrollCoord.get().add(mapViewParametersProperty.get().coordX(),
+                    mapViewParametersProperty.get().coordY()));
+
             double scale = Math.scalb(1, zoomLevel - mapViewParametersProperty.get().zoomLevel());
+
             mouseOnScrollCoord.set(mouseOnScrollCoord.get().multiply(scale).subtract(e.getX(), e.getY()));
+
             mapViewParametersProperty.set(new MapViewParameters(zoomLevel, mouseOnScrollCoord.get().getX(),
                     mouseOnScrollCoord.get().getY()));
+
             redrawOnNextPulse();
         });
     }

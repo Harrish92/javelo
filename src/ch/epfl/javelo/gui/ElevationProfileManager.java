@@ -112,11 +112,14 @@ public final class ElevationProfileManager {
      * Gère les évènements liés au profil : redimension et déplacement de la souris
      */
     private void events(){
+
         rectangle.bind(Bindings.createObjectBinding(() ->
             new Rectangle2D(insets.getLeft(), insets.getBottom(),
                     Math.max(pane.getWidth() - insets.getLeft() -insets.getRight(), 0),
                     Math.max(pane.getHeight() - insets.getBottom() - insets.getTop(), 0))
         , pane.widthProperty(), pane.heightProperty()));
+
+
 
         rectangle.addListener((p, oldS, newS) -> draw());
         elevationProfileProperty.addListener((p, oldS, newS) -> draw());
@@ -137,6 +140,7 @@ public final class ElevationProfileManager {
                 highlightedPosition,
                 worldToScreen
         ));
+
 
         position.startYProperty().bind(Bindings.select(rectangle, "minY"));
         position.endYProperty().bind(Bindings.select(rectangle, "maxY"));
@@ -177,7 +181,7 @@ public final class ElevationProfileManager {
     }
 
     /**
-     * Créé la grille du profil adaptée à la taille de la fenêtre.
+     * Créé la grille du profil adaptée à la taille de la fenêtre, ainsi que les étiquettes.
      */
     private void initGrid(){
         groupForTextInRectangle.getChildren().removeAll(groupForTextInRectangle.getChildren());
@@ -198,21 +202,22 @@ public final class ElevationProfileManager {
         int xStepOnScreen = (int) worldToScreen.get().deltaTransform(xStepOnWorld, 0).getX();
         int yStepOnScreen = (int) worldToScreen.get().deltaTransform(0, yStepOnWorld).getY();
 
-        double firstElevationOnTheGrid = (ep.minElevation() % yStepOnWorld == 0)
-                ? ep.minElevation() : ep.minElevation() + yStepOnWorld - (ep.minElevation() % yStepOnWorld);
+        double firstElevationOnTheGrid = ep.minElevation() + yStepOnWorld - (ep.minElevation() % yStepOnWorld);
         int firstHorizontalLine = (int) worldToScreen.get().transform(0, firstElevationOnTheGrid).getY();
 
 
         int textValueForElevation = (int) firstElevationOnTheGrid;
+
+
         for(int y = firstHorizontalLine; y > rectangle.get().getMinY(); y += yStepOnScreen){
+
 
             Text textForElevation = new Text();
             textForElevation.setFont(Font.font("Avenir", 10));
             textForElevation.getStyleClass().addAll("grid_label", "vertical");
-            textForElevation.setText(String.format("%d", textValueForElevation));
             textForElevation.textOriginProperty().set(VPos.CENTER);
+            textForElevation.setText(String.format("%d", textValueForElevation));
             textForElevation.setLayoutX(rectangle.get().getMinX() - textForElevation.prefWidth(0) - 2);
-
             textForElevation.setLayoutY(y);
             groupForTextInRectangle.getChildren().add(textForElevation);
 
