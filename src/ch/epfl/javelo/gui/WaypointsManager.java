@@ -110,7 +110,8 @@ public final class WaypointsManager {
                 }
 
                 else{
-                    Waypoint waypoint = new Waypoint(graph.nodePoint(nodeId), nodeId);
+                    //Waypoint waypoint = new Waypoint(graph.nodePoint(nodeId), nodeId);
+                    Waypoint waypoint = new Waypoint(point, nodeId);
                     pointsList.remove(pointIndex);
                     pointsList.add(pointIndex,waypoint);
                 }
