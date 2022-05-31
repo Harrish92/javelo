@@ -172,6 +172,7 @@ public final class SingleRoute implements Route {
         double dtf_min = Double.POSITIVE_INFINITY;
 
         for (int i = 0; i < edges.size(); ++i) {
+            if(edges.get(i).length() == 0) continue;
             double dtf_max = point.distanceTo(edges.get(i).pointAt
                     (Math2.clamp(0, edges.get(i).positionClosestTo(point), edges.get(i).length())));
 
