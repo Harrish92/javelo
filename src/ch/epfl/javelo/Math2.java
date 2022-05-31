@@ -52,7 +52,7 @@ public final class Math2 {
      * méthode similaire à celui au-dessus, mais les paramètres et le type de retour sont des nombre à virgule.
      */
     public static double clamp(double min, double v, double max) {
-        Preconditions.checkArgument(max > min);
+        Preconditions.checkArgument(max >= min);
         return (v < min) ? min : Math.min(v, max);
 
     }
