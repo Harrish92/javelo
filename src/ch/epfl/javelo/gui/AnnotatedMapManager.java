@@ -57,8 +57,11 @@ public final class AnnotatedMapManager {
             updateMousePositionOnRouteProperty();
         });
 
-        pane.setOnMouseExited(e ->
-                mousePosition = new Point2D(Double.NaN,Double.NaN));
+        pane.setOnMouseExited(e ->{
+                mousePosition = new Point2D(Double.NaN,Double.NaN);
+                mousePositionOnRouteProperty.set(Double.NaN);
+        });
+
 
 
     }
