@@ -169,7 +169,8 @@ public final class WaypointsManager {
             errors.accept("Aucune route à proximité !");
         }
         else{
-            Waypoint waypoint = new Waypoint(graph.nodePoint(nodeId), nodeId);
+            //Waypoint waypoint = new Waypoint(graph.nodePoint(nodeId), nodeId);
+            Waypoint waypoint = new Waypoint(point, nodeId);
             pointsList.add(waypoint);
         }
 
